@@ -4,9 +4,14 @@ import argparse
 from datetime import datetime, timezone
 import hashlib
 from html.parser import HTMLParser
+from io import BytesIO
 import json
 from pathlib import Path
+from pathlib import PurePosixPath
 import re
+import stat
+import zipfile
+import zlib
 from urllib.parse import unquote, urlsplit
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -68,11 +73,100 @@ def anchors(path):
     return found
 
 
-def check(root):
+
+# Archive members are explicitly validated: checking only the ZIP hash would
+# not reveal accidental inclusion of a private note in an otherwise valid demo.
+ARCHIVE_SUFFIXES = {".zip", ".npz"}
+TEXT_SUFFIXES = {".md", ".txt", ".json", ".xml", ".csv", ".yaml", ".yml",
+                 ".toml", ".cff", ".ini", ".cfg", ".py", ".sh", ".html", ".env", ".log"}
+ARCHIVE_MAX_MEMBER = 32 * 1024 * 1024
+ARCHIVE_MAX_TOTAL = 256 * 1024 * 1024
+ARCHIVE_MAX_DEPTH = 4
+# These are local runtime artifacts, not files to include in the public export.
+LOCAL_ONLY = {".git", ".venv", ".client-venv", "__pycache__", ".pytest_cache",
+              ".ruff_cache", ".cache", "dist", "build", "results", "release",
+              "outputs", "output", "render_vendor", "render_jobs", ".agent-input",
+              ".playwright-mcp", ".agents", ".codex"}
+
+
+def scan_archive_bytes(payload, location, failures, budget, depth=1):
+    """Inspect nested ZIP/NPZ members without extracting any paths to disk."""
+    if depth > ARCHIVE_MAX_DEPTH:
+        failures.append({"path": location, "reason": "archive nesting limit exceeded"})
+        return
+    try:
+        with zipfile.ZipFile(BytesIO(payload)) as archive:
+            seen = set()
+            for member in archive.infolist():
+                if member.is_dir():
+                    continue
+                raw = member.filename
+                normalized = raw.replace("\\", "/")
+                part = PurePosixPath(normalized)
+                member_location = f"{location}!/{raw}"
+                if (not normalized or normalized.startswith("/") or
+                    normalized.startswith("//") or any(x == ".." for x in part.parts) or
+                    re.match(r"^[A-Za-z]:", normalized)):
+                    failures.append({"path": member_location, "reason": "unsafe archive entry"})
+                    continue
+                if normalized in seen:
+                    failures.append({"path": member_location, "reason": "duplicate archive entry"})
+                    continue
+                seen.add(normalized)
+                if stat.S_ISLNK(member.external_attr >> 16):
+                    failures.append({"path": member_location, "reason": "symlink in archive"})
+                    continue
+                if member.flag_bits & 1:
+                    failures.append({"path": member_location, "reason": "encrypted archive member"})
+                    continue
+                if member.file_size > ARCHIVE_MAX_MEMBER or budget[0] + member.file_size > ARCHIVE_MAX_TOTAL:
+                    failures.append({"path": member_location, "reason": "archive size limit exceeded"})
+                    return
+                # Read and verify CRC rather than trusting ZIP directory metadata.
+                with archive.open(member) as stream:
+                    blob = stream.read(ARCHIVE_MAX_MEMBER + 1)
+                if len(blob) != member.file_size:
+                    failures.append({"path": member_location, "reason": "archive member size mismatch"})
+                    continue
+                budget[0] += len(blob)
+                suffix = part.suffix.lower()
+                if suffix in ARCHIVE_SUFFIXES:
+                    scan_archive_bytes(blob, member_location, failures, budget, depth + 1)
+                elif suffix in TEXT_SUFFIXES or part.name.startswith(("LICENSE", "NOTICE")):
+                    content = blob.decode("utf-8", errors="replace")
+                    for label, pattern in PRIVATE.items():
+                        for match in pattern.finditer(content):
+                            failures.append({"path": member_location, "reason": label,
+                                             "line": content.count("\n", 0, match.start()) + 1})
+    except (zipfile.BadZipFile, EOFError, ValueError, RuntimeError, OSError, zlib.error):
+        failures.append({"path": location, "reason": "corrupt or unreadable nested archive"})
+
+
+def strict_tree_failures(root, delivered):
+    """Fail closed on unreviewed files in a freshly exported public source tree."""
+    issues = []
+    for path in root.rglob("*"):
+        if not path.is_file() and not path.is_symlink():
+            continue
+        rel = path.relative_to(root)
+        if any(part in LOCAL_ONLY or part.endswith(".egg-info") for part in rel.parts):
+            continue
+        if rel.suffix in (".pyc", ".pyo"):
+            continue
+        name = rel.as_posix()
+        if name not in delivered:
+            issues.append({"path": name, "reason": "unlisted public tree file"})
+    return issues
+
+
+def check(root, *, strict_tree=False):
     root = root.resolve()
     files = public_files(root)
     delivered = {p.relative_to(root).as_posix() for p in files}
     failures, external, links = [], set(), []
+    archive_budget = [0]
+    if strict_tree:
+        failures.extend(strict_tree_failures(root, delivered))
     for path in files:
         rel = path.relative_to(root).as_posix()
         if path.is_symlink():
@@ -80,6 +174,11 @@ def check(root):
             continue
         if path.stat().st_size > 25 * 1024 * 1024:
             failures.append({'path': rel, 'reason': 'file exceeds public Git budget (25 MiB)'})
+        if path.suffix.lower() in ARCHIVE_SUFFIXES:
+            if path.stat().st_size > ARCHIVE_MAX_MEMBER:
+                failures.append({'path': rel, 'reason': 'archive compressed size limit exceeded'})
+            else:
+                scan_archive_bytes(path.read_bytes(), rel, failures, archive_budget)
         try:
             content = path.read_text()
         except (UnicodeError, ValueError):
@@ -134,15 +233,18 @@ def check(root):
     return {'status': 'pass' if not failures else 'fail', 'checked_at': datetime.now(timezone.utc).isoformat(),
             'public_files': len(files), 'public_bytes': sum(p.stat().st_size for p in files),
             'relative_links': links, 'external_urls': sorted(external), 'demo_assets_checked': checked_assets,
-            'failures': failures, 'network_used': False}
+            'failures': failures, 'network_used': False,
+            'nested_archive_bytes_inspected': archive_budget[0], 'strict_tree': strict_tree}
 
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--root', type=Path, default=ROOT)
     parser.add_argument('--report', type=Path)
+    parser.add_argument('--strict-tree', action='store_true',
+                        help='Reject extra files in an exported public source tree (not a dev checkout)')
     args = parser.parse_args()
-    result = check(args.root)
+    result = check(args.root, strict_tree=args.strict_tree)
     if args.report:
         args.report.parent.mkdir(parents=True, exist_ok=True)
         args.report.write_text(json.dumps(result, indent=2) + '\n')

@@ -54,3 +54,61 @@ def test_offline_bundle_pins_images_and_cannot_inherit_host_build_or_store(rende
         assert service['network_mode'] == 'none' and service['read_only']
         assert all('${' not in volume for volume in service['volumes'])
         assert service['volumes'][0].startswith('./results:')
+
+
+def _demo_archive(tmp_path, payload, filename="data.zip"):
+    import io
+    import zipfile
+
+    demo = tmp_path / "docs/demo"
+    demo.mkdir(parents=True)
+    with zipfile.ZipFile(io.BytesIO(payload)) as archive:
+        assert archive.testzip() is None
+    (demo / filename).write_bytes(payload)
+    (demo / "assets.json").write_text(json.dumps({"files": {filename: {
+        "bytes": len(payload), "sha256": hashlib.sha256(payload).hexdigest()
+    }}}))
+    (tmp_path / "README.md").write_text("# Release candidate\n")
+
+def test_public_check_finds_private_text_inside_nested_zip(tmp_path):
+    import io
+    import zipfile
+
+    inner = io.BytesIO()
+    with zipfile.ZipFile(inner, "w") as archive:
+        archive.writestr("research/notes.txt", "/" + "home" + "/privateuser/private-study")
+    outer = io.BytesIO()
+    with zipfile.ZipFile(outer, "w") as archive:
+        archive.writestr("source.zip", inner.getvalue())
+    _demo_archive(tmp_path, outer.getvalue())
+    result = CHECK.check(tmp_path)
+    assert result["status"] == "fail"
+    assert any(item["reason"] == "personal_path" and "source.zip" in item["path"]
+               for item in result["failures"])
+
+def test_public_check_finds_traversal_and_duplicate_names_inside_zip(tmp_path):
+    import io
+    import zipfile
+
+    buffer = io.BytesIO()
+    import warnings
+    with warnings.catch_warnings():
+        warnings.filterwarnings("ignore", message="Duplicate name", category=UserWarning)
+        with zipfile.ZipFile(buffer, "w") as archive:
+            archive.writestr("../outside.txt", "private")
+            archive.writestr("readme.txt", "one")
+            archive.writestr("readme.txt", "two")
+    _demo_archive(tmp_path, buffer.getvalue())
+    result = CHECK.check(tmp_path)
+    assert any(item["reason"] == "unsafe archive entry" for item in result["failures"])
+    assert any(item["reason"] == "duplicate archive entry" for item in result["failures"])
+
+def test_public_check_strict_tree_rejects_unlisted_files(tmp_path):
+    demo = tmp_path / "docs/demo"
+    demo.mkdir(parents=True)
+    (demo / "assets.json").write_text('{"files": {}}')
+    (tmp_path / "README.md").write_text("# Research preview\n")
+    (tmp_path / "operator_notes.txt").write_text("Do not publish")
+    assert CHECK.check(tmp_path)["status"] == "pass"
+    result = CHECK.check(tmp_path, strict_tree=True)
+    assert any(item["reason"] == "unlisted public tree file" for item in result["failures"])

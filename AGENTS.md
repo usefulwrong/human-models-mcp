@@ -27,3 +27,11 @@ Before choosing or changing an exercise posture, trajectory, support placement o
 - For push-ups, explicitly inspect and report bilateral pectoral paths and their phase-dependent forces/activation, alongside triceps and stabilizers. Record the source identifiers and aggregation definitions.
 - Display measured model activation; never manufacture chest activation or change colors to match an expected conclusion. Paths are not anatomical muscle volumes, source joint limits are not clinical norms, and model activation is not normalized surface EMG.
 - Run existing relevant tests and real saved-state/render checks. Report both passing checks and remaining model/reference mismatches.
+
+## Public source publication gate
+
+Before recommending a **freshly exported** public source tree, run
+`python3 scripts/public_check.py --strict-tree` inside that export. Do not
+substitute checks on a private working tree. Preserve prior scientific demo
+passports and historical RC reports without relabeling them as new E2E evidence.
+If the target machine cannot run Docker/MuJoCo, leave those tests BLOCKED.

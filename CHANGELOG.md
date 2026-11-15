@@ -1,5 +1,27 @@
 # Release notes
 
+## 0.7.1 — Public release hardening and contributor onboarding
+
+Release hardening and public documentation only: existing MuJoCo calculations,
+controller recipes, scenario configurations and demo assets are unchanged.
+The README now introduces the scientific purpose and limitations, explains a
+complete first experiment and real MCP connection, and distinguishes native
+muscle control from the externally assisted showcase. The contributing guide
+now covers independent research reports, reproducible tests, numerical evidence,
+licensing, security and AI-assisted PRs. Publication instructions now describe
+upgrading the *existing* UsefulWrong GitHub repository from v0.7.0. A strict public-tree
+check rejects unreviewed files in an exported source archive. The public
+validator now scans ZIP/NPZ members recursively without extracting them,
+checks archive entry paths/duplicates/CRC and limits decompressed sizes,
+including the embedded scientific evidence archive. Regression tests cover
+private text and path traversal hidden inside nested ZIPs.
+
+The public demo was generated with v0.7.0; its original passport, scientific
+results, and hashes have not been rewritten. Prior RC reports remain historical
+evidence for v0.7.0; they are not an independent Docker/GPU E2E for v0.7.1.
+See [Publication](docs/PUBLICATION.md) and [v0.7.1 upgrade](docs/RELEASE_071.md)
+for the clean-tree guard and target-host verification. No new clinical, anatomical, or biomechanical claim is made.
+
 ## 0.7.0 — Public Research Preview RC
 
 This RC packages the existing 0.7.0 engine and later palm/knuckle improvements.
