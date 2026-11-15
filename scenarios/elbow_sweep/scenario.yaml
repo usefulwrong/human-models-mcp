@@ -1,0 +1,22 @@
+id: elbow_sweep
+version: 1.0.0
+title: Right elbow / biceps long head prescribed pose sweep
+engine: mujoco
+engine_version: 3.17.0
+model: ms_human_700
+model_revision: 98a70c569c4c1b6da467a20012f766ee1f8dc521
+backend: joint_sweep
+method: static_pose
+required_capabilities: [musculotendon_length, moment_arm]
+scope: >-
+  Measure the selected musculotendon path length and signed partial moment arm;
+  defaults use BIClong_r about elbow_flexion_r in the pinned primary MS-Human-700 model. Other generalized
+  coordinates remain at upstream init; prescribed poses are not equilibrium,
+  constrained physiological moment arms, forward dynamics, or measured human motion.
+defaults:
+  joint: elbow_flexion_r
+  muscle: BIClong_r
+  start_rad: 0.2
+  end_rad: 1.8
+  samples: 9
+  render: true

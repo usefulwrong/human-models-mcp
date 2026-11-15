@@ -1,0 +1,73 @@
+{
+  "source_run_id": "9ed1e5d7-40b9-4d4c-96f8-8fcc98e6ac1b",
+  "render_job_id": "b8f93269-91a2-46e3-8e9f-c51bac859da2",
+  "scenario": "pushup_palms",
+  "scenario_version": "1.5.0",
+  "control": "assisted_muscle",
+  "external_assistance": "USED",
+  "renderer": "Cycles CPU",
+  "original_source_zip_sha256": "f793e08da58d267de29256e17e9f954c9aaeb786689aef4001372825cdec2fe7",
+  "source_trajectory_sha256": "49e311faa3e64e2829de718db7a86234341507db90dab2eb3df1ed19cdfdd317",
+  "files": {
+    "README.md": {
+      "bytes": 4458,
+      "sha256": "0e7496d1cb4478d4badf05924353ffe3a0706419dbf0bad9ddae373476082121"
+    },
+    "animation.gif": {
+      "bytes": 4361656,
+      "sha256": "dc0f19c930fd027357d948d233bd3c31ed19b502cd5620b88ff37e0f4990f6f5"
+    },
+    "animation.mp4": {
+      "bytes": 319659,
+      "sha256": "59ec761211518e2fedf0d43fb185b8988f7d45200dec229fee2be849d8e6e6b9"
+    },
+    "bottom.png": {
+      "bytes": 320978,
+      "sha256": "ead42df394c1efd0e360cf3598ddd5388e26e3fb0eb670e8bbf36ffc42530142"
+    },
+    "data.zip": {
+      "bytes": 9239919,
+      "sha256": "cc0e6e2138b646c74dd2c2656047e2679e3cd064f705d8f4ea852cc474ac299d"
+    },
+    "frames.json": {
+      "bytes": 17782,
+      "sha256": "e8833309295d9752b06df7598024ad1b3befbffedb2cf012f3fa292359a97e86"
+    },
+    "geometry_validation.json": {
+      "bytes": 22095,
+      "sha256": "2a03ae8c3212907229c7bb041d69f37a094e36b4e046b3570e0c52dd2ef406d4"
+    },
+    "index.html": {
+      "bytes": 3063,
+      "sha256": "a75c003a19364055cedecb085aa17728e97654d34587cf181f4bd6c11fd5955a"
+    },
+    "passport.json": {
+      "bytes": 89482,
+      "sha256": "02dcc0e3d9b42545a0e2446ac582c9fd4dad3c926a2e6f657c07a83a153be1f8"
+    },
+    "plot.png": {
+      "bytes": 58155,
+      "sha256": "8bad04f4242ac0dbe1c5c8a3ba08a9cc9ba7c02f134f02d79a9846d176cb9a1a"
+    },
+    "preview.png": {
+      "bytes": 327300,
+      "sha256": "5c03a351c5f338aee3e24b8891e140280880b2548b40127824b7894ad8fa58c6"
+    },
+    "return.png": {
+      "bytes": 327300,
+      "sha256": "5c03a351c5f338aee3e24b8891e140280880b2548b40127824b7894ad8fa58c6"
+    },
+    "scientific_manifest.json": {
+      "bytes": 36448,
+      "sha256": "7177f673cb3f0f2c54c6c8a3c54e00f8a5102e04aadb431990375959e1b6f384"
+    },
+    "start.png": {
+      "bytes": 327060,
+      "sha256": "cce82d9c8e3e747d6d5e8c3acf8de5349b7a1c62b28d6304bd89cb0c47e86e3f"
+    },
+    "summary.json": {
+      "bytes": 7576,
+      "sha256": "2f05f2e5854ca3e85e09c33b7324c473eca6757d1794b38bfd8d30ac4d48903b"
+    }
+  }
+}

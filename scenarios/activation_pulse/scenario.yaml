@@ -1,0 +1,22 @@
+id: activation_pulse
+version: 1.0.0
+title: Short uncontrolled full-model forward dynamics with constant muscle excitation
+engine: mujoco
+engine_version: 3.17.0
+model: ms_human_700
+model_revision: 98a70c569c4c1b6da467a20012f766ee1f8dc521
+backend: activation_forward
+method: dynamic_forward
+required_capabilities: [dynamic_forward, muscle_activation, actuator_force]
+scope: >-
+  Integrate the full primary model for at most 25 engine steps under gravity,
+  without scene floor or posture controller. Start at upstream init with zero
+  velocity and activation; apply constant excitation to one muscle, all others
+  zero. Defaults excite BIClong_r at 0.3 for 10 steps (20 ms). Outputs are model
+  activation, signed actuator force and path length, not validated biological
+  forces, controlled motion, equilibrium, exercise, or medical assessment.
+defaults:
+  muscle: BIClong_r
+  excitation: 0.3
+  steps: 10
+  render: true

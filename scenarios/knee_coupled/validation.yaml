@@ -1,0 +1,8 @@
+validation_level: numerical_sanity
+checks:
+  finite_positive_path_lengths: true
+  jacobian_central_difference:
+    step_rad: 0.000001
+    absolute_tolerance_m_per_rad: 0.00001
+  repeat_run_absolute_tolerance_m: 0.000000000001
+limitations: Local source-knee residuals and implicit tangent errors must each be <=1e-9 in their separately recorded units; not human validation.

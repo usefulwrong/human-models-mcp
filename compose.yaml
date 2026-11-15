@@ -1,0 +1,52 @@
+name: human-models-mcp-night
+services:
+  runtime:
+    image: ${HMM_RUNTIME_IMAGE:-human-models-mcp-night-runtime:local}
+    user: ${HMM_UID:-1000}:${HMM_GID:-1000}
+    build: .
+    network_mode: none
+    cpus: 2
+    mem_limit: 3g
+    pids_limit: 128
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    tmpfs:
+      - /tmp:size=512m,mode=1777
+    volumes:
+      - ${HMM_RESULTS_DIR:-./results}:/app/results
+      - ./reports:/app/reports
+      - ./render_jobs:/app/render_jobs
+    stdin_open: true
+    environment:
+      MUJOCO_GL: osmesa
+      OMP_NUM_THREADS: "1"
+      OPENBLAS_NUM_THREADS: "1"
+  renderer:
+    profiles: [render]
+    image: ${HMM_RENDER_IMAGE:-human-models-mcp-night-renderer:local}
+    user: ${HMM_UID:-1000}:${HMM_GID:-1000}
+    build:
+      context: .
+      dockerfile: Dockerfile.render
+      args:
+        SCIENCE_IMAGE: ${HMM_RUNTIME_IMAGE:-human-models-mcp-night-runtime:local}
+    network_mode: none
+    cpus: 4
+    mem_limit: 8g
+    pids_limit: 128
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    tmpfs:
+      - /tmp:size=1g,mode=1777
+    volumes:
+      - ${HMM_RESULTS_DIR:-./results}:/app/results:ro
+      - ./render_jobs:/app/render_jobs
+    environment:
+      MUJOCO_GL: osmesa
+      OMP_NUM_THREADS: "1"
+      OPENBLAS_NUM_THREADS: "1"
+      BLENDER_USER_CONFIG: /tmp/blender-config
+      CUDA_CACHE_PATH: /tmp/cuda-cache
+      XDG_CACHE_HOME: /tmp/.cache

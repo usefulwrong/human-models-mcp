@@ -1,0 +1,22 @@
+id: standing_contact_probe
+version: 1.0.0
+title: Native foot-floor contact transient in the MS-Human-700 locomotion model
+engine: mujoco
+engine_version: 3.17.0
+model: ms_human_700_locomotion
+model_revision: 98a70c569c4c1b6da467a20012f766ee1f8dc521
+backend: standing_contact_probe
+method: dynamic_forward
+required_capabilities: [dynamic_forward, contact_probe, ground_reaction_forces, center_of_mass, support_polygon, motion_visualization]
+scope: >-
+  Integrate the pinned locomotion model and upstream floor for 0.2 s with zero muscle excitations. Enforce sixteen local source knee equalities, then align the lowest native foot capsule to 0.2 mm geometric clearance. Measure world ground reaction, COM and angular-momentum balance, point-contact support hull, conditional ground-wrench CoP and joint-limit residuals. This is a passive contact transient, not initialized at equilibrium or validated human standing.
+defaults:
+  scene: locomotion_floor_v1
+  assistance: none
+  duration_s: 0.2
+  steps: 100
+  timestep_s: 0.002
+  root_height_offset_m: 0.0
+  initial_velocity_x_m_per_s: 0.0
+  downward_load_N: 0.0
+  render: true

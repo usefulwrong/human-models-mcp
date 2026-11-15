@@ -1,0 +1,28 @@
+id: elbow_tracking
+version: 1.0.0
+title: Full-model elbow tracking with a bounded external joint PD servo
+engine: mujoco
+engine_version: 3.17.0
+model: ms_human_700
+model_revision: 98a70c569c4c1b6da467a20012f766ee1f8dc521
+backend: elbow_tracking
+method: dynamic_forward
+required_capabilities: [dynamic_forward, joint_pd_tracking, motion_visualization]
+scope: >-
+  Integrate the full primary model with the documented soft pelvis fixture and
+  a sampled external elbow PD servo. A synthetic minimum-jerk reference reaches
+  0.4 rad in 0.3 s then holds to 0.4 s. Control uses actual joint angle/velocity,
+  gains 40 N m/rad and 3 N m s/rad, bounded to +/-8 N m. All muscles have zero
+  excitation by default; passive muscle and other whole-model dynamics remain.
+  This is real feedback dynamics with an engineering reference, not motion-capture
+  replay, a muscle-driven neural controller, calibrated human movement or exercise.
+defaults:
+  controller: joint_pd
+  joint: elbow_flexion_r
+  muscle: BIClong_r
+  excitation: 0.0
+  torque_Nm: 0.0
+  target_rad: 0.4
+  steps: 200
+  timestep_s: 0.002
+  render: true

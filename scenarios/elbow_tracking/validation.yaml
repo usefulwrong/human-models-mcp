@@ -1,0 +1,7 @@
+validation_level: numerical_sanity
+checks:
+  finite_state: true
+  zero_engine_warnings: true
+  activation_bounds: true
+  repeat_run_absolute_tolerance: 0.0000000001
+limitations: Initial-value full-model experiment with an explicit compliant fixture and joint torque; numerical checks do not establish experimental or clinical validity.

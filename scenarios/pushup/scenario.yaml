@@ -1,0 +1,23 @@
+id: pushup
+version: 1.0.0
+title: Full primary-model push-up with bounded muscle recruitment or external joint control
+engine: mujoco
+engine_version: 3.17.0
+model: ms_human_700
+model_revision: 98a70c569c4c1b6da467a20012f766ee1f8dc521
+backend: pushup
+method: dynamic_forward
+required_capabilities: [dynamic_forward, muscle_activation, actuator_force, muscle_actuated_dynamics, motion_visualization]
+scope: >-
+  Full 700-muscle primary model under gravity, source joint equalities and limits,
+  native self contacts plus explicit mechanical palm/toe pads. A 2.4 s forward
+  experiment tracks an engineering reference using bounded recruitment or declared
+  external joint torques, with no external root force or pelvis fixture. Computed
+  status does not imply a successful push-up: read separate acceptance gates.
+  Added passive damping and contact geometry are unvalidated mechanical proxies.
+defaults:
+  control: muscle
+  muscle_strength_scale: 1.0
+  friction: 1.3
+  timestep_s: 0.001
+  render: false

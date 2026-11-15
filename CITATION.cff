@@ -1,0 +1,61 @@
+cff-version: 1.2.0
+message: Cite this wrapper and the exact model, Menagerie revision and MuJoCo version used by your experiment. Cite Blender for rendered results and Nichols et al. when using the wrist benchmark.
+title: UsefulWrong / human-models-mcp
+type: software
+authors:
+  - name: UsefulWrong contributors
+version: 0.7.0
+license: MIT
+abstract: Local research toolkit for bounded musculoskeletal experiments with pinned MS-Human-700 assets, numerical evidence and saved-state Blender visualization. Model results are not human experimental or clinical validation.
+references:
+  - type: software
+    title: MuJoCo
+    version: 3.17.0
+    authors:
+      - name: Google DeepMind
+    repository-code: https://github.com/google-deepmind/mujoco
+    license: Apache-2.0
+  - type: software
+    title: MuJoCo Menagerie / MS-Human-700
+    authors:
+      - name: MuJoCo Menagerie contributors
+    repository-code: https://github.com/google-deepmind/mujoco_menagerie/tree/98a70c569c4c1b6da467a20012f766ee1f8dc521/ms_human_700
+    license: Apache-2.0
+  - type: article
+    title: 'Self model for embodied intelligence: Modeling full-body human musculoskeletal system and locomotion control with hierarchical low-dimensional representation'
+    authors:
+      - family-names: Zuo
+        given-names: Chenhui
+      - family-names: He
+        given-names: Kaibo
+      - family-names: Shao
+        given-names: Jing
+      - family-names: Sui
+        given-names: Yanan
+    year: 2024
+    collection-title: 2024 IEEE International Conference on Robotics and Automation
+    start: 13062
+    end: 13069
+    url: https://github.com/LNSGroup/MS-Human-700
+  - type: article
+    title: 'Surgical Simulations Based on Limited Quantitative Data: Understanding How Musculoskeletal Models Can Be Used to Predict Moment Arms and Guide Experimental Design'
+    authors:
+      - family-names: Nichols
+        given-names: Jennifer A.
+      - family-names: Bednar
+        given-names: Michael S.
+      - family-names: Murray
+        given-names: Wendy M.
+    year: 2016
+    journal: PLOS ONE
+    volume: '11'
+    issue: '6'
+    doi: 10.1371/journal.pone.0157346
+    license: CC0-1.0
+  - type: software
+    title: Blender
+    version: 4.5.15
+    authors:
+      - name: Blender contributors
+    url: https://www.blender.org
+    license: GPL-3.0-or-later

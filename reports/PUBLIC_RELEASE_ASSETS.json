@@ -1,0 +1,51 @@
+{
+  "package_version": "0.7.0",
+  "status": "PREPARED_NOT_PUBLISHED",
+  "assets": [
+    {
+      "filename": "human-models-mcp-0.7.0-palms-scene.zip",
+      "bytes": 49352376,
+      "sha256": "7dd25c7280a6b0bd5cc0b37a64dbb91ef9ce85d40c9b030e03962af0d11c0780",
+      "role": "Standalone baked Blender scene, source USD, every CPU frame and independent geometry/media checks; no Blender binary.",
+      "release_upload": "prepared",
+      "published": false
+    },
+    {
+      "filename": "human-models-mcp-0.7.0-rc-evidence.zip",
+      "bytes": 3956018,
+      "sha256": "8cfa45964112d04fb5d0c1ffd55c5289d9ea9c63cb4f9f7df01e97f3eddb581f",
+      "role": "New CPU/MCP/CLI/scientific, GPU and browser evidence; original/public-copy log hashes with explicit path redactions.",
+      "release_upload": "prepared",
+      "published": false
+    },
+    {
+      "filename": "human_models_mcp-0.7.0.tar.gz",
+      "bytes": 388933,
+      "sha256": "5e461287874bbc1c8ebb2e4504a1cfc5c563eaec97c5c7a79a3275fdd3aee1b7",
+      "role": "Optional code/project-data sdist; no demo media, downloaded models or Blender. The full public source tree is the documented installation route.",
+      "release_upload": "prepared_optional_code_package",
+      "published": false
+    },
+    {
+      "filename": "human_models_mcp-0.7.0-py3-none-any.whl",
+      "bytes": 123977,
+      "sha256": "6766e17b1cf883a8e74862ace8a0f1005ceeb952fed9af56e3e8d675eeb90f8f",
+      "role": "Optional Python 3.12 code wheel and frozen reference; not a standalone model/data installation.",
+      "release_upload": "prepared_optional_code_package",
+      "published": false
+    }
+  ],
+  "publication_input": {
+    "filename": "human-models-mcp-0.7.0-public-source.tar.gz",
+    "role": "Verified clean tree for the operator to create a fresh GitHub repository; excludes private history.",
+    "checksum_record": "Detached SHA256SUMS and PUBLISH.json beside the archive; the archive cannot embed its own checksum.",
+    "public_source_sha256": "6adfb081df1c3ad6ad98031edde860a2889ce70fb3c128f05d44cec969b0046d",
+    "hash_scope": "Sorted relative path, NUL, file SHA-256, newline; public files except reports/ (to avoid self-reference)."
+  },
+  "never_upload": [
+    "private Git history or old Git bundle",
+    "local research archives, LAN publication and operator notes",
+    "external reference photographs",
+    "downloaded Blender binaries or unreviewed Docker image archives"
+  ]
+}

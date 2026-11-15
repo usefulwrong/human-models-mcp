@@ -1,0 +1,11 @@
+muscle,axis,mean_cm,sd_cm,mean_m,sd_m,n_specimens
+FCR,extension,-1.55,0.47,-0.015500000000000002,0.0047,8
+FCR,ulnar_deviation,-0.85,0.35,-0.0085,0.0034999999999999996,8
+FCU,extension,-1.47,0.27,-0.0147,0.0027,8
+FCU,ulnar_deviation,1.81,0.61,0.0181,0.0061,8
+ECRB,extension,1.25,0.33,0.0125,0.0033000000000000004,8
+ECRB,ulnar_deviation,-1.75,0.85,-0.0175,0.0085,8
+ECRL,extension,0.93,0.35,0.009300000000000001,0.0034999999999999996,8
+ECRL,ulnar_deviation,-2.2,0.34,-0.022000000000000002,0.0034000000000000002,8
+ECU,extension,0.63,0.1,0.0063,0.001,8
+ECU,ulnar_deviation,1.94,0.4,0.0194,0.004,8

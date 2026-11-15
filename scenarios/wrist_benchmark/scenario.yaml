@@ -1,0 +1,24 @@
+id: wrist_benchmark
+version: 1.0.0
+title: Neutral wrist moment arms versus published cadaver means
+engine: mujoco
+engine_version: 3.17.0
+model: ms_human_700
+model_revision: 98a70c569c4c1b6da467a20012f766ee1f8dc521
+backend: wrist_benchmark
+method: static_pose
+required_capabilities: [musculotendon_length, moment_arm, experimental_reference_comparison]
+scope: >-
+  Compare ten physical wrist moment arms (five primary muscles, extension and
+  ulnar deviation) at a mesh-defined neutral pose with published nonimpaired
+  cadaver means and SD from Nichols et al. 2016 Table 2, DOI 10.1371/journal.pone.0157346.
+  Source carpal equalities and a physical hand-angle coordinate transformation
+  are included; no geometry or parameters are fitted to experimental values.
+  This is a descriptive aggregate experimental-reference comparison with explicit
+  anatomical-axis and posture limitations, not specimen-specific or clinical validation.
+defaults:
+  joint: flexion_r
+  muscle: FCR_r
+  samples: 10
+  reference_id: nichols2016_table2_nonimpaired
+  render: true

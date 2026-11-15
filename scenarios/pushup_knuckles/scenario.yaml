@@ -1,0 +1,31 @@
+id: pushup_knuckles
+version: 1.2.0
+title: Neutral fists, tucked elbows and fixed supports with muscle recruitment and explicit joint assistance
+engine: mujoco
+engine_version: 3.17.0
+model: ms_human_700
+model_revision: 98a70c569c4c1b6da467a20012f766ee1f8dc521
+backend: pushup
+method: dynamic_forward
+required_capabilities:
+- dynamic_forward
+- muscle_activation
+- actuator_force
+- muscle_actuated_dynamics
+- motion_visualization
+scope: Neutral fist grip, elbows alongside the trunk and a separate bottom-depth check.
+  Full primary 700-muscle body with source-derived rigid knuckles finger posture,
+  genuine detailed hand meshes and 48 source hand transmissions. Native wrist dynamics
+  and multi-point hand contacts are measured. Prescribed sticking points prevent horizontal
+  support drift; native floor normals remain unilateral. Bounded external residual joint assistance
+  stabilizes the engineering reference; this is not pure muscle-driven control, finger
+  dynamics or ligament tissue simulation. Read separate acceptance gates.
+defaults:
+  control: assisted_muscle
+  muscle_strength_scale: 1.0
+  friction: 1.3
+  timestep_s: 0.0005
+  render: false
+  hand_support: knuckles
+  support_boundary: fixed_points
+  knuckle_technique: neutral_tucked

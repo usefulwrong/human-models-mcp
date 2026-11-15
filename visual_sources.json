@@ -1,0 +1,84 @@
+{
+  "schema_version": "1.0",
+  "sources": [
+    {
+      "id": "native_ms_human_700",
+      "status": "available",
+      "source_url": "https://github.com/google-deepmind/mujoco_menagerie/tree/98a70c569c4c1b6da467a20012f766ee1f8dc521/ms_human_700",
+      "revision": "98a70c569c4c1b6da467a20012f766ee1f8dc521",
+      "asset_sha256": "a32fc82227aebf5156d9efd067d3799513044a24ca12dd117d8b9b4be436d689",
+      "license": "Apache-2.0",
+      "identifiers": "Native geom/mesh/body/tendon identifiers in each render mapping; not a complete FMA/UBERON atlas",
+      "units": "m; world right-handed Z-up",
+      "mapping": "Compiled native geom/body transforms and mesh landmarks, checked in Blender at every rendered state",
+      "registration_status": "native_identity_mapping",
+      "redistribution": "Apache-2.0 attribution retained; no source anatomical mesh replacement"
+    },
+    {
+      "id": "hra_knee_female_left_v1_3",
+      "status": "reference_only_not_in_renderer",
+      "source_url": "https://humanatlas.io/3d-reference-library",
+      "revision": "27d6d493cd53761abb10f087767ec4cc74acb051",
+      "version": "1.3",
+      "files": {
+        "metadata.yaml": {
+          "url": "https://raw.githubusercontent.com/hubmapconsortium/hra-kg/27d6d493cd53761abb10f087767ec4cc74acb051/digital-objects/ref-organ/knee-female-left/v1.3/raw/metadata.yaml",
+          "sha256": "0a9524736d24bf2a3ebeb393a18084c0b442b6e431c05374d5bb661d1ca718cc",
+          "bytes": 1991
+        },
+        "crosswalk.csv": {
+          "url": "https://raw.githubusercontent.com/hubmapconsortium/hra-kg/27d6d493cd53761abb10f087767ec4cc74acb051/digital-objects/ref-organ/knee-female-left/v1.3/raw/crosswalk.csv",
+          "sha256": "25d240059a6f912fd75531d328cd1792aef8c97d6294abd95b58fc620e638281",
+          "bytes": 1039
+        },
+        "3d-vh-f-knee-l.glb": {
+          "url": "https://raw.githubusercontent.com/hubmapconsortium/hra-kg/27d6d493cd53761abb10f087767ec4cc74acb051/digital-objects/ref-organ/knee-female-left/v1.3/raw/3d-vh-f-knee-l.glb",
+          "sha256": "8c65eec0419b5c576e6fb0fb9f149384df4df29c543a171a0173281cb43f7f4c",
+          "bytes": 348328
+        }
+      },
+      "license": "CC-BY-4.0",
+      "attribution": "Kristen Browne and Heidi Schlehlein, HuBMAP, 3D Reference Organ for Knee, Female, Left v1.3",
+      "doi": "10.48539/HBM892.RGKB.238",
+      "identifiers": {
+        "VH_F_femur_L": "FMA:24475",
+        "VH_F_patella_L": "FMA:24487",
+        "VH_F_tibia_L": "FMA:24478"
+      },
+      "units_orientation": "glTF coordinates; source registration to native solver body unverified",
+      "mapping": null,
+      "registration_status": "registration_unverified",
+      "limitations": [
+        "Published reference geometry, not a sex-specific biomechanics model",
+        "HRA supplies anatomical substructures/landmarks, but the native solver does not supply reviewed correspondences to those named atlas landmarks",
+        "No manual visual fitting, deformation, organ motion or runtime download enabled"
+      ],
+      "redistribution": "Optional reviewed reference cache only; not copied into runtime or MIT wrapper assets"
+    },
+    {
+      "id": "z_anatomy",
+      "status": "not_installed",
+      "source_url": "https://github.com/Z-Anatomy/Models-of-human-anatomy",
+      "revision": "d909eb1e89bf47180b575e4dfacce639c90044b8",
+      "license_document": {
+        "url": "https://raw.githubusercontent.com/Z-Anatomy/Models-of-human-anatomy/d909eb1e89bf47180b575e4dfacce639c90044b8/License.txt",
+        "revision": "d909eb1e89bf47180b575e4dfacce639c90044b8",
+        "sha256": "196b66b56551a862e59872f7cdb70e6d9a6ad84e9105962fca8ec28c14e97520",
+        "bytes": 2754
+      },
+      "license": "CC-BY-SA-4.0 with separately attributed components including CC-BY-NC and CC-BY-NC-SA; per-asset review required",
+      "identifiers": null,
+      "asset_sha256": null,
+      "units_orientation": null,
+      "mapping": null,
+      "registration_status": "registration_unverified",
+      "redistribution": "Disabled; no geometry copied",
+      "limitations": [
+        "Umbrella license does not override included kidney/inner-ear non-commercial terms",
+        "Missing reviewed asset-specific license, shared landmark correspondence and registration error bounds"
+      ]
+    }
+  ],
+  "access_date": "2026-11-06",
+  "external_anatomical_layer_verified": false
+}

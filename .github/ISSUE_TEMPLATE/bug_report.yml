@@ -1,0 +1,17 @@
+name: Bug or installation failure
+description: Report a reproducible software problem without private data.
+body:
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Commands and expected / actual behavior
+      description: Include the smallest reproduction and error, with personal paths and credentials removed.
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment and evidence
+      description: OS, architecture, Docker/Compose versions, package version, backend and manifest hashes.
+    validations:
+      required: true

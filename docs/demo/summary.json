@@ -1,0 +1,221 @@
+{
+  "acceptance": {
+    "full_cycle_kinematics": "PASS",
+    "four_supports": "PASS",
+    "numerical_bounds": "PASS",
+    "stationary_supports": "PASS",
+    "reference_hand_placement": "PASS",
+    "forward_fingers": "PASS",
+    "bottom_depth": "PASS",
+    "hand_support_geometry": "PASS",
+    "elbow_extension": "PASS",
+    "wrist_extension_envelope": "PASS",
+    "full_pushup": "PASS",
+    "muscle_driven": "NOT_ACHIEVED",
+    "external_control": "USED",
+    "human_experimental_validation": "NOT_VALIDATED",
+    "volumetric_anatomy_registration": "UNAVAILABLE",
+    "finger_dynamics": "RIGID_SOURCE_POSTURE",
+    "wrist_ligaments": "NOT_MODELED",
+    "wrist_range_derivation": "LITERATURE_INFORMED_NOT_CALIBRATED"
+  },
+  "metrics": {
+    "chest_excursion_m": 0.2786512921473093,
+    "chest_return_error_m": 3.234674832375273e-05,
+    "max_support_slip_m": 9.463100806624153e-05,
+    "min_support_fraction": 1.0,
+    "max_penetration_m": 0.0003652682429466994,
+    "max_hinge_limit_violation_rad": 0.001853141231057509,
+    "max_slide_limit_violation_m": 5.528332723226531e-05,
+    "max_force_balance_error_N": 4.42414031914039e-09,
+    "max_moment_balance_error_Nm": 5.788153932684164e-09,
+    "max_transmission_sum_error": 2.2737367544323206e-13,
+    "max_friction_violation_N": 0.0,
+    "max_external_generalized_force": 70.91351953421058,
+    "max_plank_joint_deviation_rad": 0.10200563522235509,
+    "external_work_J": 578.0138057221518,
+    "max_wrist_shaft_extension_rad": 1.5657962804945922,
+    "max_support_point_displacement_m": 9.463100806624153e-05,
+    "max_support_point_speed_m_per_s": 0.005911638445377464,
+    "support_constraint_work_J": -0.025020729575425074,
+    "max_wrist_ahead_head_m": -0.2730951591723232,
+    "max_wrist_ahead_shoulder_m": -0.043710848244275846,
+    "max_palm_shoulder_chest_gap_m": 0.039631876393857235,
+    "max_palm_ahead_shoulder_m": -0.0007215860155298334,
+    "min_fingers_forward_cosine": 0.9730248128404484,
+    "bottom_shoulder_above_elbow_m": 0.04040909917823038
+  },
+  "support_fractions": {
+    "palm_r": 1.0,
+    "palm_l": 1.0,
+    "toe_r": 1.0,
+    "toe_l": 1.0
+  },
+  "key_indices": [
+    0,
+    55,
+    110
+  ],
+  "top_force_impulse": [
+    {
+      "actuator": "SUBSC_r",
+      "group": "unmapped_source_identifier",
+      "mean_activation": 0.6358335375200032,
+      "absolute_force_impulse_Ns": 2922.530356420986,
+      "signed_mechanical_work_J": -3.6918759798350202
+    },
+    {
+      "actuator": "SUBSC_l",
+      "group": "unmapped_source_identifier",
+      "mean_activation": 0.6341638565515417,
+      "absolute_force_impulse_Ns": 2909.832994427079,
+      "signed_mechanical_work_J": -3.642610379568212
+    },
+    {
+      "actuator": "TRIlong_l",
+      "group": "triceps_brachii",
+      "mean_activation": 0.7077750881126595,
+      "absolute_force_impulse_Ns": 2383.0086937486144,
+      "signed_mechanical_work_J": 4.9635852434313525
+    },
+    {
+      "actuator": "TRIlong_r",
+      "group": "triceps_brachii",
+      "mean_activation": 0.6991066269173992,
+      "absolute_force_impulse_Ns": 2353.9605465530067,
+      "signed_mechanical_work_J": 4.927861954132547
+    },
+    {
+      "actuator": "INFSP_r",
+      "group": "unmapped_source_identifier",
+      "mean_activation": 0.4753993925615152,
+      "absolute_force_impulse_Ns": 2092.1445628718843,
+      "signed_mechanical_work_J": 11.39303548408881
+    },
+    {
+      "actuator": "INFSP_l",
+      "group": "unmapped_source_identifier",
+      "mean_activation": 0.4689609241532084,
+      "absolute_force_impulse_Ns": 2062.2122708047546,
+      "signed_mechanical_work_J": 11.278323754781878
+    },
+    {
+      "actuator": "recfem_r",
+      "group": "unmapped_source_identifier",
+      "mean_activation": 0.24148259355275034,
+      "absolute_force_impulse_Ns": 1947.5013499852407,
+      "signed_mechanical_work_J": 0.6440684119651277
+    },
+    {
+      "actuator": "recfem_l",
+      "group": "unmapped_source_identifier",
+      "mean_activation": 0.23971830133949598,
+      "absolute_force_impulse_Ns": 1931.8459155566522,
+      "signed_mechanical_work_J": 0.8000555692084538
+    },
+    {
+      "actuator": "TRIlat_l",
+      "group": "triceps_brachii",
+      "mean_activation": 0.7103060250324422,
+      "absolute_force_impulse_Ns": 1733.47562444622,
+      "signed_mechanical_work_J": 10.181860820327097
+    },
+    {
+      "actuator": "TRIlat_r",
+      "group": "triceps_brachii",
+      "mean_activation": 0.7061075866209475,
+      "absolute_force_impulse_Ns": 1718.557838390325,
+      "signed_mechanical_work_J": 10.964770295895802
+    },
+    {
+      "actuator": "TRImed_l",
+      "group": "triceps_brachii",
+      "mean_activation": 0.6995843239263544,
+      "absolute_force_impulse_Ns": 1631.812619374395,
+      "signed_mechanical_work_J": 9.961378637834224
+    },
+    {
+      "actuator": "TRImed_r",
+      "group": "triceps_brachii",
+      "mean_activation": 0.6943662377135433,
+      "absolute_force_impulse_Ns": 1614.5262849157207,
+      "signed_mechanical_work_J": 10.740963197655974
+    },
+    {
+      "actuator": "DELT2_r",
+      "group": "deltoid",
+      "mean_activation": 0.41026556640238626,
+      "absolute_force_impulse_Ns": 1603.8540658837983,
+      "signed_mechanical_work_J": 6.050395152469118
+    },
+    {
+      "actuator": "DELT2_l",
+      "group": "deltoid",
+      "mean_activation": 0.4008451474109291,
+      "absolute_force_impulse_Ns": 1570.1903772466767,
+      "signed_mechanical_work_J": 5.615046283702017
+    },
+    {
+      "actuator": "DELT1_l",
+      "group": "deltoid",
+      "mean_activation": 0.3182624041471968,
+      "absolute_force_impulse_Ns": 1380.781082111459,
+      "signed_mechanical_work_J": 35.541218992986074
+    },
+    {
+      "actuator": "DELT1_r",
+      "group": "deltoid",
+      "mean_activation": 0.3144438653220462,
+      "absolute_force_impulse_Ns": 1363.9112904689232,
+      "signed_mechanical_work_J": 35.664851770456906
+    },
+    {
+      "actuator": "BIClong_r",
+      "group": "biceps_brachii",
+      "mean_activation": 0.4747893906926546,
+      "absolute_force_impulse_Ns": 1076.982421279797,
+      "signed_mechanical_work_J": -4.116269000216158
+    },
+    {
+      "actuator": "BIClong_l",
+      "group": "biceps_brachii",
+      "mean_activation": 0.4731047639178483,
+      "absolute_force_impulse_Ns": 1072.6776937341192,
+      "signed_mechanical_work_J": -4.0392190262415415
+    },
+    {
+      "actuator": "BRA_l",
+      "group": "unmapped_source_identifier",
+      "mean_activation": 0.22352666414868663,
+      "absolute_force_impulse_Ns": 978.5423002183445,
+      "signed_mechanical_work_J": 2.004355285327728
+    },
+    {
+      "actuator": "SUPSP_l",
+      "group": "unmapped_source_identifier",
+      "mean_activation": 0.4905898715967536,
+      "absolute_force_impulse_Ns": 954.8657660904117,
+      "signed_mechanical_work_J": -0.8390186134472989
+    }
+  ],
+  "thresholds": {
+    "min_chest_excursion_m": 0.18,
+    "min_peak_bilateral_elbow_rad": 1.4,
+    "max_initial_elbow_rad": 0.35,
+    "max_final_elbow_rad": 0.4,
+    "max_chest_return_error_m": 0.06,
+    "min_four_support_fraction": 0.95,
+    "max_support_displacement_m": 0.0005,
+    "max_plank_joint_deviation_rad": 0.2,
+    "max_penetration_m": 0.005,
+    "max_hinge_limit_violation_rad": 0.02,
+    "max_slide_limit_violation_m": 0.001,
+    "max_force_balance_error_N": 0.0001,
+    "max_moment_balance_error_Nm": 0.0001,
+    "max_transmission_sum_error": 1e-08,
+    "max_friction_violation_N": 1e-06,
+    "max_palm_shoulder_chest_gap_m": 0.05,
+    "max_top_elbow_rad": 0.15,
+    "max_wrist_shaft_extension_rad": 1.5807963267948966
+  }
+}

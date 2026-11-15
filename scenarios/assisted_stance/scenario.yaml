@@ -1,0 +1,23 @@
+id: assisted_stance
+version: 1.0.0
+title: Externally supported contact transient with a declared pelvis PD wrench
+engine: mujoco
+engine_version: 3.17.0
+model: ms_human_700_locomotion
+model_revision: 98a70c569c4c1b6da467a20012f766ee1f8dc521
+backend: assisted_stance
+method: dynamic_forward
+required_capabilities: [dynamic_forward, contact_probe, ground_reaction_forces, center_of_mass, support_polygon, motion_visualization, externally_assisted_dynamics]
+scope: >-
+  Integrate the pinned locomotion floor scene for 0.4 s with an explicit external world-frame pelvis PD force and torque. Native foot capsules supply part of the support; the measured external wrench supplies another part. All muscle excitations are zero and passive forces remain. Record support power/work, contact forces, COM/momentum dynamics and actual contact geometry. This is externally assisted model dynamics, not unassisted standing, biological control or balance validation.
+defaults:
+  scene: locomotion_floor_v1
+  assistance: pelvis_pd
+  duration_s: 0.4
+  steps: 200
+  timestep_s: 0.002
+  root_height_offset_m: 0.0
+  initial_velocity_x_m_per_s: 0.0
+  downward_load_N: 0.0
+  render: true
+  assist_gain_scale: 1.0

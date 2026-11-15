@@ -1,0 +1,16 @@
+validation_level: numerical_sanity
+checks:
+  finite_state: true
+  zero_engine_warnings: true
+  contact_map: upstream_capsules_and_plane
+  force_balance_tolerance_N: 0.00001
+  moment_balance_tolerance_Nm: 0.00001
+  kinematic_difference_step_s: 0.000001
+  max_penetration_m: 0.005
+  max_hinge_limit_violation_rad: 0.001
+  max_slide_limit_violation_m: 0.0001
+  friction_tolerance_N: 0.000001
+  repeat_run_absolute_tolerance: 0.0000000001
+limitations: >-
+  These are engineering numerical checks of the declared model, native soft contacts and bounded initial-value experiment.
+  No measured human ground reactions, clinical accuracy, complete tissue collision or unassisted balance is established.

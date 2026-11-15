@@ -1,0 +1,29 @@
+[build-system]
+requires = ["setuptools==80.9.0", "wheel==0.45.1"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "human-models-mcp"
+version = "0.7.0"
+description = "UsefulWrong: reproducible model-specific musculoskeletal measurements over MCP"
+readme = "README.md"
+requires-python = ">=3.12,<3.13"
+license = "MIT"
+dependencies = ["mcp==2.3.0", "mujoco==3.17.0", "PyYAML==6.0.3", "Pillow==12.0.0", "matplotlib==3.11.2"]
+
+[project.scripts]
+human-models-mcp = "human_models_mcp.__main__:main"
+human-models-visualize = "human_models_mcp.visualize:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+human_models_mcp = ["adapters/palms_full_reference_v1.json"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 110
+target-version = "py312"

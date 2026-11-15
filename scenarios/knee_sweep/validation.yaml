@@ -1,0 +1,11 @@
+validation_level: numerical_sanity
+checks:
+  finite_positive_path_lengths: true
+  jacobian_central_difference:
+    step_rad: 0.000001
+    absolute_tolerance_m_per_rad: 0.00001
+  repeat_run_absolute_tolerance_m: 0.000000000001
+  default_configuration:
+    path_length_change: positive
+    signed_moment_arms: negative
+limitations: Fixed-coordinate model geometry only; no constrained knee trajectory or experimental validation.

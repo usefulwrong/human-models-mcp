@@ -1,0 +1,26 @@
+id: loaded_elbow
+version: 1.0.0
+title: Full-model elbow response to prescribed torque with a soft pelvis fixture
+engine: mujoco
+engine_version: 3.17.0
+model: ms_human_700
+model_revision: 98a70c569c4c1b6da467a20012f766ee1f8dc521
+backend: loaded_elbow
+method: dynamic_forward
+required_capabilities: [dynamic_forward, muscle_activation, actuator_force, loaded_elbow, motion_visualization]
+scope: >-
+  Full primary MS-Human-700 model with one explicit added pelvis-to-world soft weld.
+  Initialize source init qpos, zero velocity and activation. Excite BIClong_r at
+  a constant level and apply a constant generalized torque to elbow_flexion_r.
+  Other joints and muscles remain dynamic. No floor, posture controller or
+  equilibrium initialization. Measure the initial-value response and applied
+  generalized work, with saved-state frames. This is not a calibrated exercise,
+  experimentally validated biological force, or medical safety assessment.
+defaults:
+  joint: elbow_flexion_r
+  muscle: BIClong_r
+  excitation: 0.15
+  torque_Nm: 2.0
+  steps: 100
+  timestep_s: 0.002
+  render: true

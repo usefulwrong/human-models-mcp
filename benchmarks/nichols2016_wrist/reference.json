@@ -1,0 +1,29 @@
+{
+  "id": "nichols2016_table2_nonimpaired",
+  "title": "Primary Wrist Muscles: Experimentally Measured Wrist Muscle Moment Arms, Table 2, nonimpaired columns",
+  "article_title": "Surgical Simulations Based on Limited Quantitative Data: Understanding How Musculoskeletal Models Can Be Used to Predict Moment Arms and Guide Experimental Design",
+  "doi": "10.1371/journal.pone.0157346",
+  "url": "https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0157346",
+  "download_url": "https://journals.plos.org/plosone/article/file?id=10.1371/journal.pone.0157346&type=manuscript",
+  "publication_date": "2016-06-16",
+  "accessed": "2026-11-06",
+  "license": "CC0-1.0",
+  "license_basis": "Publisher article states Creative Commons CC0 public domain dedication. This extraction uses Table 2, not the separately licensed SimTK data package.",
+  "authors": [
+    "Jennifer A. Nichols",
+    "Michael S. Bednar",
+    "Wendy M. Murray"
+  ],
+  "table": "pone.0157346.t002",
+  "condition": "nonimpaired, neutral wrist",
+  "positive_directions": [
+    "extension",
+    "ulnar_deviation"
+  ],
+  "measured_quantity": "tendon excursion derivative per joint angle; published means and between-specimen SD, not individual raw trials",
+  "n_specimens": 8,
+  "files": {
+    "article.xml": "babc83e6fb84423a807b980f2fed423ea0bb924310e707221c66350f5b2fa483",
+    "reference.csv": "9089e6a96b3c3090af3826aab141a60fdba8925f117349e05440af50089902cf"
+  }
+}

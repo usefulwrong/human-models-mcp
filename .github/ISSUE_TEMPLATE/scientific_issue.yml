@@ -1,0 +1,17 @@
+name: Scientific correctness or reproducibility
+description: Report a unit, coordinate, model, reference or evidence discrepancy.
+body:
+  - type: textarea
+    id: claim
+    attributes:
+      label: Claim or result to examine
+      description: Name scenario/version, control mode, run ID, affected quantity and units. Separate model results from human measurements.
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Reproduction and source evidence
+      description: Include commands, parameters, artifact hashes and primary sources. Remove private information.
+    validations:
+      required: true

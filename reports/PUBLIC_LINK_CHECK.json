@@ -1,0 +1,718 @@
+{
+  "status": "pass",
+  "checked_at": "2026-11-12T16:12:24.708378+00:00",
+  "public_files": 202,
+  "public_bytes": 16790378,
+  "relative_links": [
+    {
+      "path": "CHANGELOG.md",
+      "target": "reports/PUBLIC_RELEASE_AUDIT.md",
+      "status": "pass"
+    },
+    {
+      "path": "CONTRIBUTING.md",
+      "target": "docs/RENDERING.md",
+      "status": "pass"
+    },
+    {
+      "path": "CONTRIBUTING.md",
+      "target": "AGENTS.md",
+      "status": "pass"
+    },
+    {
+      "path": "CONTRIBUTING.md",
+      "target": "LICENSE",
+      "status": "pass"
+    },
+    {
+      "path": "CONTRIBUTING.md",
+      "target": "SECURITY.md",
+      "status": "pass"
+    },
+    {
+      "path": "README.md",
+      "target": "docs/demo/animation.gif",
+      "status": "pass"
+    },
+    {
+      "path": "README.md",
+      "target": "docs/demo/animation.mp4",
+      "status": "pass"
+    },
+    {
+      "path": "README.md",
+      "target": "docs/demo/README.md",
+      "status": "pass"
+    },
+    {
+      "path": "README.md",
+      "target": "docs/GETTING_STARTED.md",
+      "status": "pass"
+    },
+    {
+      "path": "README.md",
+      "target": "docs/SCIENTIFIC_SCOPE.md",
+      "status": "pass"
+    },
+    {
+      "path": "README.md",
+      "target": "docs/GETTING_STARTED.md",
+      "status": "pass"
+    },
+    {
+      "path": "README.md",
+      "target": "docs/MCP_API.md",
+      "status": "pass"
+    },
+    {
+      "path": "README.md",
+      "target": "docs/REPRODUCIBILITY.md",
+      "status": "pass"
+    },
+    {
+      "path": "README.md",
+      "target": "docs/MODELS.md",
+      "status": "pass"
+    },
+    {
+      "path": "README.md",
+      "target": "docs/RENDERING.md",
+      "status": "pass"
+    },
+    {
+      "path": "README.md",
+      "target": "SECURITY.md",
+      "status": "pass"
+    },
+    {
+      "path": "README.md",
+      "target": "CONTRIBUTING.md",
+      "status": "pass"
+    },
+    {
+      "path": "README.md",
+      "target": "CHANGELOG.md",
+      "status": "pass"
+    },
+    {
+      "path": "README.md",
+      "target": "reports/PUBLIC_RELEASE_AUDIT.md",
+      "status": "pass"
+    },
+    {
+      "path": "README.md",
+      "target": "LICENSE",
+      "status": "pass"
+    },
+    {
+      "path": "README.md",
+      "target": "notices/THIRD_PARTY.md",
+      "status": "pass"
+    },
+    {
+      "path": "README.md",
+      "target": "CITATION.cff",
+      "status": "pass"
+    },
+    {
+      "path": "SECURITY.md",
+      "target": "docs/SECURITY.md",
+      "status": "pass"
+    },
+    {
+      "path": "docs/ARCHITECTURE.md",
+      "target": "RENDERING.md",
+      "status": "pass"
+    },
+    {
+      "path": "docs/GETTING_STARTED.md",
+      "target": "RENDERING.md",
+      "status": "pass"
+    },
+    {
+      "path": "docs/GETTING_STARTED.md",
+      "target": "MCP_API.md",
+      "status": "pass"
+    },
+    {
+      "path": "docs/GETTING_STARTED.md",
+      "target": "REPRODUCIBILITY.md",
+      "status": "pass"
+    },
+    {
+      "path": "docs/GETTING_STARTED.md",
+      "target": "SECURITY.md",
+      "status": "pass"
+    },
+    {
+      "path": "docs/HAND_DETAIL.md",
+      "target": "demo/README.md",
+      "status": "pass"
+    },
+    {
+      "path": "docs/HAND_DETAIL.md",
+      "target": "demo/README.md",
+      "status": "pass"
+    },
+    {
+      "path": "docs/HAND_DETAIL.md",
+      "target": "../AGENTS.md",
+      "status": "pass"
+    },
+    {
+      "path": "docs/HAND_DETAIL.md",
+      "target": "demo/README.md",
+      "status": "pass"
+    },
+    {
+      "path": "docs/HAND_DETAIL.md",
+      "target": "../tests/fixtures/rejected_knuckle_pose.json",
+      "status": "pass"
+    },
+    {
+      "path": "docs/HAND_DETAIL.md",
+      "target": "../reports/PUBLIC_RELEASE_AUDIT.md",
+      "status": "pass"
+    },
+    {
+      "path": "docs/MCP_API.md",
+      "target": "RENDERING.md",
+      "status": "pass"
+    },
+    {
+      "path": "docs/MCP_API.md",
+      "target": "../src/human_models_mcp/server.py",
+      "status": "pass"
+    },
+    {
+      "path": "docs/MCP_API.md",
+      "target": "../examples/mcp-client/README.md",
+      "status": "pass"
+    },
+    {
+      "path": "docs/MCP_API.md",
+      "target": "SECURITY.md",
+      "status": "pass"
+    },
+    {
+      "path": "docs/MODELS.md",
+      "target": "../models.lock.json",
+      "status": "pass"
+    },
+    {
+      "path": "docs/MODELS.md",
+      "target": "HAND_DETAIL.md",
+      "status": "pass"
+    },
+    {
+      "path": "docs/MODELS.md",
+      "target": "../notices/MS-Human-700-LICENSE",
+      "status": "pass"
+    },
+    {
+      "path": "docs/MODELS.md",
+      "target": "../CITATION.cff",
+      "status": "pass"
+    },
+    {
+      "path": "docs/PUBLICATION.md",
+      "target": "../reports/PUBLIC_RELEASE_ASSETS.json",
+      "status": "pass"
+    },
+    {
+      "path": "docs/PUBLICATION.md",
+      "target": "../reports/PUBLIC_RELEASE_AUDIT.md",
+      "status": "pass"
+    },
+    {
+      "path": "docs/PUBLICATION.md",
+      "target": "../CHANGELOG.md",
+      "status": "pass"
+    },
+    {
+      "path": "docs/PUBLICATION.md",
+      "target": "../notices/THIRD_PARTY.md",
+      "status": "pass"
+    },
+    {
+      "path": "docs/RENDERING.md",
+      "target": "../reports/PUBLIC_RELEASE_AUDIT.md",
+      "status": "pass"
+    },
+    {
+      "path": "docs/RENDERING.md",
+      "target": "demo/README.md",
+      "status": "pass"
+    },
+    {
+      "path": "docs/RENDERING.md",
+      "target": "SECURITY.md",
+      "status": "pass"
+    },
+    {
+      "path": "docs/RENDERING.md",
+      "target": "../notices/BLENDER_RENDERER.md",
+      "status": "pass"
+    },
+    {
+      "path": "docs/REPRODUCIBILITY.md",
+      "target": "GETTING_STARTED.md",
+      "status": "pass"
+    },
+    {
+      "path": "docs/REPRODUCIBILITY.md",
+      "target": "HAND_DETAIL.md",
+      "status": "pass"
+    },
+    {
+      "path": "docs/REPRODUCIBILITY.md",
+      "target": "RENDERING.md",
+      "status": "pass"
+    },
+    {
+      "path": "docs/REPRODUCIBILITY.md",
+      "target": "demo/README.md",
+      "status": "pass"
+    },
+    {
+      "path": "docs/REPRODUCIBILITY.md",
+      "target": "../reports/PUBLIC_RELEASE_AUDIT.md",
+      "status": "pass"
+    },
+    {
+      "path": "docs/REPRODUCIBILITY.md",
+      "target": "../reports/PUBLIC_RELEASE_CHECK.json",
+      "status": "pass"
+    },
+    {
+      "path": "docs/REPRODUCIBILITY.md",
+      "target": "PUBLICATION.md",
+      "status": "pass"
+    },
+    {
+      "path": "docs/SCIENTIFIC_SCOPE.md",
+      "target": "HAND_DETAIL.md",
+      "status": "pass"
+    },
+    {
+      "path": "docs/SCIENTIFIC_SCOPE.md",
+      "target": "../scenarios/pushup_palms/references.md",
+      "status": "pass"
+    },
+    {
+      "path": "docs/SCIENTIFIC_SCOPE.md",
+      "target": "demo/README.md",
+      "status": "pass"
+    },
+    {
+      "path": "docs/SECURITY.md",
+      "target": "RENDERING.md",
+      "status": "pass"
+    },
+    {
+      "path": "docs/SECURITY.md",
+      "target": "../SECURITY.md",
+      "status": "pass"
+    },
+    {
+      "path": "docs/V07_PUSHUP.md",
+      "target": "HAND_DETAIL.md",
+      "status": "pass"
+    },
+    {
+      "path": "docs/V07_PUSHUP.md",
+      "target": "demo/README.md",
+      "status": "pass"
+    },
+    {
+      "path": "docs/demo/README.md",
+      "target": "preview.png",
+      "status": "pass"
+    },
+    {
+      "path": "docs/demo/README.md",
+      "target": "animation.mp4",
+      "status": "pass"
+    },
+    {
+      "path": "docs/demo/README.md",
+      "target": "animation.gif",
+      "status": "pass"
+    },
+    {
+      "path": "docs/demo/README.md",
+      "target": "index.html",
+      "status": "pass"
+    },
+    {
+      "path": "docs/demo/README.md",
+      "target": "passport.json",
+      "status": "pass"
+    },
+    {
+      "path": "docs/demo/README.md",
+      "target": "scientific_manifest.json",
+      "status": "pass"
+    },
+    {
+      "path": "docs/demo/README.md",
+      "target": "data.zip",
+      "status": "pass"
+    },
+    {
+      "path": "docs/demo/README.md",
+      "target": "summary.json",
+      "status": "pass"
+    },
+    {
+      "path": "docs/demo/README.md",
+      "target": "frames.json",
+      "status": "pass"
+    },
+    {
+      "path": "docs/demo/README.md",
+      "target": "assets.json",
+      "status": "pass"
+    },
+    {
+      "path": "docs/demo/README.md",
+      "target": "plot.png",
+      "status": "pass"
+    },
+    {
+      "path": "docs/demo/README.md",
+      "target": "../../reports/PUBLIC_RELEASE_ASSETS.json",
+      "status": "pass"
+    },
+    {
+      "path": "docs/demo/README.md",
+      "target": "start.png",
+      "status": "pass"
+    },
+    {
+      "path": "docs/demo/README.md",
+      "target": "bottom.png",
+      "status": "pass"
+    },
+    {
+      "path": "docs/demo/README.md",
+      "target": "return.png",
+      "status": "pass"
+    },
+    {
+      "path": "docs/demo/README.md",
+      "target": "../SCIENTIFIC_SCOPE.md",
+      "status": "pass"
+    },
+    {
+      "path": "docs/demo/README.md",
+      "target": "../HAND_DETAIL.md",
+      "status": "pass"
+    },
+    {
+      "path": "docs/demo/README.md",
+      "target": "assets.json",
+      "status": "pass"
+    },
+    {
+      "path": "docs/demo/README.md",
+      "target": "../../notices/THIRD_PARTY.md",
+      "status": "pass"
+    },
+    {
+      "path": "docs/demo/index.html",
+      "target": "preview.png",
+      "status": "pass"
+    },
+    {
+      "path": "docs/demo/index.html",
+      "target": "animation.mp4",
+      "status": "pass"
+    },
+    {
+      "path": "docs/demo/index.html",
+      "target": "animation.mp4",
+      "status": "pass"
+    },
+    {
+      "path": "docs/demo/index.html",
+      "target": "passport.json",
+      "status": "pass"
+    },
+    {
+      "path": "docs/demo/index.html",
+      "target": "data.zip",
+      "status": "pass"
+    },
+    {
+      "path": "docs/demo/index.html",
+      "target": "scientific_manifest.json",
+      "status": "pass"
+    },
+    {
+      "path": "docs/demo/index.html",
+      "target": "frames.json",
+      "status": "pass"
+    },
+    {
+      "path": "docs/demo/index.html",
+      "target": "assets.json",
+      "status": "pass"
+    },
+    {
+      "path": "docs/demo/index.html",
+      "target": "README.md",
+      "status": "pass"
+    },
+    {
+      "path": "docs/demo/index.html",
+      "target": "start.png",
+      "status": "pass"
+    },
+    {
+      "path": "docs/demo/index.html",
+      "target": "bottom.png",
+      "status": "pass"
+    },
+    {
+      "path": "docs/demo/index.html",
+      "target": "return.png",
+      "status": "pass"
+    },
+    {
+      "path": "docs/demo/index.html",
+      "target": "plot.png",
+      "status": "pass"
+    },
+    {
+      "path": "docs/demo/index.html",
+      "target": "summary.json",
+      "status": "pass"
+    },
+    {
+      "path": "docs/demo/index.html",
+      "target": "../SCIENTIFIC_SCOPE.md",
+      "status": "pass"
+    },
+    {
+      "path": "docs/demo/index.html",
+      "target": "../../notices/THIRD_PARTY.md",
+      "status": "pass"
+    },
+    {
+      "path": "examples/mcp-client/README.md",
+      "target": "../../docs/MCP_API.md",
+      "status": "pass"
+    },
+    {
+      "path": "examples/mcp-client/README.md",
+      "target": "../../docs/RENDERING.md",
+      "status": "pass"
+    },
+    {
+      "path": "examples/mcp-client/README.md",
+      "target": "../../docs/REPRODUCIBILITY.md",
+      "status": "pass"
+    },
+    {
+      "path": "notices/THIRD_PARTY.md",
+      "target": "MS-Human-700-LICENSE",
+      "status": "pass"
+    },
+    {
+      "path": "notices/THIRD_PARTY.md",
+      "target": "MuJoCo-LICENSE",
+      "status": "pass"
+    },
+    {
+      "path": "notices/THIRD_PARTY.md",
+      "target": "BLENDER_RENDERER.md",
+      "status": "pass"
+    },
+    {
+      "path": "reports/PUBLIC_CRITICAL_AUDIT.md",
+      "target": "PUBLIC_RELEASE_CHECK.json",
+      "status": "pass"
+    },
+    {
+      "path": "reports/PUBLIC_RELEASE_AUDIT.md",
+      "target": "../docs/demo/README.md",
+      "status": "pass"
+    },
+    {
+      "path": "reports/PUBLIC_RELEASE_AUDIT.md",
+      "target": "../docs/demo/passport.json",
+      "status": "pass"
+    },
+    {
+      "path": "reports/PUBLIC_RELEASE_AUDIT.md",
+      "target": "../docs/demo/frames.json",
+      "status": "pass"
+    },
+    {
+      "path": "reports/PUBLIC_RELEASE_AUDIT.md",
+      "target": "../docs/SCIENTIFIC_SCOPE.md",
+      "status": "pass"
+    },
+    {
+      "path": "reports/PUBLIC_RELEASE_AUDIT.md",
+      "target": "PUBLIC_LINK_CHECK.json",
+      "status": "pass"
+    },
+    {
+      "path": "reports/PUBLIC_RELEASE_AUDIT.md",
+      "target": "PUBLIC_EXTERNAL_LINKS.json",
+      "status": "pass"
+    },
+    {
+      "path": "reports/PUBLIC_RELEASE_AUDIT.md",
+      "target": "PUBLIC_RELEASE_ASSETS.json",
+      "status": "pass"
+    },
+    {
+      "path": "reports/PUBLIC_RELEASE_AUDIT.md",
+      "target": "PUBLIC_CRITICAL_AUDIT.md",
+      "status": "pass"
+    },
+    {
+      "path": "reports/PUBLIC_RELEASE_AUDIT.md",
+      "target": "../CHANGELOG.md",
+      "status": "pass"
+    },
+    {
+      "path": "scenarios/pushup_knuckles/README.md",
+      "target": "../../docs/HAND_DETAIL.md#fixed-supports-and-moving-wrists",
+      "status": "pass"
+    },
+    {
+      "path": "scenarios/pushup_knuckles/README.md",
+      "target": "../../docs/HAND_DETAIL.md#neutral-fists-and-elbows-alongside-the-torso",
+      "status": "pass"
+    },
+    {
+      "path": "scenarios/pushup_palms/README.md",
+      "target": "references.md",
+      "status": "pass"
+    },
+    {
+      "path": "scenarios/pushup_palms/README.md",
+      "target": "../../docs/demo/README.md",
+      "status": "pass"
+    },
+    {
+      "path": "scenarios/pushup_palms/README.md",
+      "target": "../../docs/HAND_DETAIL.md#fixed-supports-and-moving-wrists",
+      "status": "pass"
+    },
+    {
+      "path": "skills/human-models-mcp/SKILL.md",
+      "target": "../../examples/mcp-client/client.py",
+      "status": "pass"
+    },
+    {
+      "path": "skills/human-models-mcp/SKILL.md",
+      "target": "../scientific-interpretation/SKILL.md",
+      "status": "pass"
+    },
+    {
+      "path": "skills/human-models-mcp/SKILL.md",
+      "target": "../scientific-visualization/SKILL.md",
+      "status": "pass"
+    },
+    {
+      "path": "skills/human-models-mcp/SKILL.md",
+      "target": "../../docs/HAND_DETAIL.md",
+      "status": "pass"
+    },
+    {
+      "path": "skills/human-models-mcp/SKILL.md",
+      "target": "../../AGENTS.md#human-movement-references-before-implementation",
+      "status": "pass"
+    },
+    {
+      "path": "skills/scenario-authoring/SKILL.md",
+      "target": "../../src/human_models_mcp/registry.py",
+      "status": "pass"
+    },
+    {
+      "path": "skills/scenario-authoring/SKILL.md",
+      "target": "../../AGENTS.md#human-movement-references-before-implementation",
+      "status": "pass"
+    },
+    {
+      "path": "skills/scientific-interpretation/SKILL.md",
+      "target": "../../docs/SCIENTIFIC_SCOPE.md",
+      "status": "pass"
+    },
+    {
+      "path": "skills/scientific-interpretation/SKILL.md",
+      "target": "../scientific-visualization/SKILL.md",
+      "status": "pass"
+    },
+    {
+      "path": "skills/scientific-interpretation/SKILL.md",
+      "target": "../../docs/HAND_DETAIL.md",
+      "status": "pass"
+    },
+    {
+      "path": "skills/scientific-interpretation/SKILL.md",
+      "target": "../../AGENTS.md#human-movement-references-before-implementation",
+      "status": "pass"
+    },
+    {
+      "path": "skills/scientific-visualization/SKILL.md",
+      "target": "../scientific-interpretation/SKILL.md",
+      "status": "pass"
+    },
+    {
+      "path": "skills/scientific-visualization/SKILL.md",
+      "target": "../../docs/HAND_DETAIL.md",
+      "status": "pass"
+    },
+    {
+      "path": "skills/scientific-visualization/SKILL.md",
+      "target": "../../AGENTS.md#human-movement-references-before-implementation",
+      "status": "pass"
+    }
+  ],
+  "external_urls": [
+    "https://creativecommons.org/publicdomain/zero/1.0/",
+    "https://doi.org/10.1371/journal.pone.0157346",
+    "https://github.com/LNSGroup/MS-Human-700",
+    "https://github.com/PixarAnimationStudios/OpenUSD/blob/v26.11/LICENSE.txt",
+    "https://github.com/google-deepmind/mujoco",
+    "https://github.com/google-deepmind/mujoco/blob/3.17.0/src/engine/engine_core_smooth.c",
+    "https://github.com/google-deepmind/mujoco_menagerie/blob/98a70c569c4c1b6da467a20012f766ee1f8dc521/ms_human_700/assets/body_primary/Body_Leg_Foot_r.xml",
+    "https://github.com/google-deepmind/mujoco_menagerie/blob/98a70c569c4c1b6da467a20012f766ee1f8dc521/ms_human_700/assets/equality/Equality_Lowerbody.xml",
+    "https://github.com/google-deepmind/mujoco_menagerie/blob/98a70c569c4c1b6da467a20012f766ee1f8dc521/ms_human_700/assets/muscle/Muscle_Arm_r.xml",
+    "https://github.com/google-deepmind/mujoco_menagerie/blob/98a70c569c4c1b6da467a20012f766ee1f8dc521/ms_human_700/assets/muscle/Muscle_Leg_r.xml",
+    "https://github.com/google-deepmind/mujoco_menagerie/blob/98a70c569c4c1b6da467a20012f766ee1f8dc521/ms_human_700/assets/tendon/Tendon_Leg_r.xml",
+    "https://github.com/google-deepmind/mujoco_menagerie/tree/98a70c569c4c1b6da467a20012f766ee1f8dc521/ms_human_700",
+    "https://github.com/modelcontextprotocol/python-sdk",
+    "https://huggingface.co/BAAI/MS-Human-700/tree/8eac35bb8788a183c9e8698ee1207c1bbe654094",
+    "https://jkoa.org/DOIx.php?id=10.4055/jkoa.2006.41.2.315",
+    "https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0157346",
+    "https://mujoco.readthedocs.io/en/3.17.0/APIreference/APIfunctions.html",
+    "https://mujoco.readthedocs.io/en/3.17.0/APIreference/APIfunctions.html#mj-contactforce",
+    "https://mujoco.readthedocs.io/en/3.17.0/APIreference/APItypes.html#mjtstate",
+    "https://mujoco.readthedocs.io/en/3.17.0/XMLreference.html#equality-connect",
+    "https://mujoco.readthedocs.io/en/3.17.0/XMLreference.html#equality-joint",
+    "https://mujoco.readthedocs.io/en/3.17.0/XMLreference.html#equality-weld",
+    "https://mujoco.readthedocs.io/en/3.17.0/computation/index.html",
+    "https://mujoco.readthedocs.io/en/3.17.0/modeling.html#muscles",
+    "https://mujoco.readthedocs.io/en/3.17.0/programming/simulation.html#contacts",
+    "https://pmc.ncbi.nlm.nih.gov/articles/PMC4732391/",
+    "https://projects.blender.org/blender/blender/src/tag/v4.5.15",
+    "https://pubmed.ncbi.nlm.nih.gov/16095413/",
+    "https://pubmed.ncbi.nlm.nih.gov/20664364/",
+    "https://pubmed.ncbi.nlm.nih.gov/28684196/",
+    "https://www.acefitness.org/resources/everyone/blog/5983/two-classic-exercises-everyone-should-master/",
+    "https://www.acefitness.org/resources/everyone/exercise-library/41/push-up/",
+    "https://www.blender.org",
+    "https://www.blender.org/about/license/",
+    "https://www.mdpi.com/2813-0413/5/1/18"
+  ],
+  "demo_assets_checked": 15,
+  "failures": [],
+  "network_used": false
+}
