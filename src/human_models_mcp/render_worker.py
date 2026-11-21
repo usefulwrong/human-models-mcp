@@ -29,7 +29,7 @@ from .rendering import (
 def source_integrity(folder, record):
     if (folder / "input").is_symlink():
         raise ValueError("symlinked render input")
-    for name, expected in record["source_files"].items():
+    for name, expected in (record["source_files"] | record.get("atlas_source_files", {})).items():
         if Path(name).name != name or name in (".", ".."):
             raise ValueError("invalid source filename")
         path = folder / "input" / name
@@ -262,6 +262,10 @@ def package_media(folder, expected):
         region = expected.get("regional_layer") or ("lumbar_muscles" if settings.get("camera_view") == "lumbar" else "abdominal_muscles")
         regional_values = {p["actuator"]: p["activation"] for p in frame["paths"] if region in p.get("regions", [])} if regional_view else {}
         legend = (
+            "BodyParts3D / DBCLS | Right clavicular pectoralis | Illustrative skinning | No activation mapping"
+            if "atlas" in expected else
+            "Amber: ground reaction [N] | Joint axes and center of mass"
+            if expected["request"].get("recipe") == "pushup_scientific" else
             f"Pectoral paths: R {float(frame['metrics']['pectoralis_r_absolute_path_force_N']):.1f} N, L {float(frame['metrics']['pectoralis_l_absolute_path_force_N']):.1f} N | Activation blue 0 -> red 1"
             if chest_view else
             "Region mean saved activation: " + f"{np.mean(list(regional_values.values())):.3f}"
@@ -341,7 +345,8 @@ def package_media(folder, expected):
             archive.write(work / name, name)
     with zipfile.ZipFile(out / "source.zip", "w", compression=zipfile.ZIP_DEFLATED) as archive:
         for path in (folder / "input").iterdir():
-            archive.write(path, path.name)
+            if path.name not in expected.get("atlas", {}).get("source", {}).get("files", {}):
+                archive.write(path, path.name)
     with zipfile.ZipFile(out / "scene.zip", "w", compression=zipfile.ZIP_DEFLATED) as archive:
         for path in (work / "usd").rglob("*"):
             if path.is_file():
@@ -412,6 +417,7 @@ def process_job(job_id):
             "model": expected["model"],
             "engine": expected["engine"],
             "source_files": record["source_files"],
+            **({"atlas_source_files": record["atlas_source_files"]} if "atlas_source_files" in record else {}),
             "simulation": json.loads((folder / "input/manifest.json").read_text())["execution"],
             "source_scientific": json.loads((folder / "input/manifest.json").read_text())["scientific"],
             "method": "saved-state kinematics/geometry replay through official USDExporter, Blender USD import and checked transform baking; no physics integration",
@@ -448,7 +454,57 @@ def process_job(job_id):
             "total_seconds": time.monotonic() - started,
             "test_failure_injection": os.environ.get("HMM_TEST_RENDER_FAILURE"),
         }
+        if "atlas" in expected:
+            atlas = {k: v for k, v in expected["atlas"].items() if k != "faces"}
+            atlas["frames"] = [dict(f["atlas_checks"], source_index=f["source_index"], time_s=f["time_s"],
+                                    state_sha256=f["state_sha256"]) for f in expected["frames"]]
+            atlas["blender"] = passport["geometry_validation"]["atlas_surface"]
+            passport["anatomy"].update(
+                source="Pinned native MS-Human-700 meshes and BodyParts3D " + atlas["anatomical_id"],
+                mapping="Native compiled geom/body frames and illustrative two-bone atlas skinning",
+                external_registration=atlas["status"],
+                atlas_license=atlas["source"]["license"],
+                atlas_report="anatomy_registration.json",
+            )
+            write_json(out / "anatomy_registration.json", atlas)
         write_json(out / "passport.json", passport)
+        from .evidence import evidence_context
+
+        contract = evidence_context(json.loads((folder / "input/manifest.json").read_text()))
+        contract["render_job_id"] = job_id
+        contract["renderer"] = info
+        contract["render_code_sha256"] = passport["renderer_environment"]["source_sha256"]
+        contract["numeric_checks"] += [
+            {"name": name, "status": "PASS", "threshold": expected["geometry_validation"].get(tolerance)}
+            for name, tolerance in (("blender_translation", "translation_tolerance_m"),
+                                    ("blender_rotation", "rotation_matrix_tolerance"),
+                                    ("blender_landmarks", "landmark_tolerance_m"))
+        ]
+        mapping = expected.get("atlas", {}).get("status", "native")
+        if "atlas" in expected:
+            contract["sources"] = [*contract["sources"], atlas["source"]]
+            contract["scope_limitations"] = [*contract["scope_limitations"], *atlas["limitations"]]
+            contract["numeric_checks"].append({
+                "name": "blender_atlas_surface_transfer", "status": "PASS", "unit": "m",
+                "threshold": atlas["blender"]["vertex_tolerance_m"],
+                "value": max(f["max_vertex_error_m"] for f in atlas["blender"]["frames"]),
+            })
+        claims = []
+        for path in sorted(out.iterdir()):
+            if path.is_file() and path.suffix != ".blend1":
+                scope = ("unavailable" if path.name == "source.zip" else
+                         "native" if path.name == "blender_render.json" else mapping)
+                claims.append({
+                    "claim_id": "artifact:" + path.name, "quantity": "render_artifact",
+                    "value": artifact_metadata(path), "unit": None,
+                    "time_window_s": [expected["frames"][0]["time_s"], expected["frames"][-1]["time_s"]],
+                    "side": "right" if scope == "illustrative" else None,
+                    "structure": expected.get("atlas", {}).get("anatomical_id") if scope == "illustrative" else None,
+                    "anatomical_mapping_status": scope, "reference_comparison": {"status": "NOT_AVAILABLE"},
+                    "evidence_class": "internally_checked", "validation_status": "unvalidated",
+                    "confidence_explanation": "Blender transfer checks compare to the saved model and optional skinning rig only.",
+                })
+        write_json(out / "evidence.json", dict(contract, claims=claims))
         files = {
             p.name: artifact_metadata(p)
             for p in out.iterdir()
@@ -480,7 +536,8 @@ def process_job(job_id):
             scientific={
                 "validation_level": "numerical_sanity",
                 "geometry_status": "validated_for_named_checks",
-                "anatomical_registration": "native_model_only; external registration_unverified",
+                "anatomical_registration": (atlas["status"] if "atlas" in expected else
+                                            "native_model_only; external registration_unverified"),
             },
             render_backend=info["device"],
             seconds=time.monotonic() - started,

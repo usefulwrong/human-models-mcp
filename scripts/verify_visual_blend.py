@@ -30,6 +30,20 @@ def validate_overlays(frame, mapping):
         point(obj.matrix_world @ Vector((0, 0, -1)), start)
         point(obj.matrix_world @ Vector((0, 0, 1)), end)
 
+    if "pectoralis_atlas" in layers:
+        from bpy_extras.object_utils import world_to_camera_view
+
+        atlas = bpy.data.objects["atlas_pectoralis_right_clavicular"]
+        evaluated = atlas.evaluated_get(bpy.context.evaluated_depsgraph_get())
+        if atlas.hide_render or [list(p.vertices) for p in evaluated.data.polygons] != mapping["atlas"]["faces"]:
+            raise ValueError("atlas visibility or topology differs")
+        scene = bpy.context.scene
+        for vertex, target in zip(evaluated.data.vertices, frame["atlas_vertices_m"], strict=True):
+            coordinate = evaluated.matrix_world @ vertex.co
+            point(coordinate, target)
+            p = world_to_camera_view(scene, scene.camera, coordinate)
+            if not 0 < p.x < 1 or not .04 < p.y < .91 or p.z <= 0:
+                raise ValueError("atlas surface outside visible camera region")
     if "center_of_mass" in layers:
         point(bpy.data.objects["mass_weighted_COM"].matrix_world.translation, frame["com_world_m"])
     if "joint_axes" in layers:

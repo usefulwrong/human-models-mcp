@@ -99,3 +99,6 @@ models, Blender binaries, videos, scenes or research archives. Exact apt package
 versions are inventoried in `runtime-environment.json` but Debian repositories
 are not snapshot-pinned. Preserve a verified image when exact OS dependencies
 matter. [Public files and Release assets](PUBLICATION.md) are kept separate.
+
+For claim-level Evidence Contract retrieval, the atlas lock, and private motion
+comparison, see [Anatomical evidence](V08_ANATOMICAL_EVIDENCE.md).

@@ -65,8 +65,11 @@ def run_scenario(scenario_id: str, parameters: dict | None = None, idempotency_k
 
 
 @mcp.tool()
-def get_result(run_id: str) -> dict[str, Any]:
-    """Retrieve persisted run status, computed metrics with units, evidence, limitations and artifact IDs."""
+def get_result(run_id: str, claim_id: str | None = None) -> dict[str, Any]:
+    """Retrieve a persisted run, or evidence for metric:<name>, artifact:<id> or all when claim_id is supplied."""
+    if claim_id is not None:
+        from .evidence import get_evidence
+        return get_evidence(run_id, None if claim_id == "all" else claim_id)
     return get_run(run_id)
 
 
@@ -92,11 +95,12 @@ def list_render_profiles() -> dict[str, Any]:
 
 
 @mcp.tool()
-def render_result(run_id: str, profile: str = 'preview', layers: list[str] | None = None,
-                  options: dict | None = None, idempotency_key: str | None = None) -> dict[str, Any]:
-    """Queue rendering of an existing computed trajectory. No commands, paths or physics reruns accepted."""
+def render_result(run_id: str, profile: str | None = None, layers: list[str] | None = None,
+                  options: dict | None = None, idempotency_key: str | None = None,
+                  recipe: str | None = None) -> dict[str, Any]:
+    """Queue a named recipe or explicit layers from existing states. Use list_render_profiles to discover recipes."""
     from .rendering import render_result as submit
-    return submit(run_id, profile, layers, options, idempotency_key)
+    return submit(run_id, profile, layers, options, idempotency_key, recipe)
 
 
 @mcp.tool()

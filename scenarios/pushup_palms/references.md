@@ -141,3 +141,22 @@ palms and unchanged native joint ranges. Local bounded solves and an additional
 model/solver diagnostic, not proof of human or global infeasibility. Those native
 experiments retain their original limits and failures. The later full profile's
 two changed bounds are separately identified above; muscle strengths remain unchanged.
+
+## v0.8 atlas visualization review (2026-11-21)
+
+Reopened the two ACE side photographs and Intziegianni Figure 1(a) using local
+review copies. The side photographs show extended elbows at the top and a
+lowered chest with bent elbows at the bottom. The study's frontal photographs
+show a shoulder-width placement and outward elbow movement on descent. The
+sources show top and bottom only. The return frame is available in the model
+playback. The atlas review uses saved `chest_full` states and leaves the motion,
+supports and solver parameters unchanged. [ACE photographs](https://www.acefitness.org/resources/everyone/blog/5983/two-classic-exercises-everyone-should-master/) ·
+[Intziegianni et al., Fig. 1](https://www.mdpi.com/2813-0413/5/1/18)
+
+In the v0.8 saved-state review, both model palms remain near the upper torso
+with forward fingers. The body lowers and returns as a unit with visible
+elbow flexion. The model's oblique projection and rigid bones obscure parts of
+the palm-floor interface, and elbow paths and toe spacing differ from the
+frontal photos. The run's fixed-point support diagnostics provide the
+stationarity test. The photos lack a measured floor projection, time
+alignment, a matching subject rig and a return frame.

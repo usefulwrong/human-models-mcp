@@ -62,7 +62,7 @@ with tempfile.TemporaryDirectory() as temp:
     )
     with tarfile.open(next((project / "dist").glob("*.tar.gz"))) as source:
         members = source.getnames()
-        assert not any(p.endswith((".zip", ".mp4", ".gif", ".blend", ".usdc")) for p in members)
+        assert not any(p.endswith((".zip", ".mp4", ".gif", ".blend", ".usdc", ".obj")) for p in members)
         assert not any('/outputs/' in p or '/reports/' in p or '/render_vendor/' in p for p in members)
         assert next((project / "dist").glob("*.tar.gz")).stat().st_size < 2 * 1024 * 1024
         assert any(p.endswith("/scenarios/knee_sweep/scenario.yaml") for p in members)
@@ -80,6 +80,7 @@ with tempfile.TemporaryDirectory() as temp:
         assert any(p.endswith("/AGENTS.md") for p in members)
         assert any(p.endswith("/tests/fixtures/rejected_knuckle_pose.json") for p in members)
         assert any(p.endswith("/adapters/palms_full_reference_v1.json") for p in members)
+        assert any(p.endswith("/atlas_pectoralis.json") for p in members)
         assert any(p.endswith("/renderer.lock.json") for p in members)
         assert any(p.endswith("/skills/scientific-visualization/SKILL.md") for p in members)
     wheel = next((project / "dist").glob("*.whl"))
@@ -92,6 +93,8 @@ with tempfile.TemporaryDirectory() as temp:
         assert "human_models_mcp/adapters/supports.py" in package.namelist()
         assert "human_models_mcp/adapters/palms_full_reference_v1.json" in package.namelist()
         assert "human_models_mcp/anatomy.py" in package.namelist()
+        assert "human_models_mcp/atlas_pectoralis.json" in package.namelist()
+        assert not any(name.endswith(".obj") for name in package.namelist())
         assert "human_models_mcp/rendering.py" in package.namelist()
         assert "human_models_mcp/blender_scene.py" in package.namelist()
         package.extractall(project / "installed")

@@ -141,3 +141,14 @@ the trajectory. Compare model limits with those references; preserve an honest
 negative result if they are incompatible. A numeric PASS is not a technique PASS.
 For push-ups explicitly inspect bilateral pectoral forces/activation; rendering
 colors must remain computed values and cannot be supplied from expected EMG.
+
+## Evidence and recipes in v0.8
+
+Choose a recipe via `list_render_profiles` and pass it to `render_result` with
+bounded options. Use the job and artifact IDs to retrieve `evidence.json`,
+`passport.json` and media. Load the atlas only with its pinned license receipt
+and retain the separate asset attribution. Read `anatomy_registration.json` for
+mesh transfer, attachment gaps and scope. Keep licensed Fit3D inputs and overlays
+local. An aesthetic overlay supplies no measured anatomy.
+
+[Anatomical evidence guide](../../docs/V08_ANATOMICAL_EVIDENCE.md)

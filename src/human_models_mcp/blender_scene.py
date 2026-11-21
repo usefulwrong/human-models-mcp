@@ -10,6 +10,7 @@ import time
 import bpy
 import numpy as np
 from mathutils import Matrix, Vector
+from mathutils.bvhtree import BVHTree
 
 _CONNECTORS = []
 
@@ -381,6 +382,61 @@ def validate_connectors(expected):
     }
 
 
+def atlas_overlay(expected):
+    if "atlas" not in expected:
+        return None
+    atlas, frames = expected["atlas"], expected["frames"]
+    faces = atlas["faces"]
+    mesh = bpy.data.meshes.new("BodyParts3D FJ1447")
+    mesh.from_pydata(frames[0]["atlas_vertices_m"], [], faces)
+    if mesh.validate(verbose=True):
+        raise ValueError("Blender changed imported atlas topology")
+    mesh.update()
+    obj = bpy.data.objects.new("atlas_pectoralis_right_clavicular", mesh)
+    bpy.context.scene.collection.objects.link(obj)
+    obj["source_notice"] = json.dumps(atlas["source"], ensure_ascii=False)
+    obj["interpretation"] = "Illustrative skinning; activation mapping unavailable"
+    display = atlas["display_material"]
+    mesh.materials.append(material(display["name"], display["linear_rgb"], roughness=.54))
+    for polygon in mesh.polygons:
+        polygon.use_smooth = True
+    obj.shape_key_add(name="Basis")
+    for frame in frames[1:]:
+        index = frame["frame"]
+        key = obj.shape_key_add(name=f"Saved state {frame['source_index']}")
+        key.data.foreach_set("co", np.asarray(frame["atlas_vertices_m"], dtype=np.float32).ravel())
+        for position, weight in ((0, 0), (index - 1, 0), (index, 1), (index + 1, 0)):
+            key.value = weight
+            key.keyframe_insert(data_path="value", frame=position)
+    results = []
+    scene = bpy.context.scene
+    for frame in frames:
+        scene.frame_set(frame["frame"])
+        depsgraph = bpy.context.evaluated_depsgraph_get()
+        evaluated = obj.evaluated_get(depsgraph)
+        coordinates = np.empty(len(mesh.vertices) * 3, dtype=np.float32)
+        evaluated.data.vertices.foreach_get("co", coordinates)
+        coordinates = coordinates.reshape(-1, 3)
+        error = float(np.max(np.linalg.norm(coordinates - np.asarray(frame["atlas_vertices_m"]), axis=1)))
+        if error > 3e-6 or [list(p.vertices) for p in evaluated.data.polygons] != faces:
+            raise ValueError("Blender evaluated atlas surface differs from registered geometry")
+        surface = BVHTree.FromPolygons(coordinates, faces, all_triangles=True)
+        touching = {}
+        for geom in frame["geoms"]:
+            if geom["name"] in {"clavicle", "humerus", "scapula"}:
+                bone = geom_object(geom).evaluated_get(depsgraph)
+                bone_surface = BVHTree.FromPolygons(
+                    [bone.matrix_world @ vertex.co for vertex in bone.data.vertices],
+                    [list(face.vertices) for face in bone.data.polygons],
+                )
+                touching[geom["name"]] = len(surface.overlap(bone_surface))
+        results.append({"frame": frame["frame"], "source_index": frame["source_index"],
+                        "max_vertex_error_m": error, "bone_triangle_crossings": touching})
+    scene.frame_set(0)
+    return {"status": "PASS", "vertex_tolerance_m": 3e-6, "frames": results,
+            "intersection_method": "Blender BVH triangle crossings; does not measure enclosed tissue or attachment correctness"}
+
+
 def setup_scene(expected):
     scene = bpy.context.scene
     options = expected["request"]["options"]
@@ -422,8 +478,10 @@ def setup_scene(expected):
             region = expected.get("regional_layer") or ("lumbar_muscles" if view == "lumbar" else "abdominal_muscles")
             region_points = [p[key] for f in expected["frames"] for p in f["paths"]
                              if region in p.get("regions", []) for key in ("start_m", "end_m")]
+            if "atlas" in expected and view == "chest":
+                region_points = [point for f in expected["frames"] for point in f["atlas_vertices_m"]]
             target = Vector(np.mean([f["pelvis_com_world_m"] for f in expected["frames"]], axis=0)) + Vector((.15, 0, -.03))
-            direction = Vector((.3, -1.1, .7 if view == "lumbar" else -.04)).normalized()
+            direction = Vector((.32, -1.1, -.35 if "atlas" in expected else .7 if view == "lumbar" else -.04)).normalized()
             distance, lens = 1.8, 52
             if region_points:
                 points = np.array(region_points)
@@ -434,12 +492,16 @@ def setup_scene(expected):
                 depth = relative @ np.array(direction)
                 tan_x = 36 / (2 * lens)
                 tan_y = tan_x * options["height"] / options["width"]
-                distance = max(.9, float(np.max(abs(relative @ np.array(right)) / (.9 * tan_x) + depth)),
+                distance = max(.62 if "atlas" in expected else .9, float(np.max(abs(relative @ np.array(right)) / (.9 * tan_x) + depth)),
                                float(np.max(abs(relative @ np.array(up)) / (.72 * tan_y) + depth)))
             eye = target + direction * distance
         elif expected["model"].get("derivation", {}).get("hand_support", "legacy_point") != "legacy_point":
             target = Vector((.9, 0, .04))
             eye, lens = target + Vector((1.6, -3.3, 1.35)), 42
+        if view == "full_body" and expected["request"].get("recipe") == "pushup_scientific":
+            offset = Vector((0, 0, .20))
+            target += offset
+            eye += offset
     elif contact:
         target = Vector((0, 0, 0.88))
         eye = Vector((2.5, -4.0, 1.65))
@@ -544,10 +606,7 @@ def select_device(requested):
     }
 
 
-def main():
-    started = time.monotonic()
-    path = Path(sys.argv[sys.argv.index("--") + 1])
-    expected = json.loads((path / "work/expected.json").read_text())
+def prepare_scene(path, expected):
     bpy.ops.wm.read_factory_settings(use_empty=True)
     bpy.ops.wm.usd_import(
         filepath=str(path / "work" / expected["usd_file"]),
@@ -563,10 +622,12 @@ def main():
     bpy.context.scene.frame_set(0)
     camera = setup_scene(expected)
     overlays(expected)
+    atlas = atlas_overlay(expected)
     if expected.get("pushup", expected["scenario_id"] == "pushup"):
         collections = {}
         for obj in list(bpy.context.scene.objects):
-            group = ("muscle_paths" if obj.name.startswith("native_tendon_path_") else
+            group = ("pectoralis_atlas" if obj.name.startswith("atlas_pectoralis_") else
+                     "muscle_paths" if obj.name.startswith("native_tendon_path_") else
                      "joint_axes" if obj.name.startswith("axis_") else
                      "contact_forces" if obj.name.startswith(("GRF_", "native_contact_point_")) else
                      "center_of_mass" if obj.name == "mass_weighted_COM" else
@@ -585,6 +646,14 @@ def main():
             collections[group].objects.link(obj)
     paths = validate_path_visibility(expected)
     connectors = validate_connectors(expected)
+    return imported, baked, camera, atlas, paths, connectors
+
+
+def main():
+    started = time.monotonic()
+    path = Path(sys.argv[sys.argv.index("--") + 1])
+    expected = json.loads((path / "work/expected.json").read_text())
+    imported, baked, camera, atlas, paths, connectors = prepare_scene(path, expected)
     device = select_device(os.environ.get("HMM_BLENDER_DEVICE", expected["request"]["options"]["device"]))
     # Explicit host-controlled fault injection; never accepted from MCP/render parameters.
     fault = os.environ.get("HMM_TEST_RENDER_FAILURE")
@@ -607,6 +676,7 @@ def main():
             "baked_blend": baked,
             "native_path_visibility": paths,
             "overlay_connectors": connectors,
+            **({"atlas_surface": atlas} if atlas else {}),
         },
     )
     bpy.ops.wm.save_as_mainfile(filepath=str(artifacts / "scene.blend"), compress=True)

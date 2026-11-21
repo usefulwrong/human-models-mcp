@@ -100,3 +100,6 @@ part of the quick start. Preserve manifests/data before removing your own
 outputs. Do not prune shared Docker images or volumes for troubleshooting.
 
 [Reproducibility](REPRODUCIBILITY.md) · [Security](SECURITY.md)
+
+The optional BodyParts3D cache and Fit3D comparison use separate operator
+workflows. [Atlas and reference setup](V08_ANATOMICAL_EVIDENCE.md)

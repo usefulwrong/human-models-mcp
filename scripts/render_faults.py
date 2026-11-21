@@ -12,6 +12,7 @@ from uuid import uuid4
 from mcp import Client, StdioServerParameters
 
 ROOT = Path(__file__).resolve().parents[1]
+PROJECT = os.environ.get("COMPOSE_PROJECT_NAME", "human-models-mcp-night")
 
 
 async def main():
@@ -26,7 +27,7 @@ async def main():
         "-f",
         str(ROOT / "compose.render-gpu.yaml"),
         "-p",
-        "human-models-mcp-night",
+        PROJECT,
     ]
     subprocess.run([*dc, "stop", "renderer"], env=env, check=True)
     source = StdioServerParameters(
@@ -36,14 +37,14 @@ async def main():
             "-f",
             str(ROOT / "compose.yaml"),
             "-p",
-            "human-models-mcp-night",
+            PROJECT,
             "run",
             "--rm",
             "--no-deps",
             "-T",
             "runtime",
         ],
-        env={"HMM_RESULTS_DIR": str(store)},
+        env={k: env[k] for k in ("HMM_RESULTS_DIR", "HMM_RUNTIME_IMAGE", "HMM_RENDER_IMAGE", "HMM_UID", "HMM_GID") if k in env},
         cwd=str(ROOT),
     )
     evidence = {}
@@ -56,7 +57,14 @@ async def main():
 
         run = await call("run_scenario", {"scenario_id": "elbow_tracking", "parameters": {"render": False}})
         assert run["status"] == "computed"
-        baseline = (store / run["run_id"] / "manifest.json").read_bytes()
+        run_folder = store / run["run_id"]
+        baseline = (run_folder / "manifest.json").read_bytes()
+
+        def artifact_hashes():
+            return {name: hashlib.sha256((run_folder / name).read_bytes()).hexdigest()
+                    for name in run["artifacts"]}
+
+        hashes_before = artifact_hashes()
 
         async def submit(options=None):
             job = await call(
@@ -137,7 +145,8 @@ async def main():
                 if fault.startswith("incompatible_source_"):
                     assert "incompatible source" in record["error"]["message"]
             assert (await call("get_result", {"run_id": run["run_id"]})) == run
-            assert (store / run["run_id"] / "manifest.json").read_bytes() == baseline
+            assert (run_folder / "manifest.json").read_bytes() == baseline
+            assert artifact_hashes() == hashes_before
             evidence[fault] = {
                 "status": "pass",
                 "expected_render_state": record["status"],
@@ -169,6 +178,7 @@ async def main():
         }
         subprocess.run([*dc, "up", "-d", "--no-deps", "renderer"], env=env, check=True)
         assert (await call("get_render_job", {"job_id": job["job_id"]}))["status"] == "failed"
+        assert artifact_hashes() == hashes_before
         evidence["restart_persistence"] = {"status": "pass", "job_id": job["job_id"]}
     result = {
         "status": "pass",

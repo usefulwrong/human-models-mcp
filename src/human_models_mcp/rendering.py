@@ -14,6 +14,7 @@ from uuid import UUID, uuid4
 
 from pydantic import BaseModel, ConfigDict, Field, ValidationError, model_validator
 
+from .evidence import code_sha256
 from .registry import home
 from .results import error, get_run, run_dir
 
@@ -23,6 +24,7 @@ PROFILES = {
     "cinematic": {"width": 1280, "height": 720, "samples": 32, "device": "auto", "frames": 51, "fps": 15},
 }
 LAYERS = {
+    "pectoralis_atlas": "BodyParts3D right clavicular pectoralis major surface, illustrated with two-bone skinning.",
     "native_geometry": "Native visible model geoms; collision coverage and anatomy are incomplete.",
     "bones": "Native source skeletal meshes, not a new atlas or anatomical completeness claim.",
     "muscle_paths": "Selected native tendon paths, not volumetric muscles or tissue deformation.",
@@ -38,6 +40,12 @@ LAYERS = {
     "applied_moments": "Recorded generalized elbow torque or external pelvis moment pseudovector [N*m]; not biological joint reaction.",
 }
 SUPPORTED = {"elbow_tracking", "loaded_elbow", "standing_contact_probe", "assisted_stance", "pushup", "pushup_palms", "pushup_knuckles"}
+RECIPES = {
+    "pushup_scientific": {"profile": "scientific", "layers": ["bones", "joint_axes", "contact_forces", "center_of_mass"]},
+    "pushup_muscle_paths": {"profile": "scientific", "layers": ["bones", "muscle_paths"]},
+    "pushup_anatomy": {"profile": "scientific", "layers": ["bones", "pectoralis_atlas"], "camera_view": "chest"},
+    "pushup_cinematic": {"profile": "cinematic", "layers": ["bones", "muscle_paths"]},
+}
 MAX_CHUNK = 256 * 1024
 MAX_FILE = 128 * 1024 * 1024
 
@@ -114,6 +122,8 @@ def list_render_profiles():
     )
     return {
         "profiles": PROFILES,
+        "recipes": RECIPES,
+        "reference_overlay": "Local comparison CLI for licensed Fit3D data; absent from shared render artifacts.",
         "anatomical_sources": registry,
         "layers": LAYERS,
         "supported_scenarios": sorted(SUPPORTED),
@@ -188,9 +198,17 @@ def snapshot(run, destination):
     return files
 
 
-def render_result(run_id, profile="preview", layers=None, options=None, idempotency_key=None):
+def render_result(run_id, profile=None, layers=None, options=None, idempotency_key=None, recipe=None):
     temporary = None
     try:
+        if recipe is not None:
+            if recipe not in RECIPES:
+                return error("unsupported", "unknown render recipe")
+            if layers is not None:
+                return error("invalid_input", "select either a recipe or explicit layers")
+            layers = RECIPES[recipe]["layers"]
+            profile = RECIPES[recipe]["profile"] if profile is None else profile
+        profile = "preview" if profile is None else profile
         if profile not in PROFILES:
             return error("unsupported", "unknown render profile")
         selected = layers if layers is not None else ["bones", "muscle_paths", "joint_axes"]
@@ -208,12 +226,22 @@ def render_result(run_id, profile="preview", layers=None, options=None, idempote
                 + ", ".join(sorted(set(selected) - LAYERS.keys()))
                 + "; external anatomy registration is unverified",
             )
-        settings = RenderOptions.model_validate({**PROFILES[profile], **(options or {})}).model_dump()
+        camera = RECIPES.get(recipe, {}).get("camera_view", "full_body")
+        settings = RenderOptions.model_validate({**PROFILES[profile], "camera_view": camera, **(options or {})}).model_dump()
         run = get_run(run_id)
         if run.get("status") != "computed":
             return error("invalid_input", "rendering requires an existing computed run")
         if run["scenario_id"] not in SUPPORTED:
             return error("unsupported", "this scenario has no supported saved dynamic trajectory transfer")
+        if (recipe is not None or "pectoralis_atlas" in selected) and run["scenario_id"] not in {"pushup", "pushup_palms"}:
+            return error("unsupported", "pushup recipes and atlas require pushup or pushup_palms")
+        atlas = None
+        if "pectoralis_atlas" in selected:
+            from .atlas import atlas_inputs, atlas_lock_digest
+            try:
+                atlas = atlas_inputs()
+            except (OSError, ValueError) as exc:
+                return error("unsupported", "Atlas input unavailable: " + str(exc))
         if settings["frames"] > run.get("execution", {}).get("integration_steps", 0) + 1:
             return error("invalid_input", "requested frames exceed the saved state count")
         if "contact_forces" in selected and "contacts" not in run["outputs"]:
@@ -222,7 +250,7 @@ def render_result(run_id, profile="preview", layers=None, options=None, idempote
             return error("unsupported", "hand detail layer requires a palms/knuckles experiment with saved wrist measurements")
         if settings["camera_view"] == "hands" and "wrists.json" not in run["artifacts"]:
             return error("unsupported", "hand camera requires saved wrist measurements")
-        if settings["camera_view"] == "chest" and "pectorals.csv" not in run["artifacts"]:
+        if settings["camera_view"] == "chest" and "pectorals.csv" not in run["artifacts"] and "pectoralis_atlas" not in selected:
             return error("unsupported", "chest camera requires an experiment with saved bilateral pectoral measurements")
         if set(selected) & {"arm_muscles", "lumbar_muscles", "abdominal_muscles", "hand_tendons", "pectoral_muscles"} and run["model"]["id"] != "ms_human_700":
             return error("unsupported", "regional upper-body paths require the full primary model")
@@ -231,21 +259,37 @@ def render_result(run_id, profile="preview", layers=None, options=None, idempote
         ):
             return error("invalid_input", "idempotency_key must be 1–128 characters")
         request = {"run_id": run_id, "profile": profile, "layers": sorted(set(selected)), "options": settings}
+        if recipe is not None or atlas:
+            request.update(recipe=recipe, render_code_sha256=code_sha256(),
+                           source_manifest_sha256=digest(run_dir(run_id) / "manifest.json"))
+        if atlas:
+            request["atlas_lock_sha256"] = atlas_lock_digest(atlas)
         request_hash = hashlib.sha256(json.dumps(request, sort_keys=True).encode()).hexdigest()
         root = queue_root()
         with (root / ".submit.lock").open("a") as lock:
             fcntl.flock(lock, fcntl.LOCK_EX)
             key = hashlib.sha256(idempotency_key.encode()).hexdigest() if idempotency_key else None
-            if key:
-                for path in root.glob("*/job.json"):
+            jobs = sorted(root.glob("*/job.json"))
+            if key or recipe is not None:
+                for path in jobs:
                     previous = read_job(path.parent.name)
-                    if previous.get("idempotency_key_sha256") == key:
+                    if key and previous.get("idempotency_key_sha256") == key:
                         return (
                             get_render_job(previous["job_id"])
                             if previous["request_sha256"] == request_hash
                             else error("invalid_input", "idempotency key has different render parameters")
                         )
-            if len(list(root.glob("*/job.json"))) >= 128:
+                    if not key and previous["request_sha256"] == request_hash:
+                        cached = get_render_job(previous["job_id"])
+                        if cached["status"] in {"queued", "running", "completed"}:
+                            for name, expected in cached["source_files"].items():
+                                if name not in run["artifacts"] and name != "manifest.json":
+                                    continue
+                                current = run_dir(run_id) / name
+                                if current.is_symlink() or not current.is_file() or current.stat().st_size > 2 * 1024 * 1024 or digest(current) != expected:
+                                    raise ValueError("source checksum mismatch: " + name)
+                            return cached
+            if len(jobs) >= 128:
                 return error(
                     "resource_limit", "render store full; operator must archive/remove selected own jobs"
                 )
@@ -253,6 +297,14 @@ def render_result(run_id, profile="preview", layers=None, options=None, idempote
             temporary = root / (".submit-" + job_id)
             temporary.mkdir()
             files = snapshot(run, temporary / "input")
+            atlas_files = {}
+            if atlas:
+                from .atlas import atlas_cache, verify_asset
+                for name, asset in atlas["files"].items():
+                    dest = temporary / "input" / name
+                    shutil.copyfile(atlas_cache() / name, dest)
+                    verify_asset(dest, asset)
+                    atlas_files[name] = asset["sha256"]
             record = {
                 "job_id": job_id,
                 "status": "queued",
@@ -261,6 +313,7 @@ def render_result(run_id, profile="preview", layers=None, options=None, idempote
                 "request_sha256": request_hash,
                 "idempotency_key_sha256": key,
                 "source_files": files,
+                **({"atlas_source_files": atlas_files} if atlas_files else {}),
                 "source_run_status": "computed",
                 "artifacts": {},
                 "progress": {"phase": "queued"},

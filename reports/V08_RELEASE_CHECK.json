@@ -1,0 +1,208 @@
+{
+  "schema_version": "1.0",
+  "version": "0.8.0",
+  "iteration": "Anatomical Grounding & Evidence v1",
+  "status": "PARTIAL",
+  "baseline": {
+    "version": "0.7.1",
+    "git_sha": "c5bf297463333ee380573f0f96cb3ae5bdf941cc"
+  },
+  "model": {
+    "id": "ms_human_700",
+    "revision": "98a70c569c4c1b6da467a20012f766ee1f8dc521",
+    "asset_sha256": "a32fc82227aebf5156d9efd067d3799513044a24ca12dd117d8b9b4be436d689",
+    "engine": "MuJoCo 3.17.0",
+    "physics_backend": "cpu"
+  },
+  "scientific_gates": {
+    "native_model_and_parameters": "UNCHANGED",
+    "bodyparts3d_asset_license_and_integrity": "PASS",
+    "anatomical_surface_transfer": "PASS",
+    "anatomical_mapping_status": "illustrative",
+    "anatomical_verification": "PARTIAL",
+    "external_mocap": {
+      "status": "NOT_RUN",
+      "reason": "LICENSED_DATA_NOT_PROVIDED"
+    },
+    "reference_software_control": "PASS",
+    "render_to_tissue_mechanics_claim": "UNSUPPORTED"
+  },
+  "reports": [
+    "V08_SCIENCE.md",
+    "V08_ANATOMY_REGISTRATION.md",
+    "V08_REFERENCE_BENCHMARK.md",
+    "V08_RENDER_E2E.md"
+  ],
+  "platform": {
+    "python": "3.12.16",
+    "blender": "4.5.15 LTS",
+    "blender_build": "5afeabba6097",
+    "gpu": "NVIDIA GeForce RTX 3070 Ti",
+    "gpu_memory_total_MiB": 8192,
+    "driver": "595.99.02"
+  },
+  "verification": {
+    "mcp_stdio_loopback_and_cli": {
+      "status": "PASS"
+    },
+    "pushup_legacy_suite": {
+      "status": "PASS",
+      "maximum_repeat_state_error": 0.0
+    },
+    "legacy_cpu_blender_suite": {
+      "status": "PASS"
+    },
+    "legacy_visual_regression": {
+      "status": "BLOCKED",
+      "reason": "V06_BASELINE_NUMERICS.json missing in the public baseline"
+    },
+    "numerical_v071_vs_v080": {
+      "status": "PASS",
+      "cases": 18,
+      "max_absolute_metric_difference": 0.0
+    },
+    "negative_render_fault_suite": {
+      "status": "PASS",
+      "cases": [
+        "corrupt_source",
+        "missing_source",
+        "missing_models",
+        "incompatible_source_engine",
+        "incompatible_source_model",
+        "blender_crash",
+        "timeout",
+        "gpu_oom",
+        "interrupted_blender",
+        "restart_persistence"
+      ]
+    },
+    "atlas_gpu_to_cpu_negative_control": {
+      "status": "PASS",
+      "injection": "oom",
+      "job_id": "7a0740af-c202-4d82-a1ae-fd7f2be64ce2",
+      "byte_identical_scientific_files": 36
+    },
+    "independent_saved_state_and_media_checks": {
+      "status": "PASS",
+      "paths": [
+        "cpu",
+        "optix"
+      ]
+    },
+    "strict_clean_source_export": {
+      "status": "PASS"
+    },
+    "make_test": {
+      "status": "PASS",
+      "pytest_cases": 101
+    },
+    "legacy_gpu_smoke": {
+      "status": "PASS",
+      "cases": [
+        "elbow_tracking-scientific",
+        "elbow_tracking-cinematic",
+        "assisted_stance-scientific"
+      ],
+      "physics_cpu_gpu_comparison": "PASS"
+    }
+  },
+  "atlas_e2e": {
+    "scenario_id": "pushup_palms",
+    "run_id": "951c61c9-c5ef-4292-b62c-8170476d4c21",
+    "source_sample_count": 111,
+    "rendered_state_count": 7,
+    "phases": {
+      "start": 0,
+      "bottom": 55,
+      "return": 110
+    },
+    "atlas_id": "FMA34690",
+    "license": "CC-BY-SA-2.1-JP",
+    "cpu": {
+      "backend": "cpu",
+      "job_id": "38054263-7b72-4cc0-8c7c-17bff55fb71c",
+      "worker_blender_seconds": 53.10911219700938,
+      "evidence_sha256": "c1d54d4d37d3038a5903b7f19de7bc3cde6a3fc3189cfa63355c7d0e0ada7be3"
+    },
+    "gpu": {
+      "backend": "optix",
+      "job_id": "a66778c1-79e5-42b0-86a5-129993ad3c87",
+      "fallback": null,
+      "worker_blender_seconds": 39.67589512199629,
+      "evidence_sha256": "0a94955d1b505fd00ede3ff67c2a4825564fd63b3c867b10f1990c4d4870265f",
+      "device_wide_peak_memory_MiB": 2039
+    },
+    "byte_identical_scientific_snapshot_files": 36,
+    "registration_sha256": "88b241477820e8c2815c674ddb3364203c1915caa58f33df3227cbd077fb06c0",
+    "trajectory_sha256": "49e311faa3e64e2829de718db7a86234341507db90dab2eb3df1ed19cdfdd317",
+    "simulation_package_code_sha256": "32ea72ae847c649dcd16eb40074fccc7ddca5963475714539a79a57ec9452da6",
+    "renderer_source_sha256": "f6f2bf7cc2f10c4f2595994b0c0d226119c632fcd73a3bbe7a54d2ec3220945a",
+    "sdk_claim_checks": {
+      "available_claim": "artifact:trajectory.npz",
+      "refused_claim": "computed_muscle_strain"
+    },
+    "sdk_metadata_calls": {
+      "cpu": 79,
+      "gpu": 65
+    }
+  },
+  "moving_atlas_acceptance": {
+    "status": "BLOCKED",
+    "scope": "whole-body named skeletal muscles",
+    "pass_condition": "strict majority of the frozen anatomical catalogue with reviewed dynamic registration and a scripted no-LLM workflow",
+    "coverage_denominator": null,
+    "confirmed_muscles_on_ms_human_700": 0,
+    "active_dynamic_demo_status": "illustrative single muscle part",
+    "candidate": "MyoSuite adapted BodyParts3D, CC-BY-4.0",
+    "candidate_source_surfaces": 416,
+    "excluded_cardiac_surfaces": 5,
+    "remaining_unreviewed_candidate_surfaces": 411,
+    "criteria": "docs/V08_MOVING_ATLAS.md",
+    "diagnostic_transfer": {
+      "status": "ILLUSTRATIVE_ENGINEERING_PROBE",
+      "supported_bone_mesh_correspondences": 60,
+      "source_bone_centers_checked": 86,
+      "candidate_surfaces_replayed": 204,
+      "source_state_indices": [
+        0,
+        55,
+        110
+      ],
+      "minimum_surface_z_m": -0.011738300323486328,
+      "surface_counts_crossing_floor_by_phase": [10, 12, 10],
+      "lowest_bottom_source_surface": "Left flexor digitorum longus [FJ1414M]",
+      "video": {
+        "backend": "optix",
+        "device": "NVIDIA GeForce RTX 3070 Ti",
+        "source_state_count": 23,
+        "source_time_step_s": 0.2,
+        "interpolated_states": false,
+        "skeleton_visible": false,
+        "minimum_surface_z_m": -0.011852137744426727,
+        "minimum_surface_z_source_state": 45
+      },
+      "layered_video": {
+        "status": "ILLUSTRATIVE_ENGINEERING_PROBE",
+        "backend": "optix",
+        "device": "NVIDIA GeForce RTX 3070 Ti",
+        "default_browser_layers": ["bones", "candidate_muscle_volumes"],
+        "additional_blender_layers": [
+          "joint_axes", "center_of_mass", "contact_forces", "hand_contacts",
+          "pectoral_muscles", "abdominal_muscles", "lumbar_muscles", "arm_muscles", "hand_tendons"
+        ],
+        "skeleton_object_count": 132,
+        "candidate_volume_count": 204,
+        "checked_source_states": 23,
+        "synchronization": "same source time, index and saved-state SHA-256",
+        "maximum_reopened_native_landmark_error_m": 1.4975481660844222e-07,
+        "mismatched_state_rejected": true,
+        "byte_identical_scientific_snapshot_files": 36
+      },
+      "open_findings": [
+        "unresolved torso correspondences and missing pectoralis major",
+        "atlas surface crosses floor",
+        "independent anatomical review pending"
+      ]
+    }
+  }
+}

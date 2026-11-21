@@ -1,5 +1,13 @@
 # Release notes
 
+## 0.8.0 — Anatomical Grounding & Evidence v1
+
+- Added claim-level Evidence Contract retrieval and render evidence artifacts.
+- Added optional BodyParts3D clavicular pectoralis replay and phase-specific registration diagnostics.
+- Added bounded push-up render recipes and verified local atlas provisioning.
+- Added a private Fit3D motion importer, kinematic comparison and skeleton overlay.
+- Preserved the v0.7.1 simulation scenarios and results contract. See [the v0.8 guide](docs/V08_ANATOMICAL_EVIDENCE.md).
+
 ## 0.7.1 — Public release hardening and contributor onboarding
 
 Release hardening and public documentation only: existing MuJoCo calculations,

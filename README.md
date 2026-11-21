@@ -4,13 +4,17 @@
 
 Human Models MCP connects AI agents to **computational musculoskeletal models**. An agent can select an experiment, run MuJoCo, inspect joint motion, contacts and muscle-actuator data, and ask Blender to render the *saved simulation states*. The same tools work from a CLI without an LLM.
 
-**UsefulWrong · v0.7.1 · Public Research Preview** · [MIT wrapper](LICENSE) · [Source and model licenses](notices/THIRD_PARTY.md) · [CPU checks](https://github.com/usefulwrong/human-models-mcp/actions/workflows/ci.yml)
+**UsefulWrong · v0.8.0 · Anatomical Grounding & Evidence** · [MIT wrapper](LICENSE) · [Source and model licenses](notices/THIRD_PARTY.md) · [CPU checks](https://github.com/usefulwrong/human-models-mcp/actions/workflows/ci.yml)
 
 [![Computed palm push-up: scientific animation, not measured human motion](docs/demo/animation.gif)](docs/demo/animation.mp4)
 
 **Watch the [MP4](docs/demo/animation.mp4) · Examine the [experiment, raw data and scientific passport](docs/demo/README.md).**
 
 This is a computed **palm push-up with muscle-actuator recruitment *and external joint assistance***. It is not the separate muscle-controlled `pushup` experiment. The highlighted lines are muscle/tendon **transmission paths**, not deforming anatomical muscle volumes; their color represents model activation. The movement is not a clinically validated exercise demonstration.
+
+The v0.8 acceptance gate requires a [reviewed moving anatomical atlas](docs/V08_MOVING_ATLAS.md).
+The current single-muscle demonstration and the separate whole-body source
+preview are available while that gate remains open.
 
 ## Why this exists
 
@@ -76,6 +80,12 @@ make render-preview
 The preview computes `pushup_palms`, renders five selected states on **CPU**, and prints the location of a local HTML viewer with media and evidence. The README animation is a separate, longer precomputed example. [Rendering and full-frame exports](docs/RENDERING.md).
 
 The first build downloads several GB of pinned dependencies/models. Model hashes are checked; do not disable verification to bypass a download failure. [Troubleshooting](docs/GETTING_STARTED.md#troubleshooting).
+
+Optional [anatomical replay and evidence](docs/V08_ANATOMICAL_EVIDENCE.md)
+adds a pinned BodyParts3D right clavicular pectoralis surface to a saved push-up,
+with registration residuals and a separately licensed asset cache. A local
+Fit3D importer can compare geometric motion if the operator supplies a licensed
+recording. See the [v0.8 acceptance report](reports/V08_SCIENCE.md).
 
 ## Connect an AI agent
 

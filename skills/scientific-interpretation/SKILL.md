@@ -196,3 +196,13 @@ the trajectory. Compare model limits with those references; preserve an honest
 negative result if they are incompatible. A numeric PASS is not a technique PASS.
 For push-ups explicitly inspect bilateral pectoral forces/activation; rendering
 colors must remain computed values and cannot be supplied from expected EMG.
+
+## Evidence and recipes in v0.8
+
+Use `get_result(run_id, claim_id="metric:<name>")` and render `evidence.json`.
+Check execution, named thresholds, mapping, and external comparison separately.
+Only claim the named observable. Treat absent comparisons as unavailable, model
+activation as dimensionless, and skinning as a visual rig. A render or simulation
+PASS gives no evidence of human safety, tissue mechanics or EMG.
+
+[Anatomical evidence guide](../../docs/V08_ANATOMICAL_EVIDENCE.md)

@@ -185,3 +185,13 @@ the trajectory. Compare model limits with those references; preserve an honest
 negative result if they are incompatible. A numeric PASS is not a technique PASS.
 For push-ups explicitly inspect bilateral pectoral forces/activation; rendering
 colors must remain computed values and cannot be supplied from expected EMG.
+
+## Evidence and recipes in v0.8
+
+Discover capabilities and scenario scope before execution. Inspect named gates,
+then use a listed render recipe and request Evidence Contract entries with
+`get_result(run_id, claim_id=...)`. The reference importer is a separate local
+workflow for licensed data. Use the report's named quantities and evidence
+class when drawing conclusions.
+
+[Anatomical evidence guide](../../docs/V08_ANATOMICAL_EVIDENCE.md)
