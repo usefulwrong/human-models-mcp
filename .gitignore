@@ -34,3 +34,5 @@ reports/*
 !reports/V08_REFERENCE_BENCHMARK.md
 !reports/V08_RENDER_E2E.md
 !reports/V08_RELEASE_CHECK.json
+!reports/V08_CODE_REVIEW.md
+!reports/V08_PUBLICATION_CHECK.json

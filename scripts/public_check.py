@@ -24,7 +24,7 @@ ROOT_FILES = ("README.md", "AGENTS.md", "LICENSE", "CITATION.cff", "CONTRIBUTING
 REPORTS = ("PUBLIC_RELEASE_CHECK.json", "PUBLIC_RELEASE_AUDIT.md", "PUBLIC_RELEASE_ASSETS.json",
            "PUBLIC_LINK_CHECK.json", "PUBLIC_EXTERNAL_LINKS.json", "PUBLIC_CRITICAL_AUDIT.md",
            "V08_SCIENCE.md", "V08_ANATOMY_REGISTRATION.md", "V08_REFERENCE_BENCHMARK.md",
-           "V08_RENDER_E2E.md", "V08_RELEASE_CHECK.json")
+           "V08_RENDER_E2E.md", "V08_RELEASE_CHECK.json", "V08_CODE_REVIEW.md", "V08_PUBLICATION_CHECK.json")
 MARKDOWN_LINK = re.compile(r"!?\[[^\]]*\]\((<[^>]+>|[^\s)]+)(?:\s+[^)]*)?\)")
 PRIVATE = {
     "personal_path": re.compile(r"/(?:home|Users)/[A-Za-z0-9_.-]+/"),

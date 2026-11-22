@@ -115,9 +115,12 @@ def compare_motion(reference, simulated, times, phase_indices):
     """Align one reference clip by fixed yaw, translation and scale, then compare on an affine phase clock."""
     ref = np.asarray(reference["joints_m"])
     rt = np.asarray(reference["time_s"])
+    times = np.asarray(times)
+    if rt.ndim != 1 or times.ndim != 1 or min(rt.size, times.size) < 3:
+        raise ValueError("incompatible reference/model landmarks or clocks")
     st = times - times[0]
     if (ref.shape != (len(rt), len(IDS), 3) or simulated.shape != (len(st), len(IDS), 3)
-            or min(len(rt), len(st)) < 3 or not np.isfinite(ref).all() or not np.isfinite(simulated).all()
+            or not all(np.isfinite(values).all() for values in (ref, simulated, rt, st))
             or not np.all(np.diff(rt) > 0) or not np.all(np.diff(st) > 0) or rt[0] != 0):
         raise ValueError("incompatible reference/model landmarks or clocks")
     ratio = []

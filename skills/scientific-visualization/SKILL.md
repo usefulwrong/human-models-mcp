@@ -152,3 +152,10 @@ mesh transfer, attachment gaps and scope. Keep licensed Fit3D inputs and overlay
 local. An aesthetic overlay supplies no measured anatomy.
 
 [Anatomical evidence guide](../../docs/V08_ANATOMICAL_EVIDENCE.md)
+
+For the local whole-body review, use the pinned MyoSuite full-resolution
+reference and the deterministic arm replay command in the
+[upper-limb review](../../docs/V08_UPPER_LIMB_REVIEW.md#reproduction-and-status).
+Read the open-edge, native path, and intersection reports alongside paired
+renders. Compare triangle-pair counts only for fixed topology. The replay is
+an illustrative Blender workflow with the original saved model states.

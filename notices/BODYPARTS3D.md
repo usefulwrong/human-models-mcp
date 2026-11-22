@@ -26,11 +26,30 @@ The MIT license covers the wrapper code.
 
 ## Whole-body reference preview
 
-`scripts/atlas_reference.py` uses the separately pinned MyoSuite
-`fullbody_atlas_light.glb`, distributed by that project under CC BY 4.0.
+`scripts/atlas_reference.py` uses pinned light and full-resolution MyoSuite
+assets distributed under CC BY 4.0. The full-resolution option uses
+`muscles/fullbody_atlas.glb` at revision
+`afa8427188c8bd054925200c70db6757908dee45`, SHA-256
+`11303157ba7bae54a865c58966e7e0a45b0dc07dccb7ca323a1b2f4a5748068b`.
 BodyParts3D © The Database Center for Life Science (DBCLS), adapted and
 rigged by MyoSuite. MyoSuite documents the fitting, weight assignment and
-decimation. This project applies a fixed display colour and smooth shading
+decimation. This project applies a procedural fibre material and smooth shading
 and hides identifiable papillary cardiac objects in the preview. The
-reference rig stays in its source pose.
+reference rig stays in its source pose. The moving preview rebinds the
+named geometry to saved model poses and applies the documented local fits.
 [Myosuite asset terms](https://huggingface.co/datasets/myohub/myosuite-assets/blob/afa8427188c8bd054925200c70db6757908dee45/README.md)
+
+## Rectus abdominis supplement
+
+Z-Anatomy, *The libre 3D atlas of anatomy*, CC BY-SA 4.0. Gauthier Kervyn
+(design, 3D and anatomy), based on BodyParts3D by Kousaku Okubo and DBCLS.
+The pinned source is `Z-Anatomy.zip` at revision
+`0a849e8acf7080f8da3251a926fbc160d2bc3f7a`, SHA-256
+`e029688545627bd0214b269e1063143abb580aad72b2c2445d6d8a9a0d9da736`.
+The experiment extracts the named right and left rectus geometry and adapts
+its position, longitudinal display scale and material. The source face
+assignments distinguish muscle from the light tendon regions. The adapted meshes
+and associated inspection renders carry the CC BY-SA 4.0 attribution.
+The archive and full source .blend stay in the local cache.
+[Pinned Z-Anatomy source and credits](https://github.com/Z-Anatomy/Models-of-human-anatomy/tree/0a849e8acf7080f8da3251a926fbc160d2bc3f7a) ·
+[CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/)

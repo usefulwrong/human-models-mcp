@@ -79,6 +79,11 @@ def digest(path):
         return hashlib.file_digest(stream, "sha256").hexdigest()
 
 
+def render_lock_digests():
+    return {name: digest(path) for name in ("renderer.lock.json", "requirements-render.lock")
+            if (path := home() / name).is_file()}
+
+
 def write_json(path, value):
     temporary = path.with_name("." + path.name + "." + str(uuid4()))
     temporary.write_text(json.dumps(value, indent=2, allow_nan=False) + "\n")
@@ -189,10 +194,12 @@ def snapshot(run, destination):
         total += path.stat().st_size
         if total > 32 * 1024 * 1024:
             raise ValueError("source snapshot exceeds 32 MiB")
-        shutil.copyfile(path, destination / name)
-        if digest(destination / name) != run["artifacts"][name]["sha256"]:
+        target = destination / name
+        shutil.copyfile(path, target)
+        copied = digest(target)
+        if copied != run["artifacts"][name]["sha256"]:
             raise ValueError("source changed while copying: " + name)
-        files[name] = digest(destination / name)
+        files[name] = copied
     if not {"trajectory.npz", "series.csv"} <= files.keys():
         raise ValueError("saved trajectory and numeric series required")
     return files
@@ -261,6 +268,7 @@ def render_result(run_id, profile=None, layers=None, options=None, idempotency_k
         request = {"run_id": run_id, "profile": profile, "layers": sorted(set(selected)), "options": settings}
         if recipe is not None or atlas:
             request.update(recipe=recipe, render_code_sha256=code_sha256(),
+                           render_lock_sha256=render_lock_digests(),
                            source_manifest_sha256=digest(run_dir(run_id) / "manifest.json"))
         if atlas:
             request["atlas_lock_sha256"] = atlas_lock_digest(atlas)

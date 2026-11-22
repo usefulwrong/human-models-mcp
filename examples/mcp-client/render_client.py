@@ -140,6 +140,11 @@ async def exercise(client, args):
         == passport["geometry_validation"]["baked_blend"]["status"]
         == "pass"
     )
+    if "evidence.json" in transfers:
+        evidence = json.loads((args.output / "evidence.json").read_text())
+        claims = {claim["claim_id"]: claim["value"] for claim in evidence["claims"]}
+        assert claims == {"artifact:" + name: value for name, value in job["artifacts"].items()
+                          if name != "evidence.json"}
     if "anatomy_registration.json" in transfers:
         assert passport["anatomy"]["external_registration"] == "illustrative"
         assert passport["anatomy"]["atlas_license"] == "CC-BY-SA-2.1-JP"
@@ -147,7 +152,6 @@ async def exercise(client, args):
         atlas = json.loads((args.output / "anatomy_registration.json").read_text())
         assert atlas["blender"]["status"] == "PASS" and len(atlas["frames"]) == args.frames
         assert set(atlas["phase_source_indices"].values()) <= {f["source_index"] for f in frames["frames"]}
-        evidence = json.loads((args.output / "evidence.json").read_text())
         assert any(c["anatomical_mapping_status"] == "illustrative" for c in evidence["claims"])
         claim = await call("get_result", {"run_id": run["run_id"], "claim_id": "artifact:trajectory.npz"})
         assert claim["run_id"] == run["run_id"] and claim["claims"][0]["value"]["sha256"] == source_before

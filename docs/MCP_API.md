@@ -49,7 +49,17 @@ request; changing parameters under a key is rejected. Omit a key for a new
 independent repeat. `computed` does not mean every exercise gate passed:
 inspect `scientific.acceptance` and `scientific.checks`.
 
+For claim-level evidence, call `get_result(run_id, claim_id="metric:<name>")`
+or `get_result(run_id, claim_id="artifact:<id>")`. Use `claim_id="all"`
+to enumerate claims. [Evidence fields and interpretation](V08_ANATOMICAL_EVIDENCE.md#evidence-contract-10)
+
 ## Media and HTTP
+
+[Discover the bounded recipes](V08_ANATOMICAL_EVIDENCE.md#render-an-anatomical-layer-from-saved-states)
+through `list_render_profiles`, then pass `recipe` to `render_result`.
+Identical recipes may reuse an active or completed job for the same code,
+renderer locks and source manifest. A worker rejects a newly queued recipe
+if its code or locks differ from the submission.
 
 [Rendering](RENDERING.md) describes the SDK/CLI render client. Render jobs move
 through `queued`, `running`, `completed` or `failed`. A completed render does

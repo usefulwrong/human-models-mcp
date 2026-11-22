@@ -24,8 +24,8 @@ The single-muscle render is an engineering demonstration.
   regions with insufficient motion in a push-up.
 - The operator must be able to select a region, run a deterministic recipe,
   inspect the named meshes and open the editable animation and review report
-  without an LLM. Use fixed anatomical red by default. A separate activation
-  mode requires an explicit, reviewed mesh-to-actuator mapping.
+  without an LLM. Use the red procedural fibre material by default. A
+  separate activation mode requires an explicit, reviewed mesh-to-actuator mapping.
 
 The denominator is pending. Surface counts from one asset and actuator counts
 from MuJoCo are unsuitable as denominators. [FIPAT TA2, Part II](https://cdn.dal.ca/content/dam/dalhousie/pdf/library/FIPAT/TA2/FIPAT-TA2-Part-2.pdf)
@@ -127,3 +127,148 @@ at source state 45.
 HMM_ATLAS_PROBE_VIDEO=1 bash outputs/v08/atlas-expansion/reproduce-motion.sh \
   outputs/v08/atlas-expansion/video-replay
 ```
+
+## Torso expansion
+
+The MyoSim source mesh `torso_geom_1_thoracic12_s` and the MS-Human-700
+`thoracic12` mesh have different file hashes and identical sets of 212
+distinct local-space vertices. An explicit alias raises the verified
+engineering correspondence from 60 to 61 bone meshes. Using existing
+authored weights, 288 source surfaces are now replayable. The 84 new
+surfaces include all three parts of bilateral pectoralis major, serratus
+anterior, external oblique, ascending and transverse trapezius, and
+iliocostalis and longissimus subgroups. Landmark review of muscle
+attachments and intersections is still pending.
+
+The GLB lacks independent rectus abdominis, internal oblique, transversus
+abdominis and latissimus dorsi volumes. A separate Z-Anatomy layer adds two
+named rectus meshes. The script bakes the source hierarchy, takes the
+centroids of the inferior and superior 12 mm caps and registers them
+against saved pubic and sixth-rib model sites `rect_abd_*\-P1` and
+`rect_abd_*\-P4`. It applies a proper rotation and a recorded axial scale,
+keeps the source mesh topology and checks laterality. Exact agreement at
+the fitted sites is an implementation check. The two-attachment pose
+model has no independent interior landmarks or tissue mechanics. These
+surfaces remain illustrative. The other three structures require separate
+registration before inclusion in the moving atlas.
+[Z-Anatomy geometry and terms](../notices/BODYPARTS3D.md#rectus-abdominis-supplement)
+
+The abdomen and back inspection views use separate camera and visibility
+settings. Reference images inspected on 2026-11-22 include OpenStax
+Figures 11.16 and 11.15, showing the medial rectus behind its sheath, lateral
+abdominal wall layers, and the trapezius and erector spinae in posterior view.
+The user-supplied anterior labelled plate provides a presentation reference.
+[Abdomen reference](https://openstax.org/books/anatomy-and-physiology-2e/pages/11-4-axial-muscles-of-the-abdominal-wall-and-thorax) ·
+[Back reference](https://openstax.org/books/anatomy-and-physiology-2e/pages/11-3-axial-muscles-of-the-head-neck-and-back) ·
+[User reference](https://klev.club/kartinki/chelovek/18493-kartinki-myshcy-cheloveka-46-foto.html)
+
+With the pinned Z-Anatomy `Startup.blend` available at
+`outputs/v08/atlas-expansion/core-sources/z-anatomy.blend` (SHA-256
+`9f08a17ea0115fed80b2a73ecdf0a1bc2ab2f6956f37c593ce23d513ea35afcd`),
+the cached experiment accepts the following commands.
+
+```sh
+HMM_ATLAS_PROBE_VIDEO=1 HMM_ATLAS_PROBE_CORE=1 \
+  bash outputs/v08/atlas-expansion/reproduce-motion.sh outputs/v08/atlas-expansion/torso-replay
+python3 scripts/atlas_core_activity.py PATH_TO_SAVED_PUSHUP_RUN
+```
+
+The activity report uses saved activation and native transmission force
+from the assisted-muscle run, lists every contributing actuator, and
+reports phase values and per-actuator peaks. A group peak is the maximum
+over its recorded actuator channels and samples. Human EMG experiments
+also record rectus abdominis and back activity in push-ups. They provide
+exercise context. This model run has no paired human EMG comparison.
+[Freeman et al., surface EMG in push-up variants](https://pubmed.ncbi.nlm.nih.gov/16540847/)
+
+## Superficial clearance comparison
+
+The original scene has visible bone penetrations. The surface audit found
+bone triangle intersections on 270 candidate surfaces in each of the three
+reviewed phases. Some pairs occur around attachments. The audit records
+triangular surface crossings and leaves the interpretation of individual
+attachments to anatomical review.
+
+The clearance recipe changes twelve display surfaces, covering bilateral
+pectoralis major parts, external obliques and parts of the trapezius.
+It uses an anterior and lateral offset for the anterior surfaces and a
+posterior offset for the trapezius. The torso axes come from the saved
+bilateral rectus landmarks. The offset is bounded at 24 mm and falls to
+zero around pectoral path endpoints, the inferior oblique region, or the
+medial trapezius strip. The fit preserves mesh topology. The original
+surfaces remain available in an archived Blender collection. Skeleton
+objects and the recorded model paths retain their original transforms.
+
+Across the twelve surfaces and 23 saved states, intersecting bone–muscle
+triangle pairs fell from 83,615 to 37,385. Every fitted surface had fewer
+crossing pairs on every saved state. The implementation rejects a replay
+with any non-improving fitted surface/frame. An independently reopened
+Blender file is used to check the source bone transforms and repeat the
+intersection audit at start, bottom and return. Intersection counts are
+resolution dependent. Tissue strain, attachment correctness and contact
+forces are outside this display correction.
+
+The comparison keeps the same bones, camera, lighting and simulated phase
+on both sides. The front detail camera sits below the support plane and
+hides the floor in both versions. Deep back, serratus, shoulder, hand
+and foot conflicts remain visible in the full scene. The full anatomical
+acceptance gate stays open.
+
+The trusted headless Blender scripts are
+`scripts/atlas_collision_blender.py`,
+`scripts/atlas_clearance_blender.py` and
+`scripts/atlas_clearance_render_blender.py`. The fit takes the previous
+torso scene, its `work/expected.json` and `rig-binding-alias-probe.json`.
+Use the same renderer environment and mount the scripts and saved-state
+inputs read-only. A normal fit writes `clearance.blend` and
+`clearance.json` to a new destination. The renderer accepts that
+standalone scene and can produce the whole saved-state PNG sequence and
+three matching inspection stills.
+
+## Default fibre material and moving rectus view
+
+The standard Blender volumetric muscle recipe and the MyoSuite reference
+preview use the same procedural fibre material by default. It attaches
+coordinates to the undeformed mesh vertices. The direction for other atlas
+volumes follows a dominant geometric axis. This is a display approximation.
+The scalar activation colour on analytical muscle paths remains a
+separate display channel.
+
+For both rectus volumes the longitudinal coordinate comes from their
+registered pubic-to-costal axis. The lighter regions use the original
+Z-Anatomy `Tendon` face assignments. The pinned source has 6,611 such
+faces out of 20,604 on each side. The importer preserves their indices
+and verifies loop order before reattaching a source mask to an existing
+scene. The render requires no new geometry or measured fibre directions.
+[Atlas source and terms](../notices/BODYPARTS3D.md#rectus-abdominis-supplement) ·
+[Anatomical reference for tendinous intersections](https://openstax.org/books/anatomy-and-physiology-2e/pages/11-4-axial-muscles-of-the-abdominal-wall-and-thorax)
+
+The browser's rectus view isolates the two registered muscles with the
+rib and pelvic skeleton. It shows the same 23 stored states and the same
+clock as the combined atlas. Its camera sits below the support plane
+with the floor hidden for inspection. The full atlas displays the floor
+and neighbouring muscles. The anatomical acceptance status remains
+open and the materials carry no physiology or attachment evidence.
+
+To rebuild the paired render, run the trusted Blender script
+`scripts/atlas_rectus_blender.py` on the pinned Z-Anatomy `Startup.blend`
+with the destination `rectus-source.blend` following the `--` separator.
+Then open the clearance scene with
+`scripts/atlas_textured_blender.py` and pass a new output directory and that
+extracted source file following `--`. Put `scripts` and
+`src/human_models_mcp` on Blender's trusted Python path. The two PNG
+sequences use source indices 0, 5, …, 110 and can be encoded at 5 fps.
+
+The [upper-limb review](V08_UPPER_LIMB_REVIEW.md) records the remaining
+shoulder, elbow and wrist discrepancies, a bilateral distal forearm fit
+and the experimental datasets applicable to each region.
+
+For the updated arm layer and reproducible full-resolution replay, see
+the [upper-limb review](V08_UPPER_LIMB_REVIEW.md#full-resolution-arm-surfaces-and-remaining-folds).
+Across the 411 visible source surfaces in the authored reference pose,
+the full-resolution copy reduces the total number of unmatched open
+edges from 215,494 to 9,198. The new reference has 286 surfaces without
+open edges and 184 with neither open nor nonmanifold edges after exact
+coordinate deduplication. This is a reference topology audit.
+The 62 arm parts and their topology audits contribute to the engineering
+review. The anatomical coverage gate remains open.

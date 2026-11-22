@@ -81,6 +81,7 @@ with tempfile.TemporaryDirectory() as temp:
         assert any(p.endswith("/tests/fixtures/rejected_knuckle_pose.json") for p in members)
         assert any(p.endswith("/adapters/palms_full_reference_v1.json") for p in members)
         assert any(p.endswith("/atlas_pectoralis.json") for p in members)
+        assert any(p.endswith("/scripts/atlas_arm_replay.sh") for p in members)
         assert any(p.endswith("/renderer.lock.json") for p in members)
         assert any(p.endswith("/skills/scientific-visualization/SKILL.md") for p in members)
     wheel = next((project / "dist").glob("*.whl"))

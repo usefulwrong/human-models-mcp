@@ -4,6 +4,7 @@ import json
 import hashlib
 import os
 from pathlib import Path
+import runpy
 import sys
 import time
 
@@ -396,8 +397,8 @@ def atlas_overlay(expected):
     bpy.context.scene.collection.objects.link(obj)
     obj["source_notice"] = json.dumps(atlas["source"], ensure_ascii=False)
     obj["interpretation"] = "Illustrative skinning; activation mapping unavailable"
-    display = atlas["display_material"]
-    mesh.materials.append(material(display["name"], display["linear_rgb"], roughness=.54))
+    default_material = runpy.run_path(str(Path(__file__).with_name("muscle_materials.py")))
+    default_material["apply"](mesh)
     for polygon in mesh.polygons:
         polygon.use_smooth = True
     obj.shape_key_add(name="Basis")
@@ -434,6 +435,7 @@ def atlas_overlay(expected):
                         "max_vertex_error_m": error, "bone_triangle_crossings": touching})
     scene.frame_set(0)
     return {"status": "PASS", "vertex_tolerance_m": 3e-6, "frames": results,
+            "display_material": {"texture": "procedural fibres", "coordinates": "fixed mesh coordinates"},
             "intersection_method": "Blender BVH triangle crossings; does not measure enclosed tissue or attachment correctness"}
 
 

@@ -4,7 +4,7 @@
 
 Human Models MCP connects AI agents to **computational musculoskeletal models**. An agent can select an experiment, run MuJoCo, inspect joint motion, contacts and muscle-actuator data, and ask Blender to render the *saved simulation states*. The same tools work from a CLI without an LLM.
 
-**UsefulWrong · v0.8.0 · Anatomical Grounding & Evidence** · [MIT wrapper](LICENSE) · [Source and model licenses](notices/THIRD_PARTY.md) · [CPU checks](https://github.com/usefulwrong/human-models-mcp/actions/workflows/ci.yml)
+**UsefulWrong · v0.8.0 Research Preview · Anatomical Grounding & Evidence** · [MIT wrapper](LICENSE) · [Source and model licenses](notices/THIRD_PARTY.md) · [CPU checks](https://github.com/usefulwrong/human-models-mcp/actions/workflows/ci.yml)
 
 [![Computed palm push-up: scientific animation, not measured human motion](docs/demo/animation.gif)](docs/demo/animation.mp4)
 
@@ -12,9 +12,9 @@ Human Models MCP connects AI agents to **computational musculoskeletal models**.
 
 This is a computed **palm push-up with muscle-actuator recruitment *and external joint assistance***. It is not the separate muscle-controlled `pushup` experiment. The highlighted lines are muscle/tendon **transmission paths**, not deforming anatomical muscle volumes; their color represents model activation. The movement is not a clinically validated exercise demonstration.
 
-The v0.8 acceptance gate requires a [reviewed moving anatomical atlas](docs/V08_MOVING_ATLAS.md).
-The current single-muscle demonstration and the separate whole-body source
-preview are available while that gate remains open.
+The v0.8 release includes the optional pectoralis render recipe and a separate
+experimental moving atlas with full-resolution arm surfaces. The whole-body
+anatomical acceptance gate remains **PARTIAL**. [Moving atlas coverage and checks](docs/V08_MOVING_ATLAS.md)
 
 ## Why this exists
 
@@ -127,6 +127,6 @@ A model can return `computed` while some exercise or contact criteria fail. Read
 | Reproduce, cite or criticize an experiment | [Reproducibility](docs/REPRODUCIBILITY.md) · [Scientific scope](docs/SCIENTIFIC_SCOPE.md) · [Citation](CITATION.cff) |
 | Understand the media and its underlying data | [Public demo](docs/demo/README.md) · [Rendering](docs/RENDERING.md) |
 | Propose a fix or a research use case | [Contributing](CONTRIBUTING.md) · [Issues](https://github.com/usefulwrong/human-models-mcp/issues) |
-| Release, licensing and security | [Changelog](CHANGELOG.md) · [Publication](docs/PUBLICATION.md) · [Upgrade from 0.7.0](docs/RELEASE_071.md) · [Notices](notices/THIRD_PARTY.md) · [Security](SECURITY.md) |
+| Release, licensing and security | [Changelog](CHANGELOG.md) · [v0.8.0 release handoff](docs/RELEASE_080.md) · [Notices](notices/THIRD_PARTY.md) · [Security](SECURITY.md) |
 
 **Built by [UsefulWrong](https://github.com/usefulwrong).** Contributions are welcome, especially reproducible failures, independent benchmarks, model-boundary findings and improvements to agent usability. Please keep reported model behavior distinct from conclusions about real people.

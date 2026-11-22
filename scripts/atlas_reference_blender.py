@@ -3,6 +3,7 @@
 import json
 from pathlib import Path
 import re
+import runpy
 import struct
 import sys
 
@@ -27,22 +28,13 @@ def source_names():
     return names
 
 
-def material():
-    red = bpy.data.materials.new("Reference muscle · fixed anatomical red")
-    red.use_nodes = True
-    red.diffuse_color = (.42, .085, .055, 1)
-    shader = red.node_tree.nodes["Principled BSDF"]
-    shader.inputs["Base Color"].default_value = red.diffuse_color
-    shader.inputs["Roughness"].default_value = .54
-    return red
-
-
 def aim(obj, target):
     obj.rotation_euler = (target - obj.location).to_track_quat("-Z", "Y").to_euler()
 
 
-def inspect_meshes(red):
+def inspect_meshes():
     names = source_names()
+    apply_material = runpy.run_path("/muscle-materials.py")["apply"]
     source_objects = [obj for obj in bpy.context.scene.objects if obj.type == "MESH" and obj.data.name in names]
     if {obj.data.name for obj in source_objects} != names.keys() or len(source_objects) != len(names):
         raise ValueError("pinned atlas mesh count differs")
@@ -74,8 +66,7 @@ def inspect_meshes(red):
         obj["review_status"] = "excluded_cardiac" if cardiac else "source_geometry_unreviewed"
         obj.hide_render = cardiac
         obj.hide_set(cardiac)
-        obj.data.materials.clear()
-        obj.data.materials.append(red)
+        apply_material(obj.data)
         obj.data.polygons.foreach_set("use_smooth", [True] * len(obj.data.polygons))
         if not cardiac:
             shown.append(obj)
@@ -156,13 +147,13 @@ def main():
     bpy.ops.import_scene.gltf(filepath="/atlas.glb")
     bpy.context.view_layer.update()
     scene = bpy.context.scene
-    shown, rows = inspect_meshes(material())
+    shown, rows = inspect_meshes()
     report = {
         "status": "SOURCE_REFERENCE_ONLY",
         "source_url": SOURCE_URL, "sha256": SOURCE_SHA256, "license": "CC-BY-4.0",
         "attribution": "BodyParts3D © Database Center for Life Science (DBCLS); adapted and rigged by MyoSuite",
         "source_pose": "MyoSuite myoMimicFullbody-v0 bind pose",
-        "display": "Fixed red material and smooth shading; no geometry or pose changes",
+        "display": "Procedural fibres in fixed mesh coordinates; no geometry or pose changes",
         "source_objects": len(rows), "visible_unreviewed_objects": len(shown),
         "excluded_cardiac_objects": len(rows) - len(shown),
         "confirmed_on_ms_human_700": 0, "skeletal_muscle_coverage": None,

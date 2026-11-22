@@ -6,7 +6,13 @@
 - Added optional BodyParts3D clavicular pectoralis replay and phase-specific registration diagnostics.
 - Added bounded push-up render recipes and verified local atlas provisioning.
 - Added a private Fit3D motion importer, kinematic comparison and skeleton overlay.
-- Preserved the v0.7.1 simulation scenarios and results contract. See [the v0.8 guide](docs/V08_ANATOMICAL_EVIDENCE.md).
+- Added the optional MyoSuite whole-body source preview and a scripted local
+  replay with full-resolution geometry for 62 arm parts, a bilateral distal fit,
+  and a verified fold repair on 57 surfaces.
+- Render recipe reuse now includes renderer lock digests. Artifact manifests
+  and evidence share the same verified metadata.
+- Preserved the v0.7.1 simulation scenarios and results contract. Anatomical
+  acceptance remains **PARTIAL**. See the [v0.8 handoff](docs/RELEASE_080.md).
 
 ## 0.7.1 — Public release hardening and contributor onboarding
 

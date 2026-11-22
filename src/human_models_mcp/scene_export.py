@@ -69,15 +69,15 @@ def load_saved_run(source):
         states, times, qpos = saved["states"], saved["time_s"], saved["qpos"]
     if state_spec != int(mj.mjtState.mjSTATE_INTEGRATION):
         raise ValueError("only recorded integration states supported")
+    if times.ndim != 1 or not 3 <= len(times) <= 401:
+        raise ValueError("trajectory requires a one-dimensional clock with 3 to 401 states")
     if states.shape != (len(times), mj.mj_stateSize(model, state_spec)) or qpos.shape != (
         len(times),
         model.nq,
     ):
         raise ValueError("trajectory shapes differ from the pinned compiled model")
     if (
-        times.ndim != 1
-        or not 3 <= len(times) <= 401
-        or not all(np.isfinite(v).all() for v in (states, times, qpos))
+        not all(np.isfinite(v).all() for v in (states, times, qpos))
         or not np.all(np.diff(times) > 0)
     ):
         raise ValueError("nonfinite, nonmonotonic or unsupported state count")

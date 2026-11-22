@@ -148,7 +148,13 @@ def register(model, neutral, pinned_model, folder):
         "source_topology": {"boundary_edges_after_exact_weld": int(np.count_nonzero(counts == 1)),
                             "nonmanifold_edges_after_exact_weld": int(np.count_nonzero(counts > 2))},
         "activation_mapping": "unavailable; fixed anatomical display colour",
-        "display_material": {"name": "Atlas surface / anatomical red", "linear_rgb": [.42, .085, .055]},
+        "display_material": {
+            "name": "Atlas muscle · procedural fibres",
+            "linear_rgb": [.44, .092, .056],
+            "linear_rgb_role": "highlight palette entry",
+            "orientation": "dominant geometry axis for display",
+            "interpretation": "fixed procedural shading; no measured fibre field or activation",
+        },
         "limitations": [
             "Nearest vertices and extrema are geometric proxies. Landmark homology and attachment footprints lack specialist review.",
             "The generic donor and model differ in anthropometry. Similarity of bone surfaces does not establish muscle registration accuracy.",

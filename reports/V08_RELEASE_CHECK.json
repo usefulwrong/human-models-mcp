@@ -203,6 +203,81 @@
         "atlas surface crosses floor",
         "independent anatomical review pending"
       ]
+    },
+    "torso_expansion": {
+      "status": "ILLUSTRATIVE_ENGINEERING_PROBE",
+      "thoracic12_distinct_local_vertices": 212,
+      "thoracic12_raw_vertex_set_max_distance_m": 0.0,
+      "supported_bone_mesh_correspondences": 61,
+      "rigged_myosuite_surface_count": 288,
+      "additional_z_anatomy_rectus_surface_count": 2,
+      "checked_saved_states": 23,
+      "backend": "optix",
+      "device": "NVIDIA GeForce RTX 3070 Ti",
+      "maximum_rectus_anchor_residual_m": 1.4905817079352256e-07,
+      "rectus_vertices_across_model_midline": 0,
+      "existing_minimum_floor_clearance_m": -0.011852137744426727,
+      "groups_without_replayed_volume": ["latissimus_dorsi", "internal_oblique", "transversus_abdominis"],
+      "standalone_scene_reopened_and_verified": true,
+      "native_torso_activity_control": "assisted_muscle",
+      "independent_anatomical_validation": "pending"
+    },
+    "superficial_clearance": {
+      "status": "ILLUSTRATIVE_GEOMETRY_CORRECTION",
+      "scope": ["pectoralis_major", "external_oblique", "trapezius"],
+      "fitted_surfaces": 12,
+      "source_states": 23,
+      "nonimproving_mesh_frames": 0,
+      "bone_triangle_intersection_pairs_before": 83615,
+      "bone_triangle_intersection_pairs_after": 37385,
+      "maximum_vertex_displacement_m": 0.024,
+      "whole_atlas_bottom_triangle_pairs_before": 67624,
+      "whole_atlas_bottom_triangle_pairs_after": 65654,
+      "whole_atlas_surfaces_with_intersections_at_bottom": 270,
+      "native_bone_landmark_error_m": 1.4975481660844222e-07,
+      "original_geometry_archived_in_blend": true,
+      "independent_anatomical_validation": "pending"
+    },
+    "default_fibre_material": {
+      "status": "ILLUSTRATIVE_DISPLAY_MATERIAL",
+      "volumetric_recipe_default": true,
+      "textured_visible_surfaces": 290,
+      "rectus_source": "Z-Anatomy CC BY-SA 4.0",
+      "source_tendon_faces_per_side": 6611,
+      "frames_per_mode": 23,
+      "unchanged_geometry_meshes_per_reopened_frame": 422,
+      "checked_reopened_frames": [0, 11, 22],
+      "backend": "optix",
+      "device": "NVIDIA GeForce RTX 3070 Ti",
+      "independent_anatomical_validation": "pending"
+    },
+    "upper_limb_review": {
+      "status": "ILLUSTRATIVE_DISTAL_FIT",
+      "report": "docs/V08_UPPER_LIMB_REVIEW.md",
+      "audited_bilateral_muscle_paths": 16,
+      "fit_scope": "bilateral brachioradialis",
+      "source_states": 23,
+      "fit_checks": 46,
+      "right_distal_endpoint_gap_m_before": 0.01233,
+      "right_distal_endpoint_gap_m_after": 0.00374,
+      "left_distal_endpoint_gap_m_before_range": [0.01253, 0.01254],
+      "left_distal_endpoint_gap_m_after_range": [0.00423, 0.00424],
+      "mismatched_saved_bone_pose_rejected": true,
+      "other_mesh_geometries_unchanged_per_reopened_phase": 420,
+      "open_findings": ["common distal biceps tendon", "wrist extensor routing",
+                        "missing intrinsic hand surfaces", "human palm-contact validation"]
+    },
+    "upper_limb_seam_fit": {
+      "status": "ILLUSTRATIVE_SKIN_WEIGHT_REPAIR",
+      "repaired_source_surfaces": 47,
+      "sampled_source_states": 23,
+      "worst_coincident_vertex_separation_before_m": 0.028312201520490406,
+      "worst_coincident_vertex_separation_after_m": 2.9839552036674004e-07,
+      "bone_triangle_crossings_before": 309499,
+      "bone_triangle_crossings_after": 311423,
+      "triangle_topologies_unchanged": 47,
+      "other_unchanged_meshes_per_reopened_phase": 375,
+      "independent_anatomical_validation": "pending"
     }
   }
 }

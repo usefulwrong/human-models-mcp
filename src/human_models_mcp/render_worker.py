@@ -12,6 +12,7 @@ import subprocess
 import time
 import zipfile
 
+from .evidence import code_sha256, evidence_context
 from .rendering import (
     LAYERS,
     MAX_FILE,
@@ -22,6 +23,7 @@ from .rendering import (
     now,
     queue_root,
     read_job,
+    render_lock_digests,
     write_json,
 )
 
@@ -381,7 +383,12 @@ def process_job(job_id):
     record.update(status="running", started_at=now(), progress={"phase": "exporting"})
     write_json(folder / "job.json", record)
     try:
-        options = RenderOptions.model_validate(record["request"]["options"]).model_dump()
+        request = record["request"]
+        if "render_lock_sha256" in request and (
+            request["render_lock_sha256"] != render_lock_digests() or request["render_code_sha256"] != code_sha256()
+        ):
+            raise ValueError("render worker source or dependency lock hash differs from the submission")
+        options = RenderOptions.model_validate(request["options"]).model_dump()
         source_integrity(folder, record)
         from .scene_export import export_scene
 
@@ -409,6 +416,7 @@ def process_job(job_id):
         if time.monotonic() - started > options["timeout_s"]:
             raise TimeoutError("Render job wall-time budget exceeded")
         out = folder / "artifacts"
+        source_run = json.loads((folder / "input/manifest.json").read_text())
         info = json.loads((out / "blender_render.json").read_text())
         passport = {
             "schema_version": "1.0",
@@ -418,8 +426,8 @@ def process_job(job_id):
             "engine": expected["engine"],
             "source_files": record["source_files"],
             **({"atlas_source_files": record["atlas_source_files"]} if "atlas_source_files" in record else {}),
-            "simulation": json.loads((folder / "input/manifest.json").read_text())["execution"],
-            "source_scientific": json.loads((folder / "input/manifest.json").read_text())["scientific"],
+            "simulation": source_run["execution"],
+            "source_scientific": source_run["scientific"],
             "method": "saved-state kinematics/geometry replay through official USDExporter, Blender USD import and checked transform baking; no physics integration",
             "renderer": info,
             "performance": performance,
@@ -468,9 +476,7 @@ def process_job(job_id):
             )
             write_json(out / "anatomy_registration.json", atlas)
         write_json(out / "passport.json", passport)
-        from .evidence import evidence_context
-
-        contract = evidence_context(json.loads((folder / "input/manifest.json").read_text()))
+        contract = evidence_context(source_run)
         contract["render_job_id"] = job_id
         contract["renderer"] = info
         contract["render_code_sha256"] = passport["renderer_environment"]["source_sha256"]
@@ -489,27 +495,27 @@ def process_job(job_id):
                 "threshold": atlas["blender"]["vertex_tolerance_m"],
                 "value": max(f["max_vertex_error_m"] for f in atlas["blender"]["frames"]),
             })
-        claims = []
-        for path in sorted(out.iterdir()):
-            if path.is_file() and path.suffix != ".blend1":
-                scope = ("unavailable" if path.name == "source.zip" else
-                         "native" if path.name == "blender_render.json" else mapping)
-                claims.append({
-                    "claim_id": "artifact:" + path.name, "quantity": "render_artifact",
-                    "value": artifact_metadata(path), "unit": None,
-                    "time_window_s": [expected["frames"][0]["time_s"], expected["frames"][-1]["time_s"]],
-                    "side": "right" if scope == "illustrative" else None,
-                    "structure": expected.get("atlas", {}).get("anatomical_id") if scope == "illustrative" else None,
-                    "anatomical_mapping_status": scope, "reference_comparison": {"status": "NOT_AVAILABLE"},
-                    "evidence_class": "internally_checked", "validation_status": "unvalidated",
-                    "confidence_explanation": "Blender transfer checks compare to the saved model and optional skinning rig only.",
-                })
-        write_json(out / "evidence.json", dict(contract, claims=claims))
         files = {
             p.name: artifact_metadata(p)
-            for p in out.iterdir()
-            if p.is_file() and p.suffix not in (".blend1",)
+            for p in sorted(out.iterdir())
+            if p.is_file() and p.suffix != ".blend1" and p.name != "evidence.json"
         }
+        claims = []
+        for name, metadata in files.items():
+            scope = ("unavailable" if name == "source.zip" else
+                     "native" if name == "blender_render.json" else mapping)
+            claims.append({
+                "claim_id": "artifact:" + name, "quantity": "render_artifact",
+                "value": metadata, "unit": None,
+                "time_window_s": [expected["frames"][0]["time_s"], expected["frames"][-1]["time_s"]],
+                "side": "right" if scope == "illustrative" else None,
+                "structure": expected.get("atlas", {}).get("anatomical_id") if scope == "illustrative" else None,
+                "anatomical_mapping_status": scope, "reference_comparison": {"status": "NOT_AVAILABLE"},
+                "evidence_class": "internally_checked", "validation_status": "unvalidated",
+                "confidence_explanation": "Blender transfer checks compare to the saved model and optional skinning rig only.",
+            })
+        write_json(out / "evidence.json", dict(contract, claims=claims))
+        files["evidence.json"] = artifact_metadata(out / "evidence.json")
         if (
             not {
                 "preview.png",

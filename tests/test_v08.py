@@ -1,4 +1,5 @@
 import json
+from uuid import uuid4
 
 import numpy as np
 import pytest
@@ -84,6 +85,9 @@ def test_fit3d_contract_with_synthetic_frames_only(tmp_path, monkeypatch):
     np.testing.assert_allclose(aligned, xyz, atol=1e-15, rtol=0)
     assert result["metrics"]["mpjpe_m"] < 1e-15
     assert result["time_alignment"]["bottom_phase_difference"] == 0
+    for bad_clock in ([], [*reference["time_s"][:-1], np.inf]):
+        with pytest.raises(ValueError, match="clocks"):
+            compare_motion(dict(reference, time_s=bad_clock), xyz, reference["time_s"], [0, 10, 20])
     assert write_comparison("run", None, None, None)["reason"] == "LICENSED_DATA_NOT_PROVIDED"
     with pytest.raises(ValueError, match="license"):
         import_fit3d(path, meta, False)
@@ -97,3 +101,37 @@ def test_fit3d_contract_with_synthetic_frames_only(tmp_path, monkeypatch):
     path.write_text(json.dumps({"joints3d_25": raw.tolist()}))
     with pytest.raises(ValueError, match="nonfinite"):
         import_fit3d(path, meta, True)
+
+
+def test_recipe_cache_rejects_a_different_renderer_lock(tmp_path, monkeypatch):
+    from human_models_mcp.rendering import digest, render_result
+    from human_models_mcp.render_worker import process_job
+
+    monkeypatch.setenv("HUMAN_MODELS_HOME", str(tmp_path))
+    run_id = str(uuid4())
+    run = tmp_path / "results" / run_id
+    run.mkdir(parents=True)
+    (run / "series.csv").write_text("time_s\n0\n0.1\n0.2\n")
+    np.savez(run / "trajectory.npz", time_s=[0, .1, .2])
+    manifest = run / "manifest.json"
+    manifest.write_text(json.dumps({
+        "run_id": run_id, "status": "computed", "scenario_id": "pushup",
+        "execution": {"integration_steps": 3}, "scientific": {"limitations": []},
+        "artifacts": {p.name: {"sha256": digest(p)} for p in run.iterdir()},
+    }))
+    original = manifest.read_bytes()
+    lock = tmp_path / "renderer.lock.json"
+    lock.write_text('{"renderer": "first"}')
+
+    def submit():
+        return render_result(run_id, recipe="pushup_muscle_paths", options={"frames": 3})
+
+    first = submit()
+    assert first["status"] == "queued", first
+    assert submit()["job_id"] == first["job_id"]
+    lock.write_text('{"renderer": "second"}')
+    after = submit()
+    assert after["status"] == "queued" and after["job_id"] != first["job_id"]
+    failed = process_job(first["job_id"])
+    assert failed["error"]["code"] == "integrity_error"
+    assert manifest.read_bytes() == original
