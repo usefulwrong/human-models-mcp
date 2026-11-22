@@ -12,6 +12,7 @@ import subprocess
 import time
 import zipfile
 
+from .evidence import code_sha256, evidence_context
 from .rendering import (
     LAYERS,
     MAX_FILE,
@@ -22,6 +23,7 @@ from .rendering import (
     now,
     queue_root,
     read_job,
+    render_lock_digests,
     write_json,
 )
 
@@ -29,7 +31,7 @@ from .rendering import (
 def source_integrity(folder, record):
     if (folder / "input").is_symlink():
         raise ValueError("symlinked render input")
-    for name, expected in record["source_files"].items():
+    for name, expected in (record["source_files"] | record.get("atlas_source_files", {})).items():
         if Path(name).name != name or name in (".", ".."):
             raise ValueError("invalid source filename")
         path = folder / "input" / name
@@ -234,9 +236,10 @@ def package_media(folder, expected):
         )
         if pushup:
             kind += " / " + expected["model"]["derivation"].get("hand_support", "legacy_point").upper()
-            if expected.get("acceptance", {}).get("full_pushup") == "FAIL":
-                label = ("INCOMPLETE CYCLE" if expected.get("acceptance", {}).get("reference_hand_placement") == "PASS"
-                         else "REJECTED TECHNIQUE")
+            acceptance = expected.get("acceptance", {})
+            if acceptance.get("full_pushup") == "FAIL":
+                label = ("INCOMPLETE CYCLE" if acceptance.get("full_cycle_kinematics") == "FAIL"
+                         else "EXERCISE GATES FAILED")
                 kind = label + " / " + kind
             if expected["model"]["derivation"]["parameters"].get("palm_technique") == "chest_level":
                 kind += " / CHEST-LEVEL WIDE PALMS"
@@ -256,12 +259,18 @@ def package_media(folder, expected):
             muscle_cursor.set_xdata([frame["time_s"], frame["time_s"]])
         figure.canvas.draw()
         graph = Image.fromarray(np.asarray(figure.canvas.buffer_rgba())[:, :, :3].copy())
-        if picture.width >= 640 and not regional_view:
+        if picture.width >= 640 and not regional_view and expected["request"].get("recipe") != "pushup_cinematic":
             graph.thumbnail((picture.width - 16 if pushup else picture.width // 3, picture.height // 3))
             picture.paste(graph, (picture.width - graph.width - 8, picture.height - graph.height - (30 if pushup else 8)))
         region = expected.get("regional_layer") or ("lumbar_muscles" if settings.get("camera_view") == "lumbar" else "abdominal_muscles")
         regional_values = {p["actuator"]: p["activation"] for p in frame["paths"] if region in p.get("regions", [])} if regional_view else {}
         legend = (
+            "Z-Anatomy | Bilateral rectus | Illustrative fit | Floor hidden for inspection"
+            if "rectus_atlas" in expected["request"]["layers"] else
+            "BodyParts3D / DBCLS | Right clavicular pectoralis | Illustrative skinning | No activation mapping"
+            if "atlas" in expected else
+            "Amber: ground reaction [N] | Joint axes and center of mass"
+            if expected["request"].get("recipe") == "pushup_scientific" else
             f"Pectoral paths: R {float(frame['metrics']['pectoralis_r_absolute_path_force_N']):.1f} N, L {float(frame['metrics']['pectoralis_l_absolute_path_force_N']):.1f} N | Activation blue 0 -> red 1"
             if chest_view else
             "Region mean saved activation: " + f"{np.mean(list(regional_values.values())):.3f}"
@@ -291,20 +300,30 @@ def package_media(folder, expected):
         frames.append(picture)
     plt.close(figure)
     frames[-1].save(out / "preview.png")
-    palette = frames[0].quantize(colors=128, method=Image.Quantize.MEDIANCUT)
+    for phase, source_index in expected.get("phase_source_indices", {}).items():
+        frame = next(f for f in expected["frames"] if f["source_index"] == source_index)
+        frames[frame["frame"]].save(out / (phase + ".png"))
+    palette_samples = Image.new("RGB", (480, 90))
+    for column, index in enumerate((0, len(frames) // 2, len(frames) - 1)):
+        sample = frames[index].copy()
+        sample.thumbnail((160, 90))
+        palette_samples.paste(sample, (160 * column, 0))
+    palette = palette_samples.quantize(colors=192, method=Image.Quantize.MEDIANCUT)
     indexed = [im.quantize(palette=palette, dither=Image.Dither.NONE) for im in frames]
-    gif_interval_ms = max(10, round(100 / settings["fps"]) * 10)
+    gif_boundaries = [round(i * 100 / settings["fps"]) * 10 for i in range(len(frames) + 1)]
+    gif_intervals = [b - a for a, b in zip(gif_boundaries, gif_boundaries[1:])]
     indexed[0].save(
         out / "animation.gif",
         save_all=True,
         append_images=indexed[1:],
-        duration=gif_interval_ms,
+        duration=gif_intervals,
         loop=0,
         optimize=False,
     )
     expected["timing"].update(
-        gif_frame_interval_ms=gif_interval_ms,
-        gif_duration_s=len(frames) * gif_interval_ms / 1000,
+        gif_frame_interval_ms=gif_intervals[0] if len(set(gif_intervals)) == 1 else None,
+        gif_frame_intervals_ms=gif_intervals,
+        gif_duration_s=gif_boundaries[-1] / 1000,
         gif_clock="GIF centisecond-quantized presentation; physical times are in each frame",
     )
     write_json(work / "expected.json", expected)
@@ -330,6 +349,8 @@ def package_media(folder, expected):
             "yuv420p",
             "-crf",
             "18",
+            "-movflags",
+            "+faststart",
             str(out / "animation.mp4"),
         ],
         check=True,
@@ -341,12 +362,15 @@ def package_media(folder, expected):
             archive.write(work / name, name)
     with zipfile.ZipFile(out / "source.zip", "w", compression=zipfile.ZIP_DEFLATED) as archive:
         for path in (folder / "input").iterdir():
-            archive.write(path, path.name)
+            if path.name not in expected.get("atlas", {}).get("source", {}).get("files", {}):
+                archive.write(path, path.name)
     with zipfile.ZipFile(out / "scene.zip", "w", compression=zipfile.ZIP_DEFLATED) as archive:
         for path in (work / "usd").rglob("*"):
             if path.is_file():
                 archive.write(path, str(path.relative_to(work)))
         archive.write(work / "expected.json", "expected.json")
+        if (work / "atlas_surfaces.npz").is_file():
+            archive.write(work / "atlas_surfaces.npz", "atlas_surfaces.npz")
     write_json(
         out / "frames.json",
         {
@@ -355,6 +379,7 @@ def package_media(folder, expected):
             "units": expected["units"],
             "coordinates": expected["coordinates"],
             "timing": expected["timing"],
+            "phase_source_indices": expected.get("phase_source_indices", {}),
             "frames": [
                 {
                     "frame": f["frame"],
@@ -376,7 +401,12 @@ def process_job(job_id):
     record.update(status="running", started_at=now(), progress={"phase": "exporting"})
     write_json(folder / "job.json", record)
     try:
-        options = RenderOptions.model_validate(record["request"]["options"]).model_dump()
+        request = record["request"]
+        if "render_lock_sha256" in request and (
+            request["render_lock_sha256"] != render_lock_digests() or request["render_code_sha256"] != code_sha256()
+        ):
+            raise ValueError("render worker source or dependency lock hash differs from the submission")
+        options = RenderOptions.model_validate(request["options"]).model_dump()
         source_integrity(folder, record)
         from .scene_export import export_scene
 
@@ -404,6 +434,7 @@ def process_job(job_id):
         if time.monotonic() - started > options["timeout_s"]:
             raise TimeoutError("Render job wall-time budget exceeded")
         out = folder / "artifacts"
+        source_run = json.loads((folder / "input/manifest.json").read_text())
         info = json.loads((out / "blender_render.json").read_text())
         passport = {
             "schema_version": "1.0",
@@ -412,8 +443,9 @@ def process_job(job_id):
             "model": expected["model"],
             "engine": expected["engine"],
             "source_files": record["source_files"],
-            "simulation": json.loads((folder / "input/manifest.json").read_text())["execution"],
-            "source_scientific": json.loads((folder / "input/manifest.json").read_text())["scientific"],
+            **({"atlas_source_files": record["atlas_source_files"]} if "atlas_source_files" in record else {}),
+            "simulation": source_run["execution"],
+            "source_scientific": source_run["scientific"],
             "method": "saved-state kinematics/geometry replay through official USDExporter, Blender USD import and checked transform baking; no physics integration",
             "renderer": info,
             "performance": performance,
@@ -448,12 +480,65 @@ def process_job(job_id):
             "total_seconds": time.monotonic() - started,
             "test_failure_injection": os.environ.get("HMM_TEST_RENDER_FAILURE"),
         }
+        if "atlas" in expected:
+            atlas = {k: v for k, v in expected["atlas"].items() if k != "faces"}
+            atlas["frames"] = [dict(f["atlas_checks"], source_index=f["source_index"], time_s=f["time_s"],
+                                    state_sha256=f["state_sha256"]) for f in expected["frames"]]
+            atlas["blender"] = passport["geometry_validation"]["atlas_surface"]
+            passport["anatomy"].update(
+                source="Pinned native MS-Human-700 and " + atlas["anatomical_id"],
+                mapping=atlas["method"],
+                external_registration=atlas["status"],
+                atlas_license=atlas["source"]["license"],
+                atlas_report="anatomy_registration.json",
+            )
+            write_json(out / "anatomy_registration.json", atlas)
         write_json(out / "passport.json", passport)
+        def source_json(name):
+            path = folder / "input" / name
+            return json.loads(path.read_text()) if name in record["source_files"] else None
+
+        contract = evidence_context(source_run, source_json("summary.json"), source_json("validation.json"))
+        contract["render_job_id"] = job_id
+        contract["renderer"] = info
+        contract["render_code_sha256"] = passport["renderer_environment"]["source_sha256"]
+        contract["numeric_checks"] += [
+            {"name": name, "status": "PASS", "threshold": expected["geometry_validation"].get(tolerance)}
+            for name, tolerance in (("blender_translation", "translation_tolerance_m"),
+                                    ("blender_rotation", "rotation_matrix_tolerance"),
+                                    ("blender_landmarks", "landmark_tolerance_m"))
+        ]
+        mapping = expected.get("atlas", {}).get("status", "native")
+        if "atlas" in expected:
+            contract["sources"] = [*contract["sources"], atlas["source"]]
+            contract["scope_limitations"] = [*contract["scope_limitations"], *atlas["limitations"]]
+            contract["numeric_checks"].append({
+                "name": "blender_atlas_surface_transfer", "status": "PASS", "unit": "m",
+                "threshold": atlas["blender"]["vertex_tolerance_m"],
+                "value": max(f["max_vertex_error_m"] for f in atlas["blender"]["frames"]),
+            })
         files = {
             p.name: artifact_metadata(p)
-            for p in out.iterdir()
-            if p.is_file() and p.suffix not in (".blend1",)
+            for p in sorted(out.iterdir())
+            if p.is_file() and p.suffix != ".blend1" and p.name != "evidence.json"
         }
+        claims = []
+        for name, metadata in files.items():
+            scope = ("unavailable" if name in {"source.zip", "blender_render.json", "frames.json"} else
+                     "native" if name == "plot.png" else mapping)
+            claims.append({
+                "claim_id": "artifact:" + name, "quantity": "render_artifact",
+                "value": metadata, "unit": None,
+                "time_window_s": [expected["frames"][0]["time_s"], expected["frames"][-1]["time_s"]],
+                "side": ("bilateral" if "structures" in atlas else "right") if scope == "illustrative" else None,
+                "structure": expected.get("atlas", {}).get("anatomical_id") if scope == "illustrative" else None,
+                "anatomical_mapping_status": scope, "reference_comparison": {"status": "NOT_AVAILABLE"},
+                "evidence_class": "internally_checked" if name != "source.zip" else "computed_only",
+                "validation_status": "unvalidated",
+                "confidence_explanation": "Blender transfer checks compare to the saved model and optional skinning rig only.",
+            })
+        write_json(out / "evidence.json", dict(contract, claims=claims))
+        files["evidence.json"] = artifact_metadata(out / "evidence.json")
         if (
             not {
                 "preview.png",
@@ -480,7 +565,11 @@ def process_job(job_id):
             scientific={
                 "validation_level": "numerical_sanity",
                 "geometry_status": "validated_for_named_checks",
-                "anatomical_registration": "native_model_only; external registration_unverified",
+                "anatomical_registration": (atlas["status"] if "atlas" in expected else
+                                            "native_model_only; external registration_unverified"),
+                "acceptance": contract["acceptance"],
+                "human_validation_status": contract["human_validation_status"],
+                "human_safety_status": contract["human_safety_status"],
             },
             render_backend=info["device"],
             seconds=time.monotonic() - started,

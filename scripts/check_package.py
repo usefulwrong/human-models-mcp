@@ -62,7 +62,7 @@ with tempfile.TemporaryDirectory() as temp:
     )
     with tarfile.open(next((project / "dist").glob("*.tar.gz"))) as source:
         members = source.getnames()
-        assert not any(p.endswith((".zip", ".mp4", ".gif", ".blend", ".usdc")) for p in members)
+        assert not any(p.endswith((".zip", ".mp4", ".gif", ".blend", ".usdc", ".obj")) for p in members)
         assert not any('/outputs/' in p or '/reports/' in p or '/render_vendor/' in p for p in members)
         assert next((project / "dist").glob("*.tar.gz")).stat().st_size < 2 * 1024 * 1024
         assert any(p.endswith("/scenarios/knee_sweep/scenario.yaml") for p in members)
@@ -80,6 +80,8 @@ with tempfile.TemporaryDirectory() as temp:
         assert any(p.endswith("/AGENTS.md") for p in members)
         assert any(p.endswith("/tests/fixtures/rejected_knuckle_pose.json") for p in members)
         assert any(p.endswith("/adapters/palms_full_reference_v1.json") for p in members)
+        assert any(p.endswith("/atlas_pectoralis.json") for p in members)
+        assert any(p.endswith("/scripts/atlas_arm_replay.sh") for p in members)
         assert any(p.endswith("/renderer.lock.json") for p in members)
         assert any(p.endswith("/skills/scientific-visualization/SKILL.md") for p in members)
     wheel = next((project / "dist").glob("*.whl"))
@@ -92,23 +94,35 @@ with tempfile.TemporaryDirectory() as temp:
         assert "human_models_mcp/adapters/supports.py" in package.namelist()
         assert "human_models_mcp/adapters/palms_full_reference_v1.json" in package.namelist()
         assert "human_models_mcp/anatomy.py" in package.namelist()
+        assert "human_models_mcp/atlas_pectoralis.json" in package.namelist()
+        assert not any(name.endswith(".obj") for name in package.namelist())
         assert "human_models_mcp/rendering.py" in package.namelist()
         assert "human_models_mcp/blender_scene.py" in package.namelist()
-        package.extractall(project / "installed")
-    subprocess.run(
-        [
-            sys.executable,
-            "-I",
-            "-c",
-            "import sys;sys.path.insert(0,sys.argv[1]);from human_models_mcp import __version__;assert __version__==sys.argv[2]",
-            str(project / "installed"),
-            VERSION,
-        ],
-        cwd="/tmp",
-        check=True,
-    )
+    for artifact in (wheel, next((project / "dist").glob("*.tar.gz"))):
+        installed = project / artifact.name
+        subprocess.run(
+            [sys.executable, "-m", "pip", "install", "--no-index", "--no-deps", "--no-build-isolation",
+             "--no-cache-dir", "--target", str(installed), str(artifact)],
+            cwd="/tmp",
+            check=True,
+        )
+        subprocess.run(
+            [
+                sys.executable,
+                "-I",
+                "-c",
+                "from pathlib import Path; import sys; sys.path.insert(0, sys.argv[1]); "
+                "import human_models_mcp; from human_models_mcp import server, visualize; "
+                "assert Path(human_models_mcp.__file__).is_relative_to(sys.argv[1]); "
+                "assert human_models_mcp.__version__ == sys.argv[2]",
+                str(installed),
+                VERSION,
+            ],
+            cwd="/tmp",
+            check=True,
+        )
     destination = ROOT / "reports/packages" / VERSION
     destination.mkdir(parents=True, exist_ok=True)
     for artifact in (project / "dist").iterdir():
         shutil.copy2(artifact, destination / artifact.name)
-print("Package wheel/sdist, dependency consistency, clean import and required notices: pass")
+print("Package wheel/sdist builds and installs, dependency consistency, imports and required notices: pass")

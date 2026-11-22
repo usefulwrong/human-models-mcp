@@ -17,6 +17,7 @@ from pydantic import ValidationError
 
 from . import __version__
 from .catalog import MODEL_FILES, CITATIONS, LIMITATIONS, SWEEP_LIMITATIONS, FORWARD_LIMITATIONS, COUPLED_LIMITATIONS, model_card
+from .evidence import code_sha256
 from .registry import PARAMETER_TYPES, discover, home
 from .results import error, get_run, run_dir, store, interrupt_run
 
@@ -114,6 +115,7 @@ def run_scenario(scenario_id: str, parameters: dict | None = None, idempotency_k
                           "seed": None, "parameters": params, "integration_steps": 0,
                           "environment": {"python": platform.python_version(), "platform": platform.platform(),
                                           "package_version": __version__, "machine": platform.machine(),
+                                          "code_sha256": code_sha256(),
                                           "requirements_lock_sha256": hashlib.sha256((home() / "requirements.lock").read_bytes()).hexdigest(),
                                           "render_requested": os.environ.get("MUJOCO_GL", "osmesa")},
                           "result_status": "running"},

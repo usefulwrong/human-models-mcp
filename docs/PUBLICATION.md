@@ -1,11 +1,10 @@
 # Public files, archives and operator handoff
 
 The public repository is [usefulwrong/human-models-mcp](https://github.com/usefulwrong/human-models-mcp).
-It is a source-checkout Research Preview, not a PyPI release, ready-to-run
-public container distribution or clinical product. **This document describes
-release work; it does not assert that the v0.7.1 GitHub release or DOI exists.**
-The v0.7.0 public tree was already published; v0.7.1 is a patch update, not a
-new repository creation.
+It is a source-checkout Research Preview. The current manifest and operator
+steps are in the [v0.8.0 release handoff](RELEASE_080.md).
+
+The following material documents the v0.7.x delivery and its retention policy.
 
 ## Retention matrix
 
@@ -49,7 +48,7 @@ Do not use an unfiltered tar of the working directory or `git archive HEAD`:
 HEAD may not contain the release work and private history is outside the
 reviewed delivery surface.
 
-## Manual publication checklist
+## v0.7.1 manual publication checklist
 
 1. Check the exact public `main` base and backup any local work. On the working
    repository run `git apply --check` with the delivered cumulative patch.

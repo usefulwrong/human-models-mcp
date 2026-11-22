@@ -1,0 +1,63 @@
+{
+  "dataset": "BodyParts3D",
+  "version": "4.3",
+  "source_url": "https://dbarchive.biosciencedbc.jp/en/bodyparts3d/",
+  "source_index": "https://dbarchive.biosciencedbc.jp/data/bodyparts3d/LATEST/isa_element_parts.txt",
+  "license": "CC-BY-SA-2.1-JP",
+  "license_url": "https://creativecommons.org/licenses/by-sa/2.1/jp/",
+  "current_archive_terms": "https://dbarchive.biosciencedbc.jp/en/bodyparts3d/lic.html",
+  "copy_terms": "https://github.com/olivercase/body_parts_3d_api/blob/fd527e6f4daf732fd814314d9257df5877b844bc/LICENSE",
+  "attribution": "BodyParts3D, \u00a9 The Database Center for Life Science (DBCLS).",
+  "source_coordinates": {
+    "unit": "mm",
+    "axis_convention": "right-handed X left, Y posterior, Z superior (inferred from atlas bone and muscle arrangement)",
+    "world_basis": [
+      [
+        0,
+        -1,
+        0
+      ],
+      [
+        1,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        1
+      ]
+    ]
+  },
+  "model_revision": "98a70c569c4c1b6da467a20012f766ee1f8dc521",
+  "model_asset_sha256": "a32fc82227aebf5156d9efd067d3799513044a24ca12dd117d8b9b4be436d689",
+  "files": {
+    "FJ1447.obj": {
+      "object_id": "FJ1447",
+      "representation_id": "BP23304",
+      "anatomical_id": "FMA34690",
+      "label": "Clavicular part of right pectoralis major",
+      "bytes": 141116,
+      "sha256": "8946eb62e954e216065235ed2fd434137b5a0b7d9c53663eccb429bbcec1191a",
+      "url": "https://media.githubusercontent.com/media/olivercase/body_parts_3d_api/fd527e6f4daf732fd814314d9257df5877b844bc/meshes/FJ1447_BP23304_FMA34690_Clavicular%20part%20of%20right%20pectoralis%20major.obj"
+    },
+    "FJ3362.obj": {
+      "object_id": "FJ3362",
+      "representation_id": "BP23174",
+      "anatomical_id": "FMA13322",
+      "label": "Right clavicle",
+      "bytes": 67957,
+      "sha256": "ea1c86d112c0635759ecf6ca9633b023b87e16511f01d6ef165b98d729316970",
+      "url": "https://media.githubusercontent.com/media/olivercase/body_parts_3d_api/fd527e6f4daf732fd814314d9257df5877b844bc/meshes/FJ3362_BP23174_FMA13322_Right%20clavicle.obj"
+    },
+    "FJ3368.obj": {
+      "object_id": "FJ3368",
+      "representation_id": "BP23164",
+      "anatomical_id": "FMA23130",
+      "label": "Right humerus",
+      "bytes": 256200,
+      "sha256": "0ad8a599aa3189fe4085c3d2d9b51f38c4aa46dcc8491769b4d5a03fc5666e38",
+      "url": "https://media.githubusercontent.com/media/olivercase/body_parts_3d_api/fd527e6f4daf732fd814314d9257df5877b844bc/meshes/FJ3368_BP23164_FMA23130_Right%20humerus.obj"
+    }
+  }
+}

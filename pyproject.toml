@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "human-models-mcp"
-version = "0.7.1"
+version = "0.8.0"
 description = "UsefulWrong: reproducible model-specific musculoskeletal measurements over MCP"
 readme = "README.md"
 requires-python = ">=3.12,<3.13"
@@ -19,7 +19,7 @@ human-models-visualize = "human_models_mcp.visualize:main"
 where = ["src"]
 
 [tool.setuptools.package-data]
-human_models_mcp = ["adapters/palms_full_reference_v1.json"]
+human_models_mcp = ["adapters/palms_full_reference_v1.json", "atlas_pectoralis.json"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

@@ -66,7 +66,11 @@ Blender 4.5.15 LTS (GPL-3.0-or-later), usd-core/OpenUSD 26.11
 (LicenseRef-TOST-1.0) and their bundled dependencies are separate from the
 MIT wrapper. Exact sources, hashes, licenses and redistribution considerations
 are in [BLENDER_RENDERER.md](BLENDER_RENDERER.md) and renderer.lock.json.
-External atlas meshes are not integrated into distributed demos. HRA reference
+The historical demo uses native model geometry. The four-view workflow demo
+includes renders of two Z-Anatomy muscles with separate CC BY-SA 4.0 terms.
+The downloaded atlas meshes and editable atlas scene stay local.
+[Rectus attribution](BODYPARTS3D.md#rectus-abdominis-supplement)
+HRA reference
 metadata/optional cache has CC-BY-4.0 attribution; Z-Anatomy source review found
 mixed asset licenses. No general CC permission is inferred for every asset.
 

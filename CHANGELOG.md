@@ -1,5 +1,29 @@
 # Release notes
 
+## 0.8.0 — Anatomical Grounding & Evidence v1
+
+- Added claim-level Evidence Contract retrieval and render evidence artifacts.
+- Added optional BodyParts3D clavicular pectoralis replay and phase-specific registration diagnostics.
+- Added bounded push-up render recipes and verified local atlas provisioning.
+- Added a private Fit3D motion importer, kinematic comparison and skeleton overlay.
+- Added the optional MyoSuite whole-body source preview and a scripted local
+  replay with full-resolution geometry for 62 arm parts, a bilateral distal fit,
+  and a verified fold repair on 57 surfaces.
+- Render recipe reuse now includes renderer lock digests. Artifact manifests
+  and evidence share the same verified metadata.
+- Preserved the v0.7.1 simulation scenarios and results contract. Anatomical
+  acceptance remains **PARTIAL**. See the [v0.8 handoff](docs/RELEASE_080.md).
+
+### Research workflow completion
+
+- Added one bounded study submission over the existing simulation worker and
+  Blender queue, accessible through MCP, Python and CLI.
+- Preserved scientific acceptance statuses in run evidence, finished render
+  jobs and render evidence, including `NOT_ACHIEVED` for muscle-only control.
+- Added a pinned, licensed bilateral Z-Anatomy rectus recipe with saved-site
+  registration, source tendon assignments and per-frame evidence.
+- Exported matched phase stills and a shared frame clock for multi-view demos.
+
 ## 0.7.1 — Public release hardening and contributor onboarding
 
 Release hardening and public documentation only: existing MuJoCo calculations,

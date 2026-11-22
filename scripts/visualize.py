@@ -1,5 +1,6 @@
 """Stdlib host launcher for the standalone toolkit; Docker starts only on the host."""
 
+import os
 from pathlib import Path
 import subprocess
 import sys
@@ -12,7 +13,7 @@ command = [
     "-f",
     str(ROOT / "compose.yaml"),
     "-p",
-    "human-models-mcp-night",
+    os.environ.get("COMPOSE_PROJECT_NAME", "human-models-mcp-night"),
     "run",
     "--rm",
     "--no-deps",

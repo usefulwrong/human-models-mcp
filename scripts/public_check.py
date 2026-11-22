@@ -22,7 +22,10 @@ ROOT_FILES = ("README.md", "AGENTS.md", "LICENSE", "CITATION.cff", "CONTRIBUTING
               "requirements.in", "requirements.lock", "requirements-render.lock", "models.lock.json",
               "renderer.lock.json", "visual_sources.json")
 REPORTS = ("PUBLIC_RELEASE_CHECK.json", "PUBLIC_RELEASE_AUDIT.md", "PUBLIC_RELEASE_ASSETS.json",
-           "PUBLIC_LINK_CHECK.json", "PUBLIC_EXTERNAL_LINKS.json", "PUBLIC_CRITICAL_AUDIT.md")
+           "PUBLIC_LINK_CHECK.json", "PUBLIC_EXTERNAL_LINKS.json", "PUBLIC_CRITICAL_AUDIT.md",
+           "V08_SCIENCE.md", "V08_ANATOMY_REGISTRATION.md", "V08_REFERENCE_BENCHMARK.md",
+           "V08_RENDER_E2E.md", "V08_RELEASE_CHECK.json", "V08_CODE_REVIEW.md", "V08_PUBLICATION_CHECK.json",
+           "V08_FINAL_RELEASE_AUDIT.md", "V08_FINAL_RELEASE_CHECK.json")
 MARKDOWN_LINK = re.compile(r"!?\[[^\]]*\]\((<[^>]+>|[^\s)]+)(?:\s+[^)]*)?\)")
 PRIVATE = {
     "personal_path": re.compile(r"/(?:home|Users)/[A-Za-z0-9_.-]+/"),
@@ -217,19 +220,26 @@ def check(root, *, strict_tree=False):
                 failures.append({**entry, 'reason': 'missing/undelivered file or anchor'})
     demo = root / 'docs/demo/assets.json'
     checked_assets = 0
-    if demo.exists():
-        for name, meta in json.loads(demo.read_text())['files'].items():
-            p = demo.parent / name
-            if not p.is_file() or p.is_symlink() or not p.resolve().is_relative_to(demo.parent):
-                failures.append({'path': 'docs/demo/' + name, 'reason': 'missing/unsafe demo asset'})
+    workflow = demo.parent / 'workflow/assets.json'
+    if not demo.exists():
+        failures.append({'path': 'docs/demo/assets.json', 'reason': 'public demo manifest missing'})
+    for manifest in (demo, workflow):
+        if not manifest.exists() and not (manifest == workflow and workflow.parent.exists()):
+            continue
+        if not manifest.is_file() or manifest.is_symlink():
+            failures.append({'path': manifest.relative_to(root).as_posix(), 'reason': 'public demo manifest missing or unsafe'})
+            continue
+        for name, meta in json.loads(manifest.read_text())['files'].items():
+            p = manifest.parent / name
+            rel = (manifest.parent.relative_to(root) / name).as_posix()
+            if not p.is_file() or p.is_symlink() or not p.resolve().is_relative_to(manifest.parent):
+                failures.append({'path': rel, 'reason': 'missing/unsafe demo asset'})
                 continue
             with p.open('rb') as stream:
                 sha = hashlib.file_digest(stream, 'sha256').hexdigest()
             if sha != meta['sha256'] or p.stat().st_size != meta['bytes']:
-                failures.append({'path': 'docs/demo/' + name, 'reason': 'demo size/hash mismatch'})
+                failures.append({'path': rel, 'reason': 'demo size/hash mismatch'})
             checked_assets += 1
-    else:
-        failures.append({'path': 'docs/demo/assets.json', 'reason': 'public demo manifest missing'})
     return {'status': 'pass' if not failures else 'fail', 'checked_at': datetime.now(timezone.utc).isoformat(),
             'public_files': len(files), 'public_bytes': sum(p.stat().st_size for p in files),
             'relative_links': links, 'external_urls': sorted(external), 'demo_assets_checked': checked_assets,

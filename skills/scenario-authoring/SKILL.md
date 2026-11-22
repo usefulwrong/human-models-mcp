@@ -111,3 +111,17 @@ the trajectory. Compare model limits with those references; preserve an honest
 negative result if they are incompatible. A numeric PASS is not a technique PASS.
 For push-ups explicitly inspect bilateral pectoral forces/activation; rendering
 colors must remain computed values and cannot be supplied from expected EMG.
+
+## Evidence and recipes in v0.8
+
+Record the named exercise variant, comparable landmarks, axis and unit
+conventions, and the distinction between authored motion and independent
+measurements. Check the scenario's named gates before rendering, and preserve
+failed controls and original states.
+
+[Anatomical evidence guide](../../docs/V08_ANATOMICAL_EVIDENCE.md)
+
+When adding a criterion, record its status in scientific acceptance and
+document its thresholds, units, window and source. Keep categorical scope
+statuses such as `NOT_ACHIEVED` and `NOT_VALIDATED`. Verify their values through
+`get_result` with `claim_id: "gate:<name>"` and in a saved-state render contract.

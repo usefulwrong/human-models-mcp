@@ -1,0 +1,1119 @@
+{
+  "schema_version": "1.0",
+  "run_id": "042a4b7e-95a0-4b1b-b0d2-4965a23f1861",
+  "source_model": {
+    "id": "ms_human_700",
+    "source_url": "https://github.com/google-deepmind/mujoco_menagerie/tree/98a70c569c4c1b6da467a20012f766ee1f8dc521/ms_human_700",
+    "revision": "98a70c569c4c1b6da467a20012f766ee1f8dc521",
+    "asset_sha256": "a32fc82227aebf5156d9efd067d3799513044a24ca12dd117d8b9b4be436d689",
+    "license": "Apache-2.0",
+    "integrity": "sha256_verified_for_execution",
+    "derivation": {
+      "version": "1.0.0",
+      "builder": "human_models_mcp.adapters.pushup.pushup_model",
+      "source_variant": "primary",
+      "timestep_s": 0.0005,
+      "friction": 1.3,
+      "muscle_strength_scale": 1.0,
+      "added_floor_and_pads": [
+        "palm_r",
+        "palm_l",
+        "toe_r",
+        "toe_l"
+      ],
+      "added_root_support": false,
+      "added_equalities": 4,
+      "passive_damping_floor": 10,
+      "pad_floor_solref": [
+        0.004,
+        1
+      ],
+      "solver_tolerance": 1e-10,
+      "solver_iterations": 100,
+      "integrator": "implicitfast",
+      "floor_collision_masks": [
+        4,
+        2
+      ],
+      "pad_collision_masks": [
+        2,
+        4
+      ],
+      "parameters": {
+        "control": "assisted_muscle",
+        "hand_support": "palms",
+        "support_boundary": "fixed_points",
+        "knuckle_technique": "legacy_flared",
+        "palm_technique": "chest_full",
+        "muscle_strength_scale": 1.0,
+        "friction": 1.3,
+        "timestep_s": 0.0005,
+        "render": false
+      },
+      "hand_support": "palms",
+      "support_boundary": "fixed_points",
+      "cycle_duration_s": 4.0,
+      "contact_preload_m": 2e-05,
+      "ik": {
+        "schema_version": "1.0.0",
+        "source_revision": "98a70c569c4c1b6da467a20012f766ee1f8dc521",
+        "method": "Synthetic multi-phase bounded IK followed by fixed-stance refinement; not recorded human motion. Offline SciPy 1.16.3; runtime uses checked frozen joint targets and native mj_step.",
+        "palm_yaw_rad": 0.23251865804583882,
+        "palm_x_m": 1.2498272282397551,
+        "palm_width_m": 0.31007420966434945,
+        "wrist_coordinate_extension_min_rad": -0.930016,
+        "shaft_extension_cap_rad": 1.5707963267948966,
+        "shaft_extension_reference_margin_rad": 0.005,
+        "shaft_extension_numerical_tolerance_rad": 0.01,
+        "wrist_basis": "Native elbow and proximal wrist anchors; forearm shaft expressed in hand frame, projected onto native hand longitudinal/dorsal plane. This is a geometric proxy, not calibrated clinical ROM.",
+        "literature": "https://jkoa.org/DOIx.php?id=10.4055/jkoa.2006.41.2.315",
+        "joint_names": [
+          "pelvis_tilt",
+          "elv_angle_r",
+          "shoulder_elv_r",
+          "shoulder_rot_r",
+          "elbow_flexion_r",
+          "pro_sup_r",
+          "deviation_r",
+          "flexion_r",
+          "ankle_angle_r",
+          "mtp_angle_r",
+          "hip_flexion_r",
+          "elv_angle_l",
+          "shoulder_elv_l",
+          "shoulder_rot_l",
+          "elbow_flexion_l",
+          "pro_sup_l",
+          "deviation_l",
+          "flexion_l",
+          "ankle_angle_l",
+          "mtp_angle_l",
+          "hip_flexion_l",
+          "L5_S1_FE",
+          "T12_L1_FE"
+        ],
+        "max_ik_residual": 9.365930522305177e-13,
+        "max_plank_coordinate_rad": 0.09999869005465453,
+        "initial_elbow_rad": 0.1,
+        "peak_elbow_rad": 1.9,
+        "partial_range": false,
+        "native_joint_ranges_unchanged": false,
+        "changed_native_ranges": [
+          "flexion_r lower -0.6 -> -0.930016 rad",
+          "flexion_l lower -0.6 -> -0.930016 rad"
+        ],
+        "unchanged": "All other native joint ranges, internal equalities, muscle strengths/curves, body mass/inertia.",
+        "reference_asset_sha256": "a4ea41d27ebcca8fc71c065587b1895325dad0f97ee1e01b9719ed57ee8423c6",
+        "reference_asset": "palm_reference_input.json",
+        "max_support_closure_m": 1.26610813415099e-13
+      },
+      "fixed_supports": [
+        {
+          "geom": "palm_r",
+          "body": "hand_r",
+          "local_point_m": [
+            -0.0033380016162204663,
+            -0.0449876595397095,
+            -0.036999999999997056
+          ],
+          "world_anchor_m": [
+            1.249827220932168,
+            -0.15503710476264293,
+            0.0
+          ]
+        },
+        {
+          "geom": "palm_l",
+          "body": "hand_l",
+          "local_point_m": [
+            -0.0033380014871717727,
+            -0.044987662205553225,
+            0.03699999999999879
+          ],
+          "world_anchor_m": [
+            1.2498272235560066,
+            0.155037105251355,
+            0.0
+          ]
+        },
+        {
+          "geom": "toe_r",
+          "body": "toes_r",
+          "local_point_m": [
+            0.03999999999999999,
+            -1.734723475976807e-18,
+            3.781355021606887e-18
+          ],
+          "world_anchor_m": [
+            -2.0816681711721685e-17,
+            -0.08500000000000005,
+            0.015
+          ]
+        },
+        {
+          "geom": "toe_l",
+          "body": "toes_l",
+          "local_point_m": [
+            0.03999999999999999,
+            -1.734723475976807e-18,
+            -6.409271483439692e-18
+          ],
+          "world_anchor_m": [
+            -1.7836266942572454e-09,
+            0.0849897429249419,
+            0.015
+          ]
+        }
+      ],
+      "fixed_support_solref": [
+        0.001,
+        1
+      ],
+      "fixed_support_solimp": [
+        0.9999,
+        0.9999,
+        0.001,
+        0.5,
+        2
+      ],
+      "support_guides": {
+        "count": 4,
+        "mass_each_kg": 0.0001,
+        "vertical_damping_Ns_per_m": 0.01,
+        "vertical_motion": "free; normal support remains unilateral native floor contact",
+        "unactuated": true,
+        "friction_check": "native contact cones plus aggregate Coulomb bound for each hand/foot; no pressure-map claim"
+      },
+      "hands": {
+        "support": "palms",
+        "source": "pinned MS-Human-700-Manipulation.xml right articulated hand and native mirrored left meshes",
+        "source_finger_joint_posture_rad": {
+          "cmc_flexion": 0.0,
+          "cmc_abduction": 0.0,
+          "mp_flexion": 0.0,
+          "ip_flexion": 0.0,
+          "2mcp_flexion": 0.0,
+          "2pm_flexion": 0.0,
+          "2md_flexion": 0.0,
+          "3mcp_flexion": 0.0,
+          "3pm_flexion": 0.0,
+          "3md_flexion": 0.0,
+          "4mcp_flexion": 0.0,
+          "4pm_flexion": 0.0,
+          "4md_flexion": 0.0,
+          "5mcp_flexion": 0.0,
+          "5pm_flexion": 0.0,
+          "5md_flexion": 0.0
+        },
+        "finger_dynamics": "rigid posture; no independent finger integration or grip-force estimation",
+        "left_posture": "sagittal reflection of source right posture; native source mirrored meshes",
+        "bone_geometries": [
+          "hand_detail_r_capitate",
+          "hand_detail_r_trapezium",
+          "hand_detail_r_1mc",
+          "hand_detail_r_thumbprox",
+          "hand_detail_r_thumbdist",
+          "hand_detail_r_trapezoid",
+          "hand_detail_r_hamate",
+          "hand_detail_r_2mc",
+          "hand_detail_r_2proxph",
+          "hand_detail_r_2midph",
+          "hand_detail_r_2distph",
+          "hand_detail_r_3mc",
+          "hand_detail_r_3proxph",
+          "hand_detail_r_3midph",
+          "hand_detail_r_3distph",
+          "hand_detail_r_4mc_new",
+          "hand_detail_r_4proxph_new",
+          "hand_detail_r_4midph_new",
+          "hand_detail_r_4distph_new",
+          "hand_detail_r_5mc_new",
+          "hand_detail_r_5proxph_new",
+          "hand_detail_r_5midph_new",
+          "hand_detail_r_5distph_new",
+          "hand_detail_l_capitate",
+          "hand_detail_l_trapezium",
+          "hand_detail_l_1mc",
+          "hand_detail_l_thumbprox",
+          "hand_detail_l_thumbdist",
+          "hand_detail_l_trapezoid",
+          "hand_detail_l_hamate",
+          "hand_detail_l_2mc",
+          "hand_detail_l_2proxph",
+          "hand_detail_l_2midph",
+          "hand_detail_l_2distph",
+          "hand_detail_l_3mc",
+          "hand_detail_l_3proxph",
+          "hand_detail_l_3midph",
+          "hand_detail_l_3distph",
+          "hand_detail_l_4mc_new",
+          "hand_detail_l_4proxph_new",
+          "hand_detail_l_4midph_new",
+          "hand_detail_l_4distph_new",
+          "hand_detail_l_5mc_new",
+          "hand_detail_l_5proxph_new",
+          "hand_detail_l_5midph_new",
+          "hand_detail_l_5distph_new"
+        ],
+        "rerouted_tendons": [
+          "ECRL_r_tendon",
+          "ECRB_r_tendon",
+          "ECU_r_tendon",
+          "FCR_r_tendon",
+          "FCU_r_tendon",
+          "PL_r_tendon",
+          "FDSL_r_tendon",
+          "FDSR_r_tendon",
+          "FDSM_r_tendon",
+          "FDSI_r_tendon",
+          "FDPL_r_tendon",
+          "FDPR_r_tendon",
+          "FDPM_r_tendon",
+          "FDPI_r_tendon",
+          "EDCL_r_tendon",
+          "EDCR_r_tendon",
+          "EDCM_r_tendon",
+          "EDCI_r_tendon",
+          "EDM_r_tendon",
+          "EIP_r_tendon",
+          "EPL_r_tendon",
+          "EPB_r_tendon",
+          "FPL_r_tendon",
+          "APL_r_tendon",
+          "ECRL_l_tendon",
+          "ECRB_l_tendon",
+          "ECU_l_tendon",
+          "FCR_l_tendon",
+          "FCU_l_tendon",
+          "PL_l_tendon",
+          "FDSL_l_tendon",
+          "FDSR_l_tendon",
+          "FDSM_l_tendon",
+          "FDSI_l_tendon",
+          "FDPL_l_tendon",
+          "FDPR_l_tendon",
+          "FDPM_l_tendon",
+          "FDPI_l_tendon",
+          "EDCL_l_tendon",
+          "EDCR_l_tendon",
+          "EDCM_l_tendon",
+          "EDCI_l_tendon",
+          "EDM_l_tendon",
+          "EIP_l_tendon",
+          "EPL_l_tendon",
+          "EPB_l_tendon",
+          "FPL_l_tendon",
+          "APL_l_tendon"
+        ],
+        "lengthrange": "native manipulation-hand actuator length ranges where supplied; unchanged source maximum forces",
+        "support_points_per_hand": 3,
+        "mechanical_pad_radius_m": 0.009,
+        "wrist_ligaments": "unavailable: no discrete ligament elements in the pinned model",
+        "tendon_mechanics": "native muscle-tendon transmission paths; no independently deformable tendon tissue",
+        "retained_hand_inertia": "primary source hand mass/inertia, no mass from added display meshes"
+      },
+      "wrist_range_derivation": {
+        "status": "literature-informed engineering envelope; not subject calibrated",
+        "changed_limits_rad": {
+          "flexion_r": [
+            -0.930016,
+            0.6
+          ],
+          "flexion_l": [
+            -0.930016,
+            0.6
+          ]
+        },
+        "native_limits_rad": [
+          -0.6,
+          0.6
+        ],
+        "other_joint_ranges_and_muscle_parameters": "unchanged",
+        "shaft_extension_cap_rad": 1.5707963267948966,
+        "numerical_tolerance_rad": 0.01,
+        "measurement": "forearm shaft between native elbow/wrist anchors in native hand longitudinal/dorsal plane; geometric proxy, not clinical calibration",
+        "source": "https://jkoa.org/DOIx.php?id=10.4055/jkoa.2006.41.2.315",
+        "reference_asset_sha256": "a4ea41d27ebcca8fc71c065587b1895325dad0f97ee1e01b9719ed57ee8423c6"
+      },
+      "palm_reference_check": {
+        "references": "scenarios/pushup_palms/references.md",
+        "support_landmark": "mean native palm pad centres projected onto the floor",
+        "longitudinal_band": "between ipsilateral shoulder joint and caudal end of native Sternum mesh; body-relative floor heading",
+        "placement_tolerance_m": 0.05,
+        "max_bottom_shoulder_above_elbow_m": 0.05,
+        "max_finger_direction_error_rad": 0.5235987755982988,
+        "interpretation": "Broad engineering rejection checks, not registered human kinematics or clinical norms. Legacy reach is retained for reproducibility and must fail placement."
+      }
+    }
+  },
+  "engine": {
+    "name": "mujoco",
+    "version": "3.17.0"
+  },
+  "scenario": {
+    "id": "pushup_palms",
+    "version": "1.5.0",
+    "sha256": "b9af9b93730805dfe431cbe841d6594e3c13ee1cb427c4018133274e9c8eca2f"
+  },
+  "code_sha256": "9cf513f9468fabbcf818db89d309d1d79a8a2001cc82f6f1338a3bb820260ffe",
+  "code_git_sha": null,
+  "package_version": "0.8.0",
+  "parameters": {
+    "control": "assisted_muscle",
+    "hand_support": "palms",
+    "support_boundary": "fixed_points",
+    "knuckle_technique": "legacy_flared",
+    "palm_technique": "chest_full",
+    "muscle_strength_scale": 1.0,
+    "friction": 1.3,
+    "timestep_s": 0.0005,
+    "render": false
+  },
+  "control_mode": "assisted_muscle",
+  "computed_status": "completed",
+  "numeric_checks": [
+    {
+      "name": "finite_state",
+      "status": "PASS",
+      "threshold": null
+    },
+    {
+      "name": "zero_engine_warnings",
+      "status": "PASS",
+      "threshold": null
+    },
+    {
+      "name": "activation_bounds",
+      "status": "PASS",
+      "threshold": null
+    },
+    {
+      "name": "elapsed_time",
+      "status": "PASS",
+      "threshold": null
+    },
+    {
+      "name": "no_root_actuation",
+      "status": "PASS",
+      "threshold": null
+    },
+    {
+      "name": "full_cycle_kinematics",
+      "status": "PASS",
+      "threshold": null,
+      "thresholds_at": "summary.json#/thresholds"
+    },
+    {
+      "name": "four_supports",
+      "status": "PASS",
+      "threshold": null,
+      "thresholds_at": "summary.json#/thresholds"
+    },
+    {
+      "name": "numerical_bounds",
+      "status": "PASS",
+      "threshold": null,
+      "thresholds_at": "summary.json#/thresholds"
+    },
+    {
+      "name": "stationary_supports",
+      "status": "PASS",
+      "threshold": null,
+      "thresholds_at": "summary.json#/thresholds"
+    },
+    {
+      "name": "reference_hand_placement",
+      "status": "PASS",
+      "threshold": null,
+      "thresholds_at": "summary.json#/thresholds"
+    },
+    {
+      "name": "forward_fingers",
+      "status": "PASS",
+      "threshold": null,
+      "thresholds_at": "summary.json#/thresholds"
+    },
+    {
+      "name": "bottom_depth",
+      "status": "PASS",
+      "threshold": null,
+      "thresholds_at": "summary.json#/thresholds"
+    },
+    {
+      "name": "hand_support_geometry",
+      "status": "PASS",
+      "threshold": null,
+      "thresholds_at": "summary.json#/thresholds"
+    },
+    {
+      "name": "elbow_extension",
+      "status": "PASS",
+      "threshold": null,
+      "thresholds_at": "summary.json#/thresholds"
+    },
+    {
+      "name": "wrist_extension_envelope",
+      "status": "PASS",
+      "threshold": null,
+      "thresholds_at": "summary.json#/thresholds"
+    },
+    {
+      "name": "full_pushup",
+      "status": "PASS",
+      "threshold": null,
+      "thresholds_at": "summary.json#/thresholds"
+    },
+    {
+      "name": "blender_translation",
+      "status": "PASS",
+      "threshold": 2e-06
+    },
+    {
+      "name": "blender_rotation",
+      "status": "PASS",
+      "threshold": 2e-06
+    },
+    {
+      "name": "blender_landmarks",
+      "status": "PASS",
+      "threshold": 3e-06
+    },
+    {
+      "name": "blender_atlas_surface_transfer",
+      "status": "PASS",
+      "unit": "m",
+      "threshold": 3e-06,
+      "value": 2.9103830456733704e-11
+    }
+  ],
+  "acceptance": {
+    "full_cycle_kinematics": "PASS",
+    "four_supports": "PASS",
+    "numerical_bounds": "PASS",
+    "stationary_supports": "PASS",
+    "reference_hand_placement": "PASS",
+    "forward_fingers": "PASS",
+    "bottom_depth": "PASS",
+    "hand_support_geometry": "PASS",
+    "elbow_extension": "PASS",
+    "wrist_extension_envelope": "PASS",
+    "full_pushup": "PASS",
+    "muscle_driven": "NOT_ACHIEVED",
+    "external_control": "USED",
+    "human_experimental_validation": "NOT_VALIDATED",
+    "volumetric_anatomy_registration": "UNAVAILABLE",
+    "finger_dynamics": "RIGID_SOURCE_POSTURE",
+    "wrist_ligaments": "NOT_MODELED",
+    "wrist_range_derivation": "LITERATURE_INFORMED_NOT_CALIBRATED"
+  },
+  "check_thresholds": {
+    "min_chest_excursion_m": 0.18,
+    "min_peak_bilateral_elbow_rad": 1.4,
+    "max_initial_elbow_rad": 0.35,
+    "max_final_elbow_rad": 0.4,
+    "max_chest_return_error_m": 0.06,
+    "min_four_support_fraction": 0.95,
+    "max_support_displacement_m": 0.0005,
+    "max_plank_joint_deviation_rad": 0.2,
+    "max_penetration_m": 0.005,
+    "max_hinge_limit_violation_rad": 0.02,
+    "max_slide_limit_violation_m": 0.001,
+    "max_force_balance_error_N": 0.0001,
+    "max_moment_balance_error_Nm": 0.0001,
+    "max_transmission_sum_error": 1e-08,
+    "max_friction_violation_N": 1e-06,
+    "max_palm_shoulder_chest_gap_m": 0.05,
+    "max_top_elbow_rad": 0.15,
+    "max_wrist_shaft_extension_rad": 1.5807963267948966
+  },
+  "validation_contract": {
+    "validation_level": "numerical_sanity",
+    "checks": {
+      "finite_state": true,
+      "zero_engine_warnings": true,
+      "activation_bounds": true,
+      "repeat_run_absolute_tolerance": 1e-10
+    },
+    "limitations": "All 700 muscles with declared mechanical contact pads and added passive damping. Named numerical checks and separate acceptance gates do not establish experimental or clinical validity. Repeat tolerance is checked by the independent E2E."
+  },
+  "human_validation_status": "NOT_VALIDATED",
+  "human_safety_status": "unsupported",
+  "scope_limitations": [
+    "Model-specific musculotendon geometry; no population normative or patient-specific claims.",
+    "No organ, disc pressure, spinal cord, breathing, injury risk, or medical safety predictions.",
+    "No equilibrium controller, gait policy, observed motion replay, or human force validation.",
+    "Numerical consistency is not experimental or clinical validation; wrapping branches can be nonsmooth.",
+    "Synthetic engineering reference and bounded recruitment feedback; not measured human motion or a validated neural controller.",
+    "Added massless spherical palm/toe contact pads and plane; these are mechanical proxies, not inferred anatomical tissue or flat-palm pressure.",
+    "Source self-collision retained; source visual bones do not provide complete tissue collision coverage.",
+    "Added internal viscous damping floor 10 N*m*s/rad (hinges), 10 N*s/m (slides); this changes passive mechanics and dissipates energy.",
+    "Source shoulder/scapular joint equalities prescribe scapulohumeral coupling; scapular motion is not independently controlled.",
+    "All 700 native muscle dynamics/transmissions retained, but force parameters and recruitment are unvalidated for push-ups.",
+    "Model activation is dimensionless dynamical state, not surface EMG, percent MVIC, clinical strength or injury risk.",
+    "Native muscle-tendon paths are not muscle volumes; no external atlas registration or subject calibration.",
+    "Prescribed sticking points restrict horizontal motion; free vertical numerical guides preserve unilateral floor normals. This is an ideal boundary condition, not calibrated deformable skin friction.",
+    "Four unactuated 0.1 g vertical guides add small inertia/damping; actual guide reactions are included in force balance and aggregate per-limb Coulomb checks at every integration step.",
+    "Detailed hands use native manipulation meshes and muscle paths in rigid open/closed finger poses; no independent finger dynamics, ligament forces or tissue pressure.",
+    "Left posture mirrors the source right hand with native mirrored meshes; primary hand mass/inertia retained. Hand actuator length ranges use the manipulation source where provided.",
+    "Full palms use a separately declared wrist envelope and stance; palms/knuckles are not an isolated causal comparison.",
+    "Assisted muscle mode applies recorded bounded residual generalized joint torques in addition to genuine muscle forces; it is not pure muscle-driven dynamics.",
+    "Only two wrist-extension coordinate bounds differ from the pinned model; the separate whole-shaft angle is checked at every integration step. Literature motivates this engineering envelope but does not calibrate the model's oblique hinges, coupling, muscle curves, ligaments or participant anatomy.",
+    "Endpoint agreement is imposed by the fit. Interior landmarks and human correspondence were not tested.",
+    "Affine geometric animation and source tendon materials provide no tissue stress, strain or activation."
+  ],
+  "known_confounds": [
+    "Model-specific musculotendon geometry; no population normative or patient-specific claims.",
+    "No organ, disc pressure, spinal cord, breathing, injury risk, or medical safety predictions.",
+    "No equilibrium controller, gait policy, observed motion replay, or human force validation.",
+    "Numerical consistency is not experimental or clinical validation; wrapping branches can be nonsmooth.",
+    "Synthetic engineering reference and bounded recruitment feedback; not measured human motion or a validated neural controller.",
+    "Added massless spherical palm/toe contact pads and plane; these are mechanical proxies, not inferred anatomical tissue or flat-palm pressure.",
+    "Source self-collision retained; source visual bones do not provide complete tissue collision coverage.",
+    "Added internal viscous damping floor 10 N*m*s/rad (hinges), 10 N*s/m (slides); this changes passive mechanics and dissipates energy.",
+    "Source shoulder/scapular joint equalities prescribe scapulohumeral coupling; scapular motion is not independently controlled.",
+    "All 700 native muscle dynamics/transmissions retained, but force parameters and recruitment are unvalidated for push-ups.",
+    "Model activation is dimensionless dynamical state, not surface EMG, percent MVIC, clinical strength or injury risk.",
+    "Native muscle-tendon paths are not muscle volumes; no external atlas registration or subject calibration.",
+    "Prescribed sticking points restrict horizontal motion; free vertical numerical guides preserve unilateral floor normals. This is an ideal boundary condition, not calibrated deformable skin friction.",
+    "Four unactuated 0.1 g vertical guides add small inertia/damping; actual guide reactions are included in force balance and aggregate per-limb Coulomb checks at every integration step.",
+    "Detailed hands use native manipulation meshes and muscle paths in rigid open/closed finger poses; no independent finger dynamics, ligament forces or tissue pressure.",
+    "Left posture mirrors the source right hand with native mirrored meshes; primary hand mass/inertia retained. Hand actuator length ranges use the manipulation source where provided.",
+    "Full palms use a separately declared wrist envelope and stance; palms/knuckles are not an isolated causal comparison.",
+    "Assisted muscle mode applies recorded bounded residual generalized joint torques in addition to genuine muscle forces; it is not pure muscle-driven dynamics.",
+    "Only two wrist-extension coordinate bounds differ from the pinned model; the separate whole-shaft angle is checked at every integration step. Literature motivates this engineering envelope but does not calibrate the model's oblique hinges, coupling, muscle curves, ligaments or participant anatomy."
+  ],
+  "sources": [
+    {
+      "title": "MS-Human-700 Menagerie model card and citation",
+      "url": "https://github.com/google-deepmind/mujoco_menagerie/tree/98a70c569c4c1b6da467a20012f766ee1f8dc521/ms_human_700"
+    },
+    {
+      "title": "Zuo et al., Self model for embodied intelligence, ICRA 2024, pp. 13062\u201313069",
+      "url": "https://github.com/LNSGroup/MS-Human-700"
+    },
+    {
+      "title": "MuJoCo computation: transmissions and moment arms",
+      "url": "https://mujoco.readthedocs.io/en/3.17.0/computation/index.html"
+    },
+    {
+      "title": "Youdas et al. 2010, conventional push-up EMG",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/20664364/"
+    },
+    {
+      "title": "Marcolin et al. 2015, shoulder, trunk and arm EMG in push-up variants",
+      "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC4732391/"
+    },
+    {
+      "title": "Kim et al. 2006, radiocarpal/midcarpal extension; engineering envelope, not calibration",
+      "url": "https://jkoa.org/DOIx.php?id=10.4055/jkoa.2006.41.2.315"
+    },
+    {
+      "name": "Z-Anatomy, adapted from BodyParts3D \u00a9 DBCLS",
+      "author": "Gauthier Kervyn; BodyParts3D by Kousaku Okubo and DBCLS",
+      "url": "https://github.com/Z-Anatomy/Models-of-human-anatomy/tree/0a849e8acf7080f8da3251a926fbc160d2bc3f7a",
+      "revision": "0a849e8acf7080f8da3251a926fbc160d2bc3f7a",
+      "source_blend_sha256": "9f08a17ea0115fed80b2a73ecdf0a1bc2ab2f6956f37c593ce23d513ea35afcd",
+      "license": "CC-BY-SA-4.0",
+      "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+      "objects": [
+        "Rectus abdominis muscle.r",
+        "Rectus abdominis muscle.l"
+      ],
+      "source_coordinates": "baked Z-Anatomy world transforms, metres, right-handed; +X left, +Z superior",
+      "files": {
+        "rectus.npz": {
+          "sha256": "01fc5dab901433422c766d8fbbb5beef16824f055a4eca6d1db27f33b13e61c4",
+          "bytes": 375769
+        }
+      }
+    }
+  ],
+  "render_job_id": "5f241582-5666-493c-9539-9add9b43a459",
+  "renderer": {
+    "status": "rendered",
+    "blender_version": "4.5.15 LTS",
+    "blender_build_hash": "5afeabba6097",
+    "device": {
+      "backend": "optix",
+      "devices": [
+        "NVIDIA GeForce RTX 3070 Ti"
+      ]
+    },
+    "camera": {
+      "position_m": [
+        1.2093157768249512,
+        -0.5806999802589417,
+        -1.0087709426879883
+      ],
+      "target_m": [
+        1.0157909393310547,
+        -0.00012559443712234497,
+        0.28139442205429077
+      ],
+      "rotation_euler_rad": [
+        2.698681592941284,
+        1.2427318729635317e-08,
+        0.32175061106681824
+      ],
+      "lens_mm": 52,
+      "scale_length": 1,
+      "world_up": "Z",
+      "regional_path_framing": {
+        "status": "pass",
+        "checked_path_endpoints": 8,
+        "screen_x_range": [
+          0.22159579396247864,
+          0.7786036133766174
+        ],
+        "screen_y_range": [
+          0.140000119805336,
+          0.8330159187316895
+        ]
+      }
+    },
+    "render_seconds": 229.9982467169757,
+    "cycles_samples": 4,
+    "cycles_seed": 0,
+    "cycles_max_bounces": 4,
+    "denoising": true,
+    "lighting": [
+      {
+        "name": "studio_key",
+        "position_m": [
+          3.0157909393310547,
+          -3.0001256465911865,
+          -3.7186055183410645
+        ],
+        "rotation_euler_rad": [
+          2.4080114364624023,
+          3.143121318771591e-08,
+          0.5880025625228882
+        ],
+        "type": "AREA",
+        "power_W": 495.0,
+        "size_m": 4.0
+      },
+      {
+        "name": "studio_fill",
+        "position_m": [
+          -1.9842090606689453,
+          -1.0001256465911865,
+          -1.7186055183410645
+        ],
+        "rotation_euler_rad": [
+          2.1347391605377197,
+          -1.7439060684409924e-07,
+          -1.249045968055725
+        ],
+        "type": "AREA",
+        "power_W": 292.5,
+        "size_m": 3.0
+      },
+      {
+        "name": "studio_rim",
+        "position_m": [
+          2.0157909393310547,
+          2.9998743534088135,
+          -2.7186055183410645
+        ],
+        "rotation_euler_rad": [
+          -0.8117260336875916,
+          -3.141592502593994,
+          -0.3217504918575287
+        ],
+        "type": "AREA",
+        "power_W": 630.0,
+        "size_m": 2.0
+      }
+    ],
+    "world_background": {
+      "linear_rgb": [
+        0.075,
+        0.095,
+        0.13
+      ],
+      "strength": 0.35
+    },
+    "color_management": "AgX; exposure 0; gamma 1",
+    "physics": "not_executed",
+    "materials": "presentation only; scientific paths use saved dimensionless activation linear blue-red [0,1]; cinematic red is explanatory",
+    "force_scale_m_per_N": 0.0006,
+    "moment_scale_m_per_Nm": 0.006,
+    "display_path_min_radius_m": null,
+    "display_path_radius_interpretation": "Presentation thickness for source transmission paths; not measured muscle or tendon cross-section",
+    "moment_interpretation": "Elbow generalized hinge torque or pelvis external world moment pseudovector; not a joint reaction estimate",
+    "joint_axis_half_length_m": 0.045,
+    "saved_scene": "Baked native object transforms; no external USD cache dependency"
+  },
+  "render_code_sha256": "ff75f5827cc9dc929b841960861a5b83c7293039744a6a87e2eae5dacc3a4734",
+  "claims": [
+    {
+      "claim_id": "artifact:anatomy_registration.json",
+      "quantity": "render_artifact",
+      "value": {
+        "sha256": "f8b9f64733723f661ff74bd77f5d9f7fde3ef03c929e61472d73fbde55f6e38b",
+        "bytes": 249866,
+        "mime_type": "application/json"
+      },
+      "unit": null,
+      "time_window_s": [
+        0.0,
+        4.400000000000281
+      ],
+      "side": "bilateral",
+      "structure": "Rectus abdominis muscle (bilateral)",
+      "anatomical_mapping_status": "illustrative",
+      "reference_comparison": {
+        "status": "NOT_AVAILABLE"
+      },
+      "evidence_class": "internally_checked",
+      "validation_status": "unvalidated",
+      "confidence_explanation": "Blender transfer checks compare to the saved model and optional skinning rig only."
+    },
+    {
+      "claim_id": "artifact:animation.gif",
+      "quantity": "render_artifact",
+      "value": {
+        "sha256": "d7aa4da012768d5b8623741f1f7bbe471ae9a731f6c363757dceccbabd52288b",
+        "bytes": 3887530,
+        "mime_type": "image/gif"
+      },
+      "unit": null,
+      "time_window_s": [
+        0.0,
+        4.400000000000281
+      ],
+      "side": "bilateral",
+      "structure": "Rectus abdominis muscle (bilateral)",
+      "anatomical_mapping_status": "illustrative",
+      "reference_comparison": {
+        "status": "NOT_AVAILABLE"
+      },
+      "evidence_class": "internally_checked",
+      "validation_status": "unvalidated",
+      "confidence_explanation": "Blender transfer checks compare to the saved model and optional skinning rig only."
+    },
+    {
+      "claim_id": "artifact:animation.mp4",
+      "quantity": "render_artifact",
+      "value": {
+        "sha256": "e9b4d850bd465bd08417082c9c3b45b8865c4034860475cfee334b6f7055fb95",
+        "bytes": 473847,
+        "mime_type": "video/mp4"
+      },
+      "unit": null,
+      "time_window_s": [
+        0.0,
+        4.400000000000281
+      ],
+      "side": "bilateral",
+      "structure": "Rectus abdominis muscle (bilateral)",
+      "anatomical_mapping_status": "illustrative",
+      "reference_comparison": {
+        "status": "NOT_AVAILABLE"
+      },
+      "evidence_class": "internally_checked",
+      "validation_status": "unvalidated",
+      "confidence_explanation": "Blender transfer checks compare to the saved model and optional skinning rig only."
+    },
+    {
+      "claim_id": "artifact:blender_render.json",
+      "quantity": "render_artifact",
+      "value": {
+        "sha256": "1c6d2c3cb8c93f395ec49b9d8ae0d4d5c8c77240d506a1d56d1f9703e3cff79f",
+        "bytes": 2924,
+        "mime_type": "application/json"
+      },
+      "unit": null,
+      "time_window_s": [
+        0.0,
+        4.400000000000281
+      ],
+      "side": null,
+      "structure": null,
+      "anatomical_mapping_status": "unavailable",
+      "reference_comparison": {
+        "status": "NOT_AVAILABLE"
+      },
+      "evidence_class": "internally_checked",
+      "validation_status": "unvalidated",
+      "confidence_explanation": "Blender transfer checks compare to the saved model and optional skinning rig only."
+    },
+    {
+      "claim_id": "artifact:bottom.png",
+      "quantity": "render_artifact",
+      "value": {
+        "sha256": "38eada5d4ee800c1c809cf08f58bccad0252fa66f95201f54c2ef0dc986eb1e0",
+        "bytes": 272003,
+        "mime_type": "image/png"
+      },
+      "unit": null,
+      "time_window_s": [
+        0.0,
+        4.400000000000281
+      ],
+      "side": "bilateral",
+      "structure": "Rectus abdominis muscle (bilateral)",
+      "anatomical_mapping_status": "illustrative",
+      "reference_comparison": {
+        "status": "NOT_AVAILABLE"
+      },
+      "evidence_class": "internally_checked",
+      "validation_status": "unvalidated",
+      "confidence_explanation": "Blender transfer checks compare to the saved model and optional skinning rig only."
+    },
+    {
+      "claim_id": "artifact:frames.json",
+      "quantity": "render_artifact",
+      "value": {
+        "sha256": "dcca027d58168b09d6c94670487c609d6f5dee201fe18dd0a2a7019352915452",
+        "bytes": 21236,
+        "mime_type": "application/json"
+      },
+      "unit": null,
+      "time_window_s": [
+        0.0,
+        4.400000000000281
+      ],
+      "side": null,
+      "structure": null,
+      "anatomical_mapping_status": "unavailable",
+      "reference_comparison": {
+        "status": "NOT_AVAILABLE"
+      },
+      "evidence_class": "internally_checked",
+      "validation_status": "unvalidated",
+      "confidence_explanation": "Blender transfer checks compare to the saved model and optional skinning rig only."
+    },
+    {
+      "claim_id": "artifact:frames.zip",
+      "quantity": "render_artifact",
+      "value": {
+        "sha256": "b5452e1c1c6cf2643ca7eee3a61a75306ffe16d9db4590fce24496880279fae1",
+        "bytes": 15920657,
+        "mime_type": "application/zip"
+      },
+      "unit": null,
+      "time_window_s": [
+        0.0,
+        4.400000000000281
+      ],
+      "side": "bilateral",
+      "structure": "Rectus abdominis muscle (bilateral)",
+      "anatomical_mapping_status": "illustrative",
+      "reference_comparison": {
+        "status": "NOT_AVAILABLE"
+      },
+      "evidence_class": "internally_checked",
+      "validation_status": "unvalidated",
+      "confidence_explanation": "Blender transfer checks compare to the saved model and optional skinning rig only."
+    },
+    {
+      "claim_id": "artifact:geometry_validation.json",
+      "quantity": "render_artifact",
+      "value": {
+        "sha256": "59f45429c4d5514de6bb70c4a0b92956b2006ff31394ecfc5363b7c3aaf341a7",
+        "bytes": 225607,
+        "mime_type": "application/json"
+      },
+      "unit": null,
+      "time_window_s": [
+        0.0,
+        4.400000000000281
+      ],
+      "side": "bilateral",
+      "structure": "Rectus abdominis muscle (bilateral)",
+      "anatomical_mapping_status": "illustrative",
+      "reference_comparison": {
+        "status": "NOT_AVAILABLE"
+      },
+      "evidence_class": "internally_checked",
+      "validation_status": "unvalidated",
+      "confidence_explanation": "Blender transfer checks compare to the saved model and optional skinning rig only."
+    },
+    {
+      "claim_id": "artifact:passport.json",
+      "quantity": "render_artifact",
+      "value": {
+        "sha256": "dd363858756eca4a5bcf81b808f05ac02d6f0174d520e6fce31c953205cd48ec",
+        "bytes": 301961,
+        "mime_type": "application/json"
+      },
+      "unit": null,
+      "time_window_s": [
+        0.0,
+        4.400000000000281
+      ],
+      "side": "bilateral",
+      "structure": "Rectus abdominis muscle (bilateral)",
+      "anatomical_mapping_status": "illustrative",
+      "reference_comparison": {
+        "status": "NOT_AVAILABLE"
+      },
+      "evidence_class": "internally_checked",
+      "validation_status": "unvalidated",
+      "confidence_explanation": "Blender transfer checks compare to the saved model and optional skinning rig only."
+    },
+    {
+      "claim_id": "artifact:plot.png",
+      "quantity": "render_artifact",
+      "value": {
+        "sha256": "8bad04f4242ac0dbe1c5c8a3ba08a9cc9ba7c02f134f02d79a9846d176cb9a1a",
+        "bytes": 58155,
+        "mime_type": "image/png"
+      },
+      "unit": null,
+      "time_window_s": [
+        0.0,
+        4.400000000000281
+      ],
+      "side": null,
+      "structure": null,
+      "anatomical_mapping_status": "native",
+      "reference_comparison": {
+        "status": "NOT_AVAILABLE"
+      },
+      "evidence_class": "internally_checked",
+      "validation_status": "unvalidated",
+      "confidence_explanation": "Blender transfer checks compare to the saved model and optional skinning rig only."
+    },
+    {
+      "claim_id": "artifact:preview.png",
+      "quantity": "render_artifact",
+      "value": {
+        "sha256": "f675625848fd9171e80f41ac03ed63705772690e39bd5123a201daf0d74abce4",
+        "bytes": 255725,
+        "mime_type": "image/png"
+      },
+      "unit": null,
+      "time_window_s": [
+        0.0,
+        4.400000000000281
+      ],
+      "side": "bilateral",
+      "structure": "Rectus abdominis muscle (bilateral)",
+      "anatomical_mapping_status": "illustrative",
+      "reference_comparison": {
+        "status": "NOT_AVAILABLE"
+      },
+      "evidence_class": "internally_checked",
+      "validation_status": "unvalidated",
+      "confidence_explanation": "Blender transfer checks compare to the saved model and optional skinning rig only."
+    },
+    {
+      "claim_id": "artifact:return.png",
+      "quantity": "render_artifact",
+      "value": {
+        "sha256": "f675625848fd9171e80f41ac03ed63705772690e39bd5123a201daf0d74abce4",
+        "bytes": 255725,
+        "mime_type": "image/png"
+      },
+      "unit": null,
+      "time_window_s": [
+        0.0,
+        4.400000000000281
+      ],
+      "side": "bilateral",
+      "structure": "Rectus abdominis muscle (bilateral)",
+      "anatomical_mapping_status": "illustrative",
+      "reference_comparison": {
+        "status": "NOT_AVAILABLE"
+      },
+      "evidence_class": "internally_checked",
+      "validation_status": "unvalidated",
+      "confidence_explanation": "Blender transfer checks compare to the saved model and optional skinning rig only."
+    },
+    {
+      "claim_id": "artifact:scene.blend",
+      "quantity": "render_artifact",
+      "value": {
+        "sha256": "ffe19c44e620a6de4e0f12d690dc83c8d53486c3081b2e08e026a5750a58b78e",
+        "bytes": 21062661,
+        "mime_type": "application/octet-stream"
+      },
+      "unit": null,
+      "time_window_s": [
+        0.0,
+        4.400000000000281
+      ],
+      "side": "bilateral",
+      "structure": "Rectus abdominis muscle (bilateral)",
+      "anatomical_mapping_status": "illustrative",
+      "reference_comparison": {
+        "status": "NOT_AVAILABLE"
+      },
+      "evidence_class": "internally_checked",
+      "validation_status": "unvalidated",
+      "confidence_explanation": "Blender transfer checks compare to the saved model and optional skinning rig only."
+    },
+    {
+      "claim_id": "artifact:scene.zip",
+      "quantity": "render_artifact",
+      "value": {
+        "sha256": "7d8d86747a3af720aa8badac75d12ec44a74b0146bd4a617a45ec9dbd53e2a5a",
+        "bytes": 19194289,
+        "mime_type": "application/zip"
+      },
+      "unit": null,
+      "time_window_s": [
+        0.0,
+        4.400000000000281
+      ],
+      "side": "bilateral",
+      "structure": "Rectus abdominis muscle (bilateral)",
+      "anatomical_mapping_status": "illustrative",
+      "reference_comparison": {
+        "status": "NOT_AVAILABLE"
+      },
+      "evidence_class": "internally_checked",
+      "validation_status": "unvalidated",
+      "confidence_explanation": "Blender transfer checks compare to the saved model and optional skinning rig only."
+    },
+    {
+      "claim_id": "artifact:source.zip",
+      "quantity": "render_artifact",
+      "value": {
+        "sha256": "359666bd7332595f478b39004cb8272444dbe925c32b9a11622687d655e553a2",
+        "bytes": 9152097,
+        "mime_type": "application/zip"
+      },
+      "unit": null,
+      "time_window_s": [
+        0.0,
+        4.400000000000281
+      ],
+      "side": null,
+      "structure": null,
+      "anatomical_mapping_status": "unavailable",
+      "reference_comparison": {
+        "status": "NOT_AVAILABLE"
+      },
+      "evidence_class": "computed_only",
+      "validation_status": "unvalidated",
+      "confidence_explanation": "Blender transfer checks compare to the saved model and optional skinning rig only."
+    },
+    {
+      "claim_id": "artifact:start.png",
+      "quantity": "render_artifact",
+      "value": {
+        "sha256": "3c0086ad1691288275f5d949314ce14877d225f8c87f8ada8da36f81c53b74b1",
+        "bytes": 255528,
+        "mime_type": "image/png"
+      },
+      "unit": null,
+      "time_window_s": [
+        0.0,
+        4.400000000000281
+      ],
+      "side": "bilateral",
+      "structure": "Rectus abdominis muscle (bilateral)",
+      "anatomical_mapping_status": "illustrative",
+      "reference_comparison": {
+        "status": "NOT_AVAILABLE"
+      },
+      "evidence_class": "internally_checked",
+      "validation_status": "unvalidated",
+      "confidence_explanation": "Blender transfer checks compare to the saved model and optional skinning rig only."
+    }
+  ]
+}

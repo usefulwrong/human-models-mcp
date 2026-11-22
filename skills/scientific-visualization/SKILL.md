@@ -141,3 +141,33 @@ the trajectory. Compare model limits with those references; preserve an honest
 negative result if they are incompatible. A numeric PASS is not a technique PASS.
 For push-ups explicitly inspect bilateral pectoral forces/activation; rendering
 colors must remain computed values and cannot be supplied from expected EMG.
+
+## Evidence and recipes in v0.8
+
+Choose a recipe via `list_render_profiles` and pass it to `render_result` with
+bounded options. Use the job and artifact IDs to retrieve `evidence.json`,
+`passport.json` and media. Load the atlas only with its pinned license receipt
+and retain the separate asset attribution. Read `anatomy_registration.json` for
+mesh transfer, attachment gaps and scope. Keep licensed Fit3D inputs and overlays
+local. An aesthetic overlay supplies no measured anatomy.
+
+[Anatomical evidence guide](../../docs/V08_ANATOMICAL_EVIDENCE.md)
+
+For the local whole-body review, use the pinned MyoSuite full-resolution
+reference and the deterministic arm replay command in the
+[upper-limb review](../../docs/V08_UPPER_LIMB_REVIEW.md#reproduction-and-status).
+Read the open-edge, native path, and intersection reports alongside paired
+renders. Compare triangle-pair counts only for fixed topology. The replay is
+an illustrative Blender workflow with the original saved model states.
+
+## Regional anatomy and multiple views
+
+Use `run_scenario.visualization` to compute and queue multiple push-up
+recipes together, or `render_result` for a persisted run. The
+`pushup_rectus` recipe fits two named Z-Anatomy surfaces to the saved pubic
+and costal sites. Its `anatomy_registration.json` records source pins,
+scale, laterality, phase indices and crossings. The mapping is illustrative.
+Fibre shading and tendon face materials have no activation signal. Take
+activity from saved paths and the native numerical traces. Describe the
+fixed relative playback clock using `frames.json`; report presentation
+sampling separately from the physics timestep.

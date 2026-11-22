@@ -174,9 +174,10 @@ assert (
 )
 with Image.open(folder / "animation.gif") as gif:
     assert gif.n_frames == len(transferred["frames"])
+    intervals = transferred["timing"].get("gif_frame_intervals_ms")
     for index in range(gif.n_frames):
         gif.seek(index)
-        assert gif.info["duration"] == transferred["timing"]["gif_frame_interval_ms"]
+        assert gif.info["duration"] == (intervals[index] if intervals else transferred["timing"]["gif_frame_interval_ms"])
 
 maxp = maxr = 0
 for index in (0, len(expected["frames"]) // 2, len(expected["frames"]) - 1):

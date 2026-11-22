@@ -58,7 +58,10 @@ Neither arrow scale nor material color is a physical constitutive property.
 Original `pushup` muscle mode and assisted palm/fist runs have distinct
 acceptance copied into each passport. Rendering an experiment does not promote
 its evidence level. Rejected techniques and incomplete cycles are labeled.
-Clinical, ligament and registered volumetric anatomy layers are unavailable.
+The optional `pectoralis_atlas` layer depicts a right clavicular pectoralis
+surface with illustrative skinning. Clinical quantities, ligaments and tissue
+mechanics remain outside the scope.
+[Preset recipes, atlas installation and Evidence Contract](V08_ANATOMICAL_EVIDENCE.md)
 
 ## Clock, coordinates and independent checks
 

@@ -10,6 +10,7 @@ from uuid import uuid4
 from package_release import image_matches_source, read_image_environment
 
 ROOT = Path(__file__).resolve().parents[1]
+PROJECT = os.environ.get("COMPOSE_PROJECT_NAME", "human-models-mcp-night")
 IMAGE = os.environ.get("HMM_RENDER_IMAGE", "human-models-mcp-night-renderer:local")
 
 
@@ -127,7 +128,7 @@ def main():
     compose = ["docker", "compose", "-f", str(ROOT / "compose.yaml")]
     if args.gpu:
         compose += ["-f", str(ROOT / "compose.render-gpu.yaml")]
-    compose += ["-p", "human-models-mcp-night"]
+    compose += ["-p", PROJECT]
     command([*compose, "up", "-d", "--no-deps", "renderer"], env=env)
     python = os.environ.get("HMM_CLIENT_PYTHON", str(ROOT / ".client-venv/bin/python"))
     evidence = {}
@@ -202,7 +203,7 @@ def main():
                 "-f",
                 str(ROOT / "compose.yaml"),
                 "-p",
-                "human-models-mcp-night",
+                PROJECT,
                 "run",
                 "--rm",
                 "--no-deps",

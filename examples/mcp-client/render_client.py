@@ -18,12 +18,14 @@ from render_artifacts import download
 
 async def exercise(client, args):
     calls = []
+    response_bytes = {}
 
     async def call(name, arguments=None):
         response = await client.call_tool(name, arguments or {})
         if response.is_error or response.structured_content is None:
             raise RuntimeError(str(response.content))
         value = response.structured_content
+        response_bytes[name] = response_bytes.get(name, 0) + len(json.dumps(value, separators=(",", ":")).encode())
         calls.append({"tool": name, "arguments": arguments or {}, "status": value.get("status", "metadata")})
         return value
 
@@ -61,9 +63,10 @@ async def exercise(client, args):
         "width": args.width,
         "height": args.height,
         "samples": args.samples,
-        "camera_view": args.camera_view,
         "timeout_s": args.timeout,
     }
+    if args.camera_view:
+        options["camera_view"] = args.camera_view
     request = {
         "run_id": run["run_id"],
         "profile": args.profile,
@@ -71,6 +74,9 @@ async def exercise(client, args):
         "options": options,
         "idempotency_key": hashlib.sha256(str(args.output).encode()).hexdigest(),
     }
+    if args.recipe:
+        request.pop("layers")
+        request["recipe"] = args.recipe
     start = time.monotonic()
     job = await call("render_result", request)
     assert job["status"] in ("queued", "running", "completed"), job
@@ -99,6 +105,7 @@ async def exercise(client, args):
     args.output.mkdir(parents=True, exist_ok=False)
     transfers = {}
     for name in (
+        *[name for name in ("evidence.json", "anatomy_registration.json") if name in job["artifacts"]],
         "preview.png",
         "animation.mp4",
         "animation.gif",
@@ -133,7 +140,25 @@ async def exercise(client, args):
         == passport["geometry_validation"]["baked_blend"]["status"]
         == "pass"
     )
-    assert passport["anatomy"]["external_registration"] == "registration_unverified"
+    if "evidence.json" in transfers:
+        evidence = json.loads((args.output / "evidence.json").read_text())
+        claims = {claim["claim_id"]: claim["value"] for claim in evidence["claims"]}
+        assert claims == {"artifact:" + name: value for name, value in job["artifacts"].items()
+                          if name != "evidence.json"}
+    if "anatomy_registration.json" in transfers:
+        assert passport["anatomy"]["external_registration"] == "illustrative"
+        assert passport["anatomy"]["atlas_license"] == "CC-BY-SA-2.1-JP"
+        assert "FMA34690" in passport["anatomy"]["source"]
+        atlas = json.loads((args.output / "anatomy_registration.json").read_text())
+        assert atlas["blender"]["status"] == "PASS" and len(atlas["frames"]) == args.frames
+        assert set(atlas["phase_source_indices"].values()) <= {f["source_index"] for f in frames["frames"]}
+        assert any(c["anatomical_mapping_status"] == "illustrative" for c in evidence["claims"])
+        claim = await call("get_result", {"run_id": run["run_id"], "claim_id": "artifact:trajectory.npz"})
+        assert claim["run_id"] == run["run_id"] and claim["claims"][0]["value"]["sha256"] == source_before
+        rejected = await call("get_result", {"run_id": run["run_id"], "claim_id": "computed_muscle_strain"})
+        assert rejected["status"] == "unsupported"
+    else:
+        assert passport["anatomy"]["external_registration"] == "registration_unverified"
     if args.scenario in ("pushup", "pushup_palms", "pushup_knuckles"):
         assert passport["source_scientific"]["acceptance"] == run["scientific"]["acceptance"]
     after = await call("get_result", {"run_id": run["run_id"]})
@@ -147,11 +172,16 @@ async def exercise(client, args):
         "source_physics_unchanged": True,
         "transfers": transfers,
         "calls": calls,
+        "structured_response_bytes_excluding_artifact_chunks": response_bytes,
         "seconds": time.monotonic() - start,
         "output": str(args.output),
     }
+    evidence_link = (' · <a href="evidence.json">Evidence Contract</a>'
+                     if "evidence.json" in transfers else "")
     (args.output / "index.html").write_text(
-        '<!doctype html><meta charset="utf-8"><title>UsefulWrong computed motion</title><h1>UsefulWrong / saved-state visualization</h1><video controls loop src="animation.mp4" style="max-width:100%"></video><p>Computed model motion; Blender presentation. No clinical or balance validation.</p><img src="preview.png" style="max-width:100%"><p><a href="passport.json">Scientific passport</a> · <a href="source.zip">Source data</a> · <a href="scene.blend">Editable scene</a> · <a href="frames.json">Frame clock and hashes</a></p>'
+        '<!doctype html><meta charset="utf-8"><title>UsefulWrong computed motion</title><h1>UsefulWrong / saved-state visualization</h1><video controls loop src="animation.mp4" style="max-width:100%"></video><p>Computed model motion; Blender presentation. No clinical or balance validation.</p><img src="preview.png" style="max-width:100%"><p><a href="passport.json">Scientific passport</a>'
+        + evidence_link
+        + ' · <a href="source.zip">Source data</a> · <a href="scene.blend">Editable scene</a> · <a href="frames.json">Frame clock and hashes</a></p>'
     )
     (args.output / "client.json").write_text(json.dumps(result, indent=2) + "\n")
     print(
@@ -174,6 +204,7 @@ async def main():
     parser.add_argument("--scenario", default="elbow_tracking")
     parser.add_argument("--run-id")
     parser.add_argument("--profile", default="preview")
+    parser.add_argument("--recipe")
     parser.add_argument("--layers", nargs="+")
     parser.add_argument("--device", default="cpu")
     parser.add_argument("--frames", type=int, default=5)
@@ -181,7 +212,7 @@ async def main():
     parser.add_argument("--width", type=int, default=480)
     parser.add_argument("--height", type=int, default=270)
     parser.add_argument("--samples", type=int, default=4)
-    parser.add_argument("--camera-view", choices=["full_body", "hands", "lumbar", "abdomen", "chest"], default="full_body")
+    parser.add_argument("--camera-view", choices=["full_body", "hands", "lumbar", "abdomen", "chest"])
     parser.add_argument("--timeout", type=int, default=600)
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--transport", choices=["docker", "stdio", "http"], default="docker")

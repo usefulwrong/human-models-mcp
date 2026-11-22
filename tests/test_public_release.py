@@ -39,6 +39,18 @@ def test_public_demo_detects_changed_bytes_and_private_data_without_echoing(tmp_
     assert any(f['reason'] == 'demo size/hash mismatch' for f in CHECK.check(tmp_path)['failures'])
 
 
+def test_workflow_demo_manifest_is_checked_alongside_historical_manifest(tmp_path):
+    archive = tmp_path / "docs/demo"
+    workflow = archive / "workflow"
+    workflow.mkdir(parents=True)
+    (archive / "assets.json").write_text('{"files": {}}')
+    assert any(f["path"] == "docs/demo/workflow/assets.json" for f in CHECK.check(tmp_path)["failures"])
+    (workflow / "assets.json").write_text('{"files": {"animation.mp4": {"bytes": 1, "sha256": "bad"}}}')
+    (workflow / "animation.mp4").write_bytes(b"a")
+    assert any(f["path"] == "docs/demo/workflow/animation.mp4" and f["reason"] == "demo size/hash mismatch"
+               for f in CHECK.check(tmp_path)["failures"])
+
+
 @pytest.mark.parametrize('renderer', ['sha256:renderer', None])
 def test_offline_bundle_pins_images_and_cannot_inherit_host_build_or_store(renderer):
     root = Path(__file__).resolve().parents[1]

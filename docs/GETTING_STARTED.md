@@ -1,9 +1,8 @@
 # Getting started
 
-Tested platform: Linux x86-64 with Docker Engine and Compose v2. The scientific
-container runs pinned Python 3.12; host Python 3.13 is used for launchers and the
-SDK client in the RC check. macOS, Windows, ARM and non-Docker installs have
-not been release-tested.
+The supported workflow uses Linux x86-64 with Docker Engine and Compose. The
+science container uses Python 3.12 and MuJoCo 3.17.0. The renderer uses Blender
+4.5.15.
 
 ## Requirements
 
@@ -100,3 +99,7 @@ part of the quick start. Preserve manifests/data before removing your own
 outputs. Do not prune shared Docker images or volumes for troubleshooting.
 
 [Reproducibility](REPRODUCIBILITY.md) · [Security](SECURITY.md)
+
+For the four-view experiment and the optional Z-Anatomy recipe, follow the
+[v0.8 workflow](V08_WORKFLOW.md). The BodyParts3D cache and Fit3D comparison
+have their own setup. [Atlas and reference setup](V08_ANATOMICAL_EVIDENCE.md)

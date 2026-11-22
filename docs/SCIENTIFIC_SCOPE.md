@@ -84,7 +84,7 @@ are not discrete ligament tensions.
 ## Unsupported claims
 
 No diagnosis, treatment, injury probability, ligament mechanics, deforming skin,
-registered muscle volumes, organ function, fatigue, patient anatomy, sex/age
+validated volumetric muscle mechanics, organ function, fatigue, patient anatomy, sex/age
 customization or medical clearance is available. Joint limits and numerical
 thresholds are source/settings, not human population norms. The 85 primary
 coordinates include coupled coordinates; 700 actuators are model subdivisions,
@@ -93,3 +93,10 @@ not 700 independently validated anatomical structures.
 Use `get_model_capabilities` before requesting a quantity. Unsupported requests
 return structured refusals without fabricated substitutes. Source search returns
 attributed references, not newly computed biological facts.
+
+The optional anatomy recipes show a right clavicular pectoralis surface from
+BodyParts3D or bilateral rectus surfaces from Z-Anatomy. Registration is
+illustrative. Fit residuals and geometry transfer checks accompany the
+render. Native muscle-path activation and atlas surface shading describe
+different quantities. The local Fit3D workflow compares geometric observables.
+[Anatomical replay and Evidence Contract](V08_ANATOMICAL_EVIDENCE.md)

@@ -77,6 +77,34 @@
         "Umbrella license does not override included kidney/inner-ear non-commercial terms",
         "Missing reviewed asset-specific license, shared landmark correspondence and registration error bounds"
       ]
+    },
+    {
+      "id": "bodyparts3d_pectoralis_right_clavicular",
+      "status": "optional_local_cache",
+      "version": "4.3",
+      "source_url": "https://dbarchive.biosciencedbc.jp/en/bodyparts3d/",
+      "license": "CC-BY-SA-2.1-JP (pinned mirror copies)",
+      "identifiers": {
+        "FJ1447": "FMA34690",
+        "FJ3362": "FMA13322",
+        "FJ3368": "FMA23130"
+      },
+      "registration_status": "illustrative",
+      "mapping": "Two-bone skinning after approximate nearest-vertex rigid registration, no tissue mechanics",
+      "redistribution": "Separate DBCLS attribution and ShareAlike; original OBJ files excluded from source and images",
+      "asset_lock": "src/human_models_mcp/atlas_pectoralis.json"
+    },
+    {
+      "id": "z_anatomy_rectus_abdominis",
+      "status": "optional_local_cache",
+      "source_url": "https://github.com/Z-Anatomy/Models-of-human-anatomy/tree/0a849e8acf7080f8da3251a926fbc160d2bc3f7a",
+      "revision": "0a849e8acf7080f8da3251a926fbc160d2bc3f7a",
+      "license": "CC-BY-SA-4.0",
+      "identifiers": ["Rectus abdominis muscle.r", "Rectus abdominis muscle.l"],
+      "registration_status": "illustrative",
+      "mapping": "Fit source vertex caps to saved pubic and costal model sites, with axial display scale",
+      "redistribution": "Separate Z-Anatomy/DBCLS attribution and ShareAlike; cached source meshes stay local",
+      "asset_lock": "src/human_models_mcp/rectus.py"
     }
   ],
   "access_date": "2026-11-06",

@@ -15,7 +15,7 @@ Human Models MCP is a **research preview**: a local interface between AI agents,
 | New engine, anatomical source, scenario or major control change | **Discuss first** in an issue; specify provenance, scientific question, resources, licenses and tests |
 | Security problem or data exposure | Follow [private security reporting](SECURITY.md); do not post exploit details in public issues |
 
-The **0.7.x maintenance line is in feature freeze**. Changes for a patch release should correct behavior, installation, evidence handling, documentation, or security without silently changing the physics of an already published experiment. Larger research additions are welcome as proposals, but belong to a separately reviewed feature release.
+The **0.8.0 release is in feature freeze**. Release changes address confirmed defects, installation, reproducibility, documentation and security. Propose larger research additions for a future iteration.
 
 ## Before filing an issue
 
@@ -70,7 +70,7 @@ python3 scripts/experiment.py --scenario pushup --output outputs/reproduction-01
 
 Choose a new directory every time: existing runs and failed experiments are evidence, not disposable scratch data. Retain `manifest.json`, scientific acceptance, numerical CSV/NPZ and the model recipe. If changing a scenario, run before/after comparisons from **separate outputs** and report the model hash, inputs, units and tolerances. Do not modify historical manifests or force a new result to match a visually pleasing target.
 
-The included [palm demo](docs/demo/README.md) is externally assisted. The `pushup` muscle-controlled scenario is distinct. Never compare two configurations without identifying their different contacts, controller, wrist settings and acceptance criteria.
+The [four-view palm demo](docs/demo/workflow/README.md) uses external joint assistance. Identify contacts, controller, wrist settings and acceptance criteria when comparing it with the muscle-controlled `pushup` scenario.
 
 ## Scientific standards
 

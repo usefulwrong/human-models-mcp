@@ -49,7 +49,17 @@ request; changing parameters under a key is rejected. Omit a key for a new
 independent repeat. `computed` does not mean every exercise gate passed:
 inspect `scientific.acceptance` and `scientific.checks`.
 
+For claim-level evidence, call `get_result(run_id, claim_id="metric:<name>")`
+or `get_result(run_id, claim_id="artifact:<id>")`. Use `claim_id="all"`
+to enumerate claims. [Evidence fields and interpretation](V08_ANATOMICAL_EVIDENCE.md#evidence-contract-10)
+
 ## Media and HTTP
+
+[Discover the bounded recipes](V08_ANATOMICAL_EVIDENCE.md#render-an-anatomical-layer-from-saved-states)
+through `list_render_profiles`, then pass `recipe` to `render_result`.
+Identical recipes may reuse an active or completed job for the same code,
+renderer locks and source manifest. A worker rejects a newly queued recipe
+if its code or locks differ from the submission.
 
 [Rendering](RENDERING.md) describes the SDK/CLI render client. Render jobs move
 through `queued`, `running`, `completed` or `failed`. A completed render does
@@ -78,3 +88,10 @@ See [source contracts](../src/human_models_mcp/server.py),
 [official SDK examples](../examples/mcp-client/README.md) and
 [trust boundaries](SECURITY.md). A scripted SDK test checks protocol behavior;
 it is not a new LLM session or a validation of arbitrary agent conclusions.
+
+## Research workflow
+
+For push-up scenarios, add `visualization` to `run_scenario` to queue named
+views on the same run. The reply includes the scientific gates and render
+job IDs. Use `get_result` with a `gate:<name>` claim ID to inspect a specific
+criterion. [Complete MCP, CLI and Python examples](V08_WORKFLOW.md)
