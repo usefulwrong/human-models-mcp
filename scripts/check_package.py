@@ -98,21 +98,31 @@ with tempfile.TemporaryDirectory() as temp:
         assert not any(name.endswith(".obj") for name in package.namelist())
         assert "human_models_mcp/rendering.py" in package.namelist()
         assert "human_models_mcp/blender_scene.py" in package.namelist()
-        package.extractall(project / "installed")
-    subprocess.run(
-        [
-            sys.executable,
-            "-I",
-            "-c",
-            "import sys;sys.path.insert(0,sys.argv[1]);from human_models_mcp import __version__;assert __version__==sys.argv[2]",
-            str(project / "installed"),
-            VERSION,
-        ],
-        cwd="/tmp",
-        check=True,
-    )
+    for artifact in (wheel, next((project / "dist").glob("*.tar.gz"))):
+        installed = project / artifact.name
+        subprocess.run(
+            [sys.executable, "-m", "pip", "install", "--no-index", "--no-deps", "--no-build-isolation",
+             "--no-cache-dir", "--target", str(installed), str(artifact)],
+            cwd="/tmp",
+            check=True,
+        )
+        subprocess.run(
+            [
+                sys.executable,
+                "-I",
+                "-c",
+                "from pathlib import Path; import sys; sys.path.insert(0, sys.argv[1]); "
+                "import human_models_mcp; from human_models_mcp import server, visualize; "
+                "assert Path(human_models_mcp.__file__).is_relative_to(sys.argv[1]); "
+                "assert human_models_mcp.__version__ == sys.argv[2]",
+                str(installed),
+                VERSION,
+            ],
+            cwd="/tmp",
+            check=True,
+        )
     destination = ROOT / "reports/packages" / VERSION
     destination.mkdir(parents=True, exist_ok=True)
     for artifact in (project / "dist").iterdir():
         shutil.copy2(artifact, destination / artifact.name)
-print("Package wheel/sdist, dependency consistency, clean import and required notices: pass")
+print("Package wheel/sdist builds and installs, dependency consistency, imports and required notices: pass")

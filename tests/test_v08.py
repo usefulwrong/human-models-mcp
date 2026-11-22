@@ -46,13 +46,18 @@ def test_evidence_does_not_promote_failed_numeric_or_unsupported_claim(monkeypat
                       "environment": {"package_version": "0.8.0"}},
         "scientific": {"limits": [], "limitations": ["Assisted"], "citations": [],
                        "checks": [{"name": "finite_state", "status": "pass"}],
-                       "acceptance": {"numerical_bounds": "FAIL"}},
+                       "acceptance": {"numerical_bounds": "FAIL", "full_pushup": "FAIL",
+                                      "muscle_driven": "NOT_ACHIEVED", "external_control": "USED"}},
         "outputs": {"metrics": [{"name": "example", "value": 1, "unit": "N"}]},
     }
     monkeypatch.setattr("human_models_mcp.evidence.get_run", lambda _: run)
     result = get_evidence("example", "metric:example")
     assert result["claims"][0]["evidence_class"] == "computed_only"
     assert result["control_mode"] == "assisted_muscle"
+    assert result["computed_status"] == "completed"
+    assert result["human_safety_status"] == "unsupported"
+    assert result["acceptance"]["full_pushup"] == "FAIL"
+    assert get_evidence("example", "gate:muscle_driven")["claims"][0]["value"] == "NOT_ACHIEVED"
     assert get_evidence("example", "computed_muscle_strain")["status"] == "unsupported"
 
 
@@ -135,3 +140,51 @@ def test_recipe_cache_rejects_a_different_renderer_lock(tmp_path, monkeypatch):
     failed = process_job(first["job_id"])
     assert failed["error"]["code"] == "integrity_error"
     assert manifest.read_bytes() == original
+
+
+def test_workflow_reports_partial_and_preserves_science(monkeypatch):
+    from human_models_mcp import research
+
+    run = {"run_id": "one", "status": "computed", "scientific": {}, "artifacts": {"series.csv": {}}}
+    evidence = {"computed_status": "completed", "control_mode": "assisted_muscle",
+                "acceptance": {"full_pushup": "FAIL", "muscle_driven": "NOT_ACHIEVED"}, "numeric_checks": [],
+                "human_validation_status": "NOT_VALIDATED", "human_safety_status": "unsupported"}
+    calls = []
+    monkeypatch.setattr(research, "run_scenario", lambda *args: (calls.append(args), run)[1])
+    monkeypatch.setattr(research, "get_evidence", lambda _: evidence)
+
+    def render(run_id, options, recipe):
+        assert run_id == "one" and options == {"frames": 3}
+        return ({"status": "queued", "job_id": "two"} if recipe == "pushup_scientific" else
+                {"status": "unsupported", "error": {"code": "unsupported", "message": "missing atlas"}})
+
+    monkeypatch.setattr(research, "render_result", render)
+    request = research.ResearchRequest(recipes=["pushup_scientific", "pushup_rectus"], options={"frames": 3})
+    result = research.run_research(request)
+    assert len(calls) == 1
+    assert result["status"] == "partial"
+    assert result["render_jobs"]["pushup_scientific"]["job_id"] == "two"
+    assert result["acceptance"] == evidence["acceptance"]
+    repeated = research.ResearchRequest(recipes=["pushup_scientific", "pushup_scientific"])
+    assert research.run_research(repeated)["status"] == "invalid_input"
+    assert len(calls) == 1
+
+
+def test_rectus_rejects_unit_axis_license_and_pin(tmp_path):
+    from human_models_mcp.rectus import SOURCE, provision_rectus, register, segment_frame
+
+    with pytest.raises(ValueError, match="explicit acceptance"):
+        provision_rectus("MIT", tmp_path / "rectus.npz")
+    with pytest.raises(ValueError, match="model pin"):
+        register(tmp_path / "rectus.npz", {"revision": "wrong", "asset_sha256": "wrong"})
+    up, left = np.array([0., 0., .4]), np.array([1., 0., 0.])
+    basis, length = segment_frame(np.zeros(3), up, left)
+    assert np.linalg.det(basis) == 1 and length == .4
+    with pytest.raises(ValueError, match="metre-scale"):
+        segment_frame(np.zeros(3), up * 1000, left)
+    with pytest.raises(ValueError, match="degenerate"):
+        segment_frame(np.zeros(3), up, up)
+    damaged = tmp_path / "rectus.npz"
+    damaged.write_bytes(b"x" * SOURCE["files"]["rectus.npz"]["bytes"])
+    with pytest.raises(ValueError, match="checksum"):
+        provision_rectus(SOURCE["license"], damaged)

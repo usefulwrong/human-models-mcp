@@ -46,3 +46,29 @@ nonmanifold edges. The render retains the original vertex and face indexing.
 The largest observed vertex displacement into the bottom sample is 0.150 m
 between sampled states. That includes rigid body motion and illustrates why
 vertex displacement cannot be interpreted as muscle fiber strain.
+
+## Closure registration of bilateral rectus abdominis
+
+The `pushup_rectus` recipe uses `Rectus abdominis muscle.r` and
+`Rectus abdominis muscle.l` from the licensed Z-Anatomy source. The locked
+procedural extraction was repeated in Blender 4.5.15 with identical
+375,769-byte NPZ output and SHA-256
+`01fc5dab901433422c766d8fbbb5beef16824f055a4eca6d1db27f33b13e61c4`.
+Each surface retains 10,304 vertices, 20,604 triangles and 6,611 source
+tendon faces. [Source and license](../notices/BODYPARTS3D.md#rectus-abdominis-supplement)
+
+A proper rotation and bounded long-axis scale place the centroids of 12 mm
+source vertex caps at `rect_abd_{r,l}-P1` and `rect_abd_{r,l}-P4` in each
+saved state. The bilateral midpoint line and costal landmark span define
+the laterality test. In the seven-sample CPU check the scale ranged from
+1.00550 to 1.02742. The largest endpoint residual was below `7e-18 m`.
+The largest Blender vertex transfer residual was `2.92e-11 m`, within
+the `3e-6 m` tolerance. The endpoint check verifies the fit implementation
+and the Blender check verifies replay of the fitted surface.
+
+The per-frame audit enumerates native rib, sternum and pelvic surface
+intersections. Each side had 64 triangle crossings with its ipsilateral
+pelvis in the matched start, bottom and return poses. The source images
+and additional pose checks supply no independent tissue association or
+interior landmarks. The engineering transfer passes. The anatomy status
+remains `illustrative`. [Registration passport and phase figures](../docs/demo/workflow/README.md)

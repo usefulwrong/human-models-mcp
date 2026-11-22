@@ -2,6 +2,10 @@
 
 ## Render an anatomical layer from saved states
 
+The [research workflow](V08_WORKFLOW.md) supports bilateral Z-Anatomy rectus
+abdominis via `pushup_rectus`. It uses the same queue and saved states as the
+BodyParts3D pectoralis recipe below. Both surfaces are illustrative.
+
 Build the runtime and renderer as described in [Getting started](GETTING_STARTED.md).
 Install the optional BodyParts3D subset into `render_jobs/.bodyparts3d` from
 the project directory. The network fetch runs on the host. The renderer and MCP
@@ -44,7 +48,10 @@ the archived purple demonstration predates this display change. See the
 
 ## Evidence Contract 1.0
 
-Use `get_result(run_id, claim_id="metric:<name>")` or `"artifact:<name>"`.
+Use `get_result(run_id, claim_id="metric:<name>")`, `"gate:<name>"` or
+`"artifact:<name>"`. The full `acceptance` map preserves categorical
+statuses such as `NOT_ACHIEVED`, `USED` and `NOT_VALIDATED` in both model and
+Blender contracts.
 Use `claim_id="all"` for full enumeration, or the local CLI command
 `python3 scripts/visualize.py evidence RUN_UUID --claim-id metric:NAME`.
 Python exposes `evidence.get_evidence`. Ordinary `get_result(run_id)` returns

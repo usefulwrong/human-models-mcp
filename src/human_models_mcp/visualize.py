@@ -8,6 +8,7 @@ from pathlib import Path
 import time
 
 from .rendering import get_render_artifact, get_render_job, list_render_profiles, render_result
+from .research import ResearchRequest, run_research
 
 
 def export(job, destination):
@@ -50,6 +51,7 @@ def main():
     render.add_argument("--recipe", choices=list(list_render_profiles()["recipes"]))
     render.add_argument("--layers", nargs="+", default=None)
     render.add_argument("--frames", type=int, default=21)
+    render.add_argument("--fps", type=int)
     render.add_argument("--device", choices=["cpu", "gpu", "auto"], default=None)
     render.add_argument("--camera-view", choices=["full_body", "hands", "lumbar", "abdomen", "chest"])
     render.add_argument("--wait", action="store_true")
@@ -62,10 +64,19 @@ def main():
     evidence = sub.add_parser("evidence")
     evidence.add_argument("run_id")
     evidence.add_argument("--claim-id")
+    research = sub.add_parser("research")
+    research.add_argument("--scenario", default="pushup_palms")
+    research.add_argument("--parameters", default="{}", help="JSON object with scenario overrides")
+    research.add_argument("--recipe", choices=list(list_render_profiles()["recipes"]), action="append")
+    research.add_argument("--options", default="{}", help="JSON object with render overrides")
+    research.add_argument("--idempotency-key")
     atlas = sub.add_parser("provision-atlas")
     atlas.add_argument("--accept-license", required=True)
     atlas.add_argument("--offline", action="store_true")
     atlas.add_argument("--source-dir", type=Path)
+    rectus = sub.add_parser("provision-rectus")
+    rectus.add_argument("--accept-license", required=True)
+    rectus.add_argument("--source", type=Path, required=True)
     compare = sub.add_parser("compare-fit3d")
     compare.add_argument("run_id")
     compare.add_argument("--dataset-json", type=Path)
@@ -75,6 +86,14 @@ def main():
     args = parser.parse_args()
     if args.command == "list-profiles":
         result = list_render_profiles()
+    elif args.command == "research":
+        try:
+            request = ResearchRequest(scenario_id=args.scenario, parameters=json.loads(args.parameters),
+                                      options=json.loads(args.options), idempotency_key=args.idempotency_key,
+                                      **({"recipes": args.recipe} if args.recipe else {}))
+            result = run_research(request)
+        except ValueError as exc:
+            parser.error(str(exc))
     elif args.command == "evidence":
         from .evidence import get_evidence
         result = get_evidence(args.run_id, args.claim_id)
@@ -82,6 +101,12 @@ def main():
         from .atlas import provision_atlas
         try:
             result = provision_atlas(args.accept_license, args.offline, args.source_dir)
+        except (OSError, ValueError) as exc:
+            parser.error(str(exc))
+    elif args.command == "provision-rectus":
+        from .rectus import provision_rectus
+        try:
+            result = provision_rectus(args.accept_license, args.source)
         except (OSError, ValueError) as exc:
             parser.error(str(exc))
     elif args.command == "compare-fit3d":
@@ -103,6 +128,8 @@ def main():
         export(result, args.output)
     else:
         options = {"frames": args.frames}
+        if args.fps is not None:
+            options["fps"] = args.fps
         if args.camera_view:
             options["camera_view"] = args.camera_view
         if args.device:
@@ -120,7 +147,7 @@ def main():
                 raise RuntimeError("use --wait to export a completed render")
             export(result, args.output)
     print(json.dumps(result, indent=2))
-    if "error" in result or result.get("status") == "failed":
+    if "error" in result or result.get("status") in {"failed", "partial"}:
         raise SystemExit(1)
 
 

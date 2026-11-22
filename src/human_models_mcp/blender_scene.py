@@ -383,54 +383,75 @@ def validate_connectors(expected):
     }
 
 
-def atlas_overlay(expected):
-    if "atlas" not in expected:
-        return None
+def atlas_overlay(expected, rectus=None):
     atlas, frames = expected["atlas"], expected["frames"]
-    faces = atlas["faces"]
-    mesh = bpy.data.meshes.new("BodyParts3D FJ1447")
-    mesh.from_pydata(frames[0]["atlas_vertices_m"], [], faces)
+    if rectus is not None:
+        results = {}
+        for side, (vertices, faces, tendon) in rectus.items():
+            results[side] = animate_atlas(atlas["structures"][side]["source_object"], atlas["source"],
+                                          frames, vertices, faces.tolist(), tendon)
+        return {**results["r"], "structures": results, "frames": [
+            {**right, "max_vertex_error_m": max(right["max_vertex_error_m"], left["max_vertex_error_m"]),
+             "bone_triangle_crossings": {"r": right["bone_triangle_crossings"], "l": left["bone_triangle_crossings"]}}
+            for right, left in zip(results["r"]["frames"], results["l"]["frames"], strict=True)
+        ]}
+    return animate_atlas("BodyParts3D FJ1447", atlas["source"], frames,
+                         [f["atlas_vertices_m"] for f in frames], atlas["faces"])
+
+
+def animate_atlas(name, source, frames, vertices, faces, tendon=None):
+    mesh = bpy.data.meshes.new(name)
+    mesh.from_pydata(vertices[0], [], faces)
     if mesh.validate(verbose=True):
         raise ValueError("Blender changed imported atlas topology")
     mesh.update()
-    obj = bpy.data.objects.new("atlas_pectoralis_right_clavicular", mesh)
+    obj = bpy.data.objects.new("atlas_pectoralis_right_clavicular" if tendon is None else "atlas_rectus_" + name, mesh)
     bpy.context.scene.collection.objects.link(obj)
-    obj["source_notice"] = json.dumps(atlas["source"], ensure_ascii=False)
-    obj["interpretation"] = "Illustrative skinning; activation mapping unavailable"
+    obj["source_notice"] = json.dumps(source, ensure_ascii=False)
+    obj["interpretation"] = "Illustrative geometric animation; activation mapping unavailable"
     default_material = runpy.run_path(str(Path(__file__).with_name("muscle_materials.py")))
-    default_material["apply"](mesh)
+    direction = None
+    if tendon is not None:
+        default_material["set_source_tendon_mask"](mesh, tendon)
+        side = name[-1]
+        direction = np.subtract(*reversed(frames[0]["rectus_sites_m"][side]))
+    default_material["apply"](mesh, direction)
     for polygon in mesh.polygons:
         polygon.use_smooth = True
     obj.shape_key_add(name="Basis")
-    for frame in frames[1:]:
+    for frame, surface_vertices in zip(frames[1:], vertices[1:], strict=True):
         index = frame["frame"]
         key = obj.shape_key_add(name=f"Saved state {frame['source_index']}")
-        key.data.foreach_set("co", np.asarray(frame["atlas_vertices_m"], dtype=np.float32).ravel())
+        key.data.foreach_set("co", np.asarray(surface_vertices, dtype=np.float32).ravel())
         for position, weight in ((0, 0), (index - 1, 0), (index, 1), (index + 1, 0)):
             key.value = weight
             key.keyframe_insert(data_path="value", frame=position)
     results = []
     scene = bpy.context.scene
-    for frame in frames:
+    for frame, surface_vertices in zip(frames, vertices, strict=True):
         scene.frame_set(frame["frame"])
         depsgraph = bpy.context.evaluated_depsgraph_get()
         evaluated = obj.evaluated_get(depsgraph)
         coordinates = np.empty(len(mesh.vertices) * 3, dtype=np.float32)
         evaluated.data.vertices.foreach_get("co", coordinates)
         coordinates = coordinates.reshape(-1, 3)
-        error = float(np.max(np.linalg.norm(coordinates - np.asarray(frame["atlas_vertices_m"]), axis=1)))
+        error = float(np.max(np.linalg.norm(coordinates - np.asarray(surface_vertices), axis=1)))
         if error > 3e-6 or [list(p.vertices) for p in evaluated.data.polygons] != faces:
             raise ValueError("Blender evaluated atlas surface differs from registered geometry")
         surface = BVHTree.FromPolygons(coordinates, faces, all_triangles=True)
         touching = {}
         for geom in frame["geoms"]:
-            if geom["name"] in {"clavicle", "humerus", "scapula"}:
+            name = geom["name"]
+            if (name in {"clavicle", "humerus", "scapula"} if tendon is None else
+                    name.startswith("Rib") or name in {"r_pelvis", "l_pelvis", "Sternum"}):
                 bone = geom_object(geom).evaluated_get(depsgraph)
                 bone_surface = BVHTree.FromPolygons(
                     [bone.matrix_world @ vertex.co for vertex in bone.data.vertices],
                     [list(face.vertices) for face in bone.data.polygons],
                 )
                 touching[geom["name"]] = len(surface.overlap(bone_surface))
+        if tendon is not None and not {"r_pelvis", "l_pelvis", "Sternum", "Rib6R", "Rib6L"} <= touching.keys():
+            raise ValueError("rectus crossing audit is missing pinned pelvic or rib cage meshes")
         results.append({"frame": frame["frame"], "source_index": frame["source_index"],
                         "max_vertex_error_m": error, "bone_triangle_crossings": touching})
     scene.frame_set(0)
@@ -439,10 +460,11 @@ def atlas_overlay(expected):
             "intersection_method": "Blender BVH triangle crossings; does not measure enclosed tissue or attachment correctness"}
 
 
-def setup_scene(expected):
+def setup_scene(expected, atlas_bounds=None):
     scene = bpy.context.scene
     options = expected["request"]["options"]
     cinematic = expected["request"]["profile"] == "cinematic"
+    rectus = atlas_bounds is not None
     bone = material(
         "Native model bone / presentation material",
         (0.72, 0.62, 0.43) if cinematic else (0.67, 0.72, 0.73),
@@ -456,7 +478,7 @@ def setup_scene(expected):
     show_base = bool({"bones", "native_geometry"} & set(expected["request"]["layers"]))
     for obj in bpy.data.objects:
         if obj.type == "MESH":
-            obj.hide_render = not (show_base and obj.name in allowed or "floor_id" in obj.name)
+            obj.hide_render = not (show_base and obj.name in allowed or "floor_id" in obj.name and not rectus)
             obj.data.materials.clear()
             obj.data.materials.append(bone if "floor" not in obj.name else other)
             for polygon in obj.data.polygons:
@@ -481,9 +503,12 @@ def setup_scene(expected):
             region_points = [p[key] for f in expected["frames"] for p in f["paths"]
                              if region in p.get("regions", []) for key in ("start_m", "end_m")]
             if "atlas" in expected and view == "chest":
-                region_points = [point for f in expected["frames"] for point in f["atlas_vertices_m"]]
+                region_points = atlas_bounds if rectus else [point for f in expected["frames"] for point in f["atlas_vertices_m"]]
+            if rectus and view == "abdomen":
+                region_points = atlas_bounds
             target = Vector(np.mean([f["pelvis_com_world_m"] for f in expected["frames"]], axis=0)) + Vector((.15, 0, -.03))
-            direction = Vector((.32, -1.1, -.35 if "atlas" in expected else .7 if view == "lumbar" else -.04)).normalized()
+            direction = Vector((.15, -.45, -1.) if rectus else
+                               (.32, -1.1, -.35 if "atlas" in expected else .7 if view == "lumbar" else -.04)).normalized()
             distance, lens = 1.8, 52
             if region_points:
                 points = np.array(region_points)
@@ -500,10 +525,15 @@ def setup_scene(expected):
         elif expected["model"].get("derivation", {}).get("hand_support", "legacy_point") != "legacy_point":
             target = Vector((.9, 0, .04))
             eye, lens = target + Vector((1.6, -3.3, 1.35)), 42
-        if view == "full_body" and expected["request"].get("recipe") == "pushup_scientific":
-            offset = Vector((0, 0, .20))
+        recipe = expected["request"].get("recipe")
+        if view == "full_body" and recipe == "pushup_scientific":
+            # Frame the standing-height head and floor contacts between the annotation bands.
+            offset = Vector((0, 0, .025))
             target += offset
             eye += offset
+        elif view == "full_body" and recipe == "pushup_cinematic":
+            target.z = .28
+            eye, lens = target + Vector((.88, -2.85, 1.12)), 46
     elif contact:
         target = Vector((0, 0, 0.88))
         eye = Vector((2.5, -4.0, 1.65))
@@ -546,6 +576,8 @@ def setup_scene(expected):
         ("fill", (-3, -1, 2), 650, 3),
         ("rim", (1, 3, 3), 1400, 2),
     ]:
+        if rectus:
+            offset = (offset[0], offset[1], -abs(offset[2]))
         bpy.ops.object.light_add(type="AREA", location=target + Vector(offset))
         light = bpy.context.object
         light.name = "studio_" + name
@@ -622,13 +654,24 @@ def prepare_scene(path, expected):
     imported = validate_import(expected)
     baked = bake_transforms(expected)
     bpy.context.scene.frame_set(0)
-    camera = setup_scene(expected)
+    rectus = None
+    atlas_bounds = None
+    if "rectus_atlas" in expected["request"]["layers"]:
+        from itertools import product
+
+        with np.load(path / "work/atlas_surfaces.npz", allow_pickle=False) as arrays:
+            rectus = {side: tuple(arrays[f"{side}_{key}"] for key in ("vertices", "faces", "tendon"))
+                      for side in ("r", "l")}
+        points = np.concatenate([data[0].reshape(-1, 3) for data in rectus.values()])
+        atlas_bounds = list(product(*zip(points.min(axis=0), points.max(axis=0), strict=True)))
+    camera = setup_scene(expected, atlas_bounds)
     overlays(expected)
-    atlas = atlas_overlay(expected)
+    atlas = atlas_overlay(expected, rectus) if "atlas" in expected else None
     if expected.get("pushup", expected["scenario_id"] == "pushup"):
         collections = {}
         for obj in list(bpy.context.scene.objects):
             group = ("pectoralis_atlas" if obj.name.startswith("atlas_pectoralis_") else
+                     "rectus_atlas" if obj.name.startswith("atlas_rectus_") else
                      "muscle_paths" if obj.name.startswith("native_tendon_path_") else
                      "joint_axes" if obj.name.startswith("axis_") else
                      "contact_forces" if obj.name.startswith(("GRF_", "native_contact_point_")) else

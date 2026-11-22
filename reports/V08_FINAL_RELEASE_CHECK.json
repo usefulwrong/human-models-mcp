@@ -1,0 +1,217 @@
+{
+  "status": "READY_FOR_OPERATOR_REVIEW",
+  "version": "0.8.0",
+  "date": "2026-11-22",
+  "base_git_commit": "8c4293386bb290b5733ab62ff1bd0387d0defdf9",
+  "tested_working_tree": true,
+  "published_main_at_review": "c5bf297463333ee380573f0f96cb3ae5bdf941cc",
+  "environment": {
+    "host_python": "3.12.12",
+    "runtime_python": "3.12.16",
+    "mujoco": "3.17.0",
+    "mcp": "2.3.0",
+    "blender": "4.5.15",
+    "gpu": "NVIDIA GeForce RTX 3070 Ti",
+    "renderer_backend": "optix",
+    "runtime_image": "sha256:9de77870ee875135e9cf9573fb1c8339cdba7267fc097c2ca8f6cdb76652d595",
+    "renderer_image": "sha256:61258f6d40664379ffb645030797af735fa75955e1971b7e6fe6d6341333b58f",
+    "model_revision": "98a70c569c4c1b6da467a20012f766ee1f8dc521",
+    "model_sha256": "a32fc82227aebf5156d9efd067d3799513044a24ca12dd117d8b9b4be436d689"
+  },
+  "checks": {
+    "make build": "PASS",
+    "make test": "PASS",
+    "make e2e": "PASS",
+    "make pushup-e2e": "PASS",
+    "make render-build": "PASS",
+    "make render-e2e": "PASS",
+    "python3 scripts/public_check.py --strict-tree": "PASS"
+  },
+  "pytest_passed": 105,
+  "wheel_install": "PASS",
+  "sdist_install": "PASS",
+  "runtime_package_version": "0.8.0",
+  "cli_workflow": "PASS",
+  "mcp_tool_count": 14,
+  "partial_mcp": {
+    "status": "PASS",
+    "submission_status": "partial",
+    "job_statuses": {
+      "pushup_scientific": "queued",
+      "pushup_rectus": "unsupported"
+    },
+    "claim_value": "NOT_ACHIEVED"
+  },
+  "workflow": {
+    "status": "PASS",
+    "run_id": "48ebaf73-cdff-4882-a659-03af83f44430",
+    "frames_per_job": 9,
+    "identical_cpu_gpu_source_and_sampled_state_hashes": true,
+    "rectus_independent_native_blend_and_media": "PASS",
+    "jobs": {
+      "cpu": {
+        "pushup_cinematic": {
+          "job_id": "1a0629d7-8fcd-48a1-b76b-72665996d453",
+          "render_backend": {
+            "backend": "cpu",
+            "devices": [
+              "CPU"
+            ]
+          }
+        },
+        "pushup_rectus": {
+          "job_id": "0904bd45-022b-4cf2-b69e-8d0a91c56752",
+          "render_backend": {
+            "backend": "cpu",
+            "devices": [
+              "CPU"
+            ]
+          }
+        },
+        "pushup_muscle_paths": {
+          "job_id": "65df4433-2b13-44b3-8c27-ab241fc3c073",
+          "render_backend": {
+            "backend": "cpu",
+            "devices": [
+              "CPU"
+            ]
+          }
+        },
+        "pushup_scientific": {
+          "job_id": "f416cba8-0173-4e27-8748-6797c6f04d1c",
+          "render_backend": {
+            "backend": "cpu",
+            "devices": [
+              "CPU"
+            ]
+          }
+        }
+      },
+      "gpu": {
+        "pushup_cinematic": {
+          "job_id": "e61f2fa2-9dd1-442b-94e0-464db5eb088e",
+          "render_backend": {
+            "backend": "optix",
+            "devices": [
+              "NVIDIA GeForce RTX 3070 Ti"
+            ]
+          }
+        },
+        "pushup_rectus": {
+          "job_id": "2581ce69-541b-4194-ab6e-87bf976f876c",
+          "render_backend": {
+            "backend": "optix",
+            "devices": [
+              "NVIDIA GeForce RTX 3070 Ti"
+            ]
+          }
+        },
+        "pushup_muscle_paths": {
+          "job_id": "df76f9cf-46aa-4d5b-a78f-53c7e56d84d0",
+          "render_backend": {
+            "backend": "optix",
+            "devices": [
+              "NVIDIA GeForce RTX 3070 Ti"
+            ]
+          }
+        },
+        "pushup_scientific": {
+          "job_id": "a1ba7f96-3fc4-4e11-a4b3-938e5a6ad414",
+          "render_backend": {
+            "backend": "optix",
+            "devices": [
+              "NVIDIA GeForce RTX 3070 Ti"
+            ]
+          }
+        }
+      }
+    }
+  },
+  "scientific": {
+    "overall_anatomy": "PARTIAL",
+    "atlas_registration": "illustrative",
+    "muscle_driven": "NOT_ACHIEVED",
+    "human_experimental_validation": "NOT_VALIDATED",
+    "fit3d_real_comparison": "NOT_RUN",
+    "human_exercise_safety": "UNSUPPORTED",
+    "tissue_stress_strain": "UNSUPPORTED",
+    "pectoralis_phase_rows": [
+      {
+        "time_s": 0.0,
+        "pectoralis_r_activation": 0.0,
+        "pectoralis_l_activation": 0.0,
+        "pectoralis_r_absolute_path_force_N": 0.0,
+        "pectoralis_l_absolute_path_force_N": 0.0,
+        "triceps_brachii_activation": 0.0,
+        "serratus_anterior_activation": 0.0,
+        "rectus_abdominis_activation": 0.0
+      },
+      {
+        "time_s": 2.199999999999902,
+        "pectoralis_r_activation": 0.999998264885881,
+        "pectoralis_l_activation": 0.9999983282542227,
+        "pectoralis_r_absolute_path_force_N": 1252.64915389626,
+        "pectoralis_l_absolute_path_force_N": 1253.1377498335967,
+        "triceps_brachii_activation": 0.9676719403291002,
+        "serratus_anterior_activation": 0.2284479601117701,
+        "rectus_abdominis_activation": 0.12320142559768557
+      },
+      {
+        "time_s": 4.400000000000281,
+        "pectoralis_r_activation": 0.0019759902836704404,
+        "pectoralis_l_activation": 0.0008442114387519894,
+        "pectoralis_r_absolute_path_force_N": 2.4488834657661327,
+        "pectoralis_l_absolute_path_force_N": 0.9536075203117016,
+        "triceps_brachii_activation": 0.5418050974345514,
+        "serratus_anterior_activation": 0.02433147329934817,
+        "rectus_abdominis_activation": 0.22117220554450712
+      }
+    ]
+  },
+  "public_demo": {
+    "status": "PASS",
+    "source_run_id": "042a4b7e-95a0-4b1b-b0d2-4965a23f1861",
+    "assets_checked": 33,
+    "mp4s_decoded": 4,
+    "samples_per_mp4": 61,
+    "fps": 14,
+    "recomputed_series_and_pectorals_byte_identical": true
+  },
+  "changes": [
+    "README hierarchy and workflow documentation",
+    "Private handoff moved to ignored operator folder",
+    "Current release notes and final reports",
+    "Actual offline wheel and sdist installation in package check"
+  ],
+  "future_work": [
+    "Atlas attachment and crossing review",
+    "Independent experimental validation",
+    "Shared scientific store serializes computations and returns busy on concurrent submissions"
+  ],
+  "limits": [
+    "Final workflow used nine samples per recipe. The existing 61-frame public videos were verified separately.",
+    "GitHub Actions execution is pending the operator commit.",
+    "Some historical reference hosts returned 403 or failed TLS checks."
+  ],
+  "operator": [
+    "Verify SHA256SUMS",
+    "Review all working-tree files and handoff removal",
+    "Run CI on publication candidate",
+    "Commit, push, tag v0.8.0 and publish Research Preview with notices"
+  ],
+  "release_artifacts_directory": "outputs/v080-final/release",
+  "recheck_commands": [
+    "python3 scripts/public_check.py --strict-tree",
+    "make build",
+    "make test",
+    "make e2e",
+    "make pushup-e2e",
+    "make render-build",
+    "make render-e2e",
+    "make render-start",
+    ".client-venv/bin/python examples/mcp-client/research_client.py --frames 9 --key v080-review --output outputs/v080-review-cpu",
+    "make render-gpu-start",
+    ".client-venv/bin/python examples/mcp-client/research_client.py --frames 9 --key v080-review --device gpu --output outputs/v080-review-gpu",
+    "sha256sum -c SHA256SUMS"
+  ]
+}

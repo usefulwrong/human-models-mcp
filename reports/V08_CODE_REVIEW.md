@@ -36,3 +36,16 @@ push-up validation and no material or tissue stress model in this release.
 The historical visual regression fixture is unavailable in the public tree.
 The earlier v0.8 audit compared 18 fresh v0.7.1 and v0.8 SDK runs instead.
 [Earlier comparison evidence](V08_RENDER_E2E.md)
+
+## Closure acceptance from four perspectives
+
+| Perspective | Observed result and remaining limit |
+| --- | --- |
+| MCP developer | The 14-tool surface is preserved. An optional typed visualization request queues the four views on one calculated run. Status and artifact retrieval use the original tools. A missing atlas produces a partial response with a recipe error. |
+| Biomechanics reviewer | Independent repeats reproduced the sampled state and pectoral trace bytes. Numerical, exercise and muscle-only criteria are explicit. The selected demonstration uses assisted control and prescribed supports. The human comparison remains visual context. |
+| 3D reviewer | The scientific camera was reframed to keep the head and hand contacts outside the annotation bands. Reopened Blender files were checked for transfer errors, wrong axes, scales and frame order. Bilateral rectus uses source tendon masks and preserves the observed pelvic crossings in its report. |
+| First-time GitHub reader | The README starts with four views of one run. Copyable commands cover the CPU path, optional anatomy provision, MCP, and retrieval of checks and media. The full API and attribution live in linked documents. |
+
+The experimental whole-body MyoSuite atlas has broader geometry but retains
+the previously reported attachment and intersection limits. Its arm studies
+remain separate from the narrower two-surface recipe in the supported queue.

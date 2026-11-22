@@ -36,3 +36,5 @@ reports/*
 !reports/V08_RELEASE_CHECK.json
 !reports/V08_CODE_REVIEW.md
 !reports/V08_PUBLICATION_CHECK.json
+!reports/V08_FINAL_RELEASE_AUDIT.md
+!reports/V08_FINAL_RELEASE_CHECK.json

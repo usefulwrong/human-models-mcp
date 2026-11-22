@@ -53,3 +53,9 @@ and associated inspection renders carry the CC BY-SA 4.0 attribution.
 The archive and full source .blend stay in the local cache.
 [Pinned Z-Anatomy source and credits](https://github.com/Z-Anatomy/Models-of-human-anatomy/tree/0a849e8acf7080f8da3251a926fbc160d2bc3f7a) ·
 [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/)
+
+The `pushup_rectus` recipe extracts only the bilateral rectus objects and checks
+the portable NPZ against its pinned digest. It fits the meshes to the saved
+model's pubic and costal sites and applies geometric axial scale and fibre
+shading. Public stills and video containing these adapted surfaces carry
+CC BY-SA 4.0. [Reproduction and evidence](../docs/V08_WORKFLOW.md)

@@ -94,8 +94,9 @@ Use `get_model_capabilities` before requesting a quantity. Unsupported requests
 return structured refusals without fabricated substitutes. Source search returns
 attributed references, not newly computed biological facts.
 
-The optional BodyParts3D layer shows one externally sourced surface with
-illustrative skinning. Its engineering fit residuals and geometry transfer
-checks accompany the render. This surface has no material properties or
-activation map. The local Fit3D workflow compares geometric observables only.
+The optional anatomy recipes show a right clavicular pectoralis surface from
+BodyParts3D or bilateral rectus surfaces from Z-Anatomy. Registration is
+illustrative. Fit residuals and geometry transfer checks accompany the
+render. Native muscle-path activation and atlas surface shading describe
+different quantities. The local Fit3D workflow compares geometric observables.
 [Anatomical replay and Evidence Contract](V08_ANATOMICAL_EVIDENCE.md)

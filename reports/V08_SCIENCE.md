@@ -56,3 +56,39 @@ The independent sparse transmission reconstruction differed by at most
 (1.14\times10^{-13}) in the native generalized-force units. Eleven palm
 numeric artifacts, including all six chunks of the 700 muscle traces,
 match their freshly computed v0.7.1 hashes.
+
+## Closure review of the current checkout
+
+The closure review began at `8c4293386bb290b5733ab62ff1bd0387d0defdf9`.
+The four-view demonstration uses run `042a4b7e-95a0-4b1b-b0d2-4965a23f1861`,
+scenario `pushup_palms` 1.5.0, MuJoCo 3.17.0 on CPU, and model asset
+SHA-256 `a32fc82227aebf5156d9efd067d3799513044a24ca12dd117d8b9b4be436d689`.
+An independent run with the same defaults produced identical metric values
+and identical `trajectory.npz`, `series.csv` and `pectorals.csv` digests.
+
+The model completed 8,800 integration steps at 0.5 ms. The start, bottom
+and return occur at saved indices 0, 55 and 110, at 0.0, 2.2 and 4.4 s.
+The lowest-chest displacement is 0.279 m. `full_pushup` and
+`numerical_bounds` are `PASS`; `muscle_driven` is `NOT_ACHIEVED`;
+`external_control` is `USED`. The declared sticking guides and residual
+joint assistance affect interpretation. [Scenario and criteria](../scenarios/pushup_palms/README.md)
+
+| Saved phase | Pectoral force R / L (N) | Pectoral activation R / L | Triceps activation | Lumbar activation | Abdominal activation |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| Start | 0 / 0 | 0 / 0 | 0 | 0 | 0 |
+| Bottom | 1252.65 / 1253.14 | 1.000 / 1.000 | 0.968 | 0.126 | 0.031 |
+| Return | 2.45 / 0.95 | 0.0020 / 0.0008 | 0.542 | 0.0068 | 0.035 |
+
+Pectoral values use the three source bundles `PECM1`, `PECM2` and `PECM3`
+for each side. Force is the sum of each path's absolute transmission force.
+Activation is the arithmetic mean of the named paths. The other group
+activations use the aggregates defined in the run's actuator inventory and
+series columns. The pectoral saturation at the bottom belongs to this
+controller and model. See the saved signed path forces, excitation,
+activation, length, velocity and work in the original run. Surface EMG,
+anatomical load, tissue deformation and risk remain outside these measurements.
+
+The negative zero-strength and low-friction legacy trials completed
+integration and failed `full_pushup` and `numerical_bounds`. The acceptance
+map is preserved in the run evidence and in render evidence. A request for
+`computed_muscle_strain` returns `unsupported`.

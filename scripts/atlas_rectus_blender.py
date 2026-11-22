@@ -12,10 +12,9 @@ SIDES = ("r", "l")
 SOURCE_OBJECT = "Rectus abdominis muscle"
 
 
-def extract_world_meshes(destination):
-    """Bake the source scene's hierarchy before doing the limited library import."""
+def source_meshes():
+    """Bake the pinned source scene's hierarchy and retain tendon assignments."""
     bpy.context.view_layer.update()
-    meshes = set()
     for side in SIDES:
         original = bpy.data.objects[f"{SOURCE_OBJECT}.{side}"]
         if [material.name for material in original.data.materials] != ["Flexion", "Tendon"]:
@@ -29,10 +28,31 @@ def extract_world_meshes(destination):
         mesh.materials.clear()
         mask = mesh.attributes.new("atlas_source_tendon", "BOOLEAN", "FACE")
         mask.data.foreach_set("value", assignments == 1)
+        yield side, original, mesh, assignments
+
+
+def extract_world_meshes(destination):
+    meshes = set()
+    for side, original, mesh, _ in source_meshes():
         obj = bpy.data.objects.new(f"atlas-source-rectus-{side}", mesh)
         obj["source_object"] = original.name
         meshes.add(obj)
     bpy.data.libraries.write(str(destination), meshes, compress=True)
+
+
+def extract_portable(destination):
+    arrays = {}
+    for side, _, mesh, assignments in source_meshes():
+        vertices = np.empty(len(mesh.vertices) * 3, dtype="<f4")
+        faces = np.empty(len(mesh.loops), dtype="<i4")
+        mesh.vertices.foreach_get("co", vertices)
+        mesh.loops.foreach_get("vertex_index", faces)
+        if len(faces) != len(mesh.polygons) * 3 or any(len(p.vertices) != 3 for p in mesh.polygons):
+            raise ValueError("pinned rectus polygons must be triangles")
+        arrays.update({f"{side}_vertices": vertices.reshape(-1, 3), f"{side}_faces": faces.reshape(-1, 3),
+                       f"{side}_tendon": assignments.astype("u1")})
+    with destination.open("xb") as stream:
+        np.savez_compressed(stream, **arrays)
 
 
 def segment_frame(lower, upper, anatomical_left):
@@ -123,4 +143,8 @@ def transfer_rectus(scene, source, frames, material):
 
 
 if __name__ == "__main__":
-    extract_world_meshes(Path(sys.argv[sys.argv.index("--") + 1]))
+    destination = Path(sys.argv[sys.argv.index("--") + 1])
+    if destination.suffix == ".npz":
+        extract_portable(destination)
+    else:
+        extract_world_meshes(destination)

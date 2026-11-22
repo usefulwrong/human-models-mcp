@@ -7,6 +7,7 @@ from mcp.server import MCPServer
 from . import __version__, core
 from .catalog import MODEL_FILES, model_card
 from .registry import discover
+from .research import ResearchViews
 from .results import error, get_run
 
 mcp = MCPServer("UsefulWrong / human-models-mcp", version=__version__, instructions=(
@@ -59,14 +60,25 @@ def describe_scenario(scenario_id: str) -> dict[str, Any]:
 
 
 @mcp.tool()
-def run_scenario(scenario_id: str, parameters: dict | None = None, idempotency_key: str | None = None) -> dict[str, Any]:
-    """Execute a bounded real engine operation. Unknown parameters rejected. Optional key reuses the same run."""
+def run_scenario(scenario_id: str, parameters: dict | None = None, idempotency_key: str | None = None,
+                 visualization: ResearchViews | None = None) -> dict[str, Any]:
+    """Execute a bounded engine operation. For push-ups, visualization also queues named saved-state views."""
+    if visualization is not None:
+        from .research import ResearchRequest, run_research
+        from pydantic import ValidationError
+
+        try:
+            request = ResearchRequest(scenario_id=scenario_id, parameters=parameters or {},
+                                      idempotency_key=idempotency_key, **visualization.model_dump(exclude_unset=True))
+        except ValidationError as exc:
+            return error("invalid_input", str(exc)[:1500])
+        return run_research(request)
     return core.run_scenario(scenario_id, parameters, idempotency_key)
 
 
 @mcp.tool()
 def get_result(run_id: str, claim_id: str | None = None) -> dict[str, Any]:
-    """Retrieve a persisted run, or evidence for metric:<name>, artifact:<id> or all when claim_id is supplied."""
+    """Retrieve a run or evidence for metric:<name>, gate:<name>, artifact:<id> or all."""
     if claim_id is not None:
         from .evidence import get_evidence
         return get_evidence(run_id, None if claim_id == "all" else claim_id)
@@ -92,6 +104,7 @@ def list_render_profiles() -> dict[str, Any]:
     """Discover bounded Blender profiles, real layers and unsupported anatomy; physics remains unchanged."""
     from .rendering import list_render_profiles as profiles
     return profiles()
+
 
 
 @mcp.tool()

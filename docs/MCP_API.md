@@ -88,3 +88,10 @@ See [source contracts](../src/human_models_mcp/server.py),
 [official SDK examples](../examples/mcp-client/README.md) and
 [trust boundaries](SECURITY.md). A scripted SDK test checks protocol behavior;
 it is not a new LLM session or a validation of arbitrary agent conclusions.
+
+## Research workflow
+
+For push-up scenarios, add `visualization` to `run_scenario` to queue named
+views on the same run. The reply includes the scientific gates and render
+job IDs. Use `get_result` with a `gate:<name>` claim ID to inspect a specific
+criterion. [Complete MCP, CLI and Python examples](V08_WORKFLOW.md)

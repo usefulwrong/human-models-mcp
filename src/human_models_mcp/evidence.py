@@ -24,10 +24,19 @@ def read_json(run, artifact_id):
     return json.loads(artifact["data"])
 
 
-def evidence_context(run):
+def evidence_context(run, summary=None, validation=None):
     scientific, execution = run["scientific"], run["execution"]
+    acceptance = scientific.get("acceptance", {})
+    thresholds = (summary or {}).get("thresholds", {})
     checks = [dict(check, status=check["status"].upper(), threshold=check.get("threshold"))
               for check in scientific.get("checks", [])]
+    checks += [
+        {"name": name, "status": status, "threshold": None,
+         "thresholds_at": "summary.json#/thresholds" if thresholds else None}
+        for name, status in acceptance.items() if status in {"PASS", "FAIL", "NOT_RUN"}
+    ]
+    if not checks:
+        checks.append({"name": "execution_checks", "status": "NOT_RUN", "threshold": None})
     return {
         "schema_version": "1.0",
         "run_id": run["run_id"],
@@ -42,6 +51,11 @@ def evidence_context(run):
         "computed_status": ("completed" if run["status"] == "computed" or execution.get("numeric_status") == "computed"
                             else "failed" if run["status"] == "failed" else "not_run"),
         "numeric_checks": checks,
+        "acceptance": acceptance,
+        "check_thresholds": thresholds,
+        "validation_contract": validation or {},
+        "human_validation_status": acceptance.get("human_experimental_validation", "NOT_VALIDATED"),
+        "human_safety_status": "unsupported",
         "scope_limitations": scientific["limitations"],
         "known_confounds": scientific["limitations"],
         "sources": scientific["citations"],
@@ -54,21 +68,11 @@ def get_evidence(run_id, claim_id=None):
     if "scientific" not in run:
         return run
     try:
-        context = evidence_context(run)
-        summary = read_json(run, "summary.json")
-        context["check_thresholds"] = summary.get("thresholds", {})
-        context["validation_contract"] = read_json(run, "validation.json")
+        context = evidence_context(run, read_json(run, "summary.json"), read_json(run, "validation.json"))
     except (OSError, ValueError) as exc:
         return error("integrity_error", str(exc))
-    context["numeric_checks"] += [
-        {"name": name, "status": status, "threshold": None, "thresholds_at": "summary.json#/thresholds"}
-        for name, status in run["scientific"].get("acceptance", {}).items() if status in {"PASS", "FAIL"}
-    ]
-    if not context["numeric_checks"]:
-        context["numeric_checks"].append({"name": "execution_checks", "status": "NOT_RUN", "threshold": None})
     checked = (context["computed_status"] == "completed"
-               and any(x["status"] == "PASS" for x in context["numeric_checks"])
-               and all(x["status"] != "FAIL" for x in context["numeric_checks"]))
+               and all(x["status"] == "PASS" for x in context["numeric_checks"]))
     execution = run["execution"]
     time_window = ([0, execution["simulation_time_s"]] if execution.get("simulation_time_s") else None)
     claims = {}
@@ -101,7 +105,16 @@ def get_evidence(run_id, claim_id=None):
             "validation_status": "unvalidated",
             "confidence_explanation": "Manifest digest identifies the persisted file. Retrieve through verified artifact access.",
         }
+    for name, status in context["acceptance"].items():
+        claims["gate:" + name] = {
+            "quantity": name, "value": status, "unit": None, "time_window_s": time_window,
+            "side": None, "structure": None, "anatomical_mapping_status": "unavailable",
+            "reference_comparison": {"status": "NOT_AVAILABLE"},
+            "evidence_class": "internally_checked" if status in {"PASS", "FAIL", "NOT_ACHIEVED"} else "computed_only",
+            "validation_status": "unvalidated",
+            "confidence_explanation": "This status applies to the named scenario criterion under the recorded controls.",
+        }
     if claim_id is not None and claim_id not in claims:
-        return error("unsupported", "No evidence for the requested claim. Use a listed metric or artifact ID.")
+        return error("unsupported", "No evidence for the requested claim. Use a listed metric, gate or artifact ID.")
     selected = claims if claim_id is None else {claim_id: claims[claim_id]}
     return {**context, "claims": [dict(claim, claim_id=key) for key, claim in selected.items()]}

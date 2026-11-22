@@ -5,9 +5,15 @@ import json
 import sys
 from pathlib import Path
 from mathutils import Vector
+import numpy as np
 
 folder = Path(sys.argv[sys.argv.index("--") + 1])
 expected = json.loads((folder / "unpacked/scene/expected.json").read_text())
+rectus = {}
+if "rectus_atlas" in expected["request"]["layers"]:
+    with np.load(folder / "unpacked/scene/atlas_surfaces.npz", allow_pickle=False) as arrays:
+        rectus = {side: tuple(arrays[f"{side}_{key}"] for key in ("vertices", "faces", "tendon"))
+                  for side in ("r", "l")}
 
 
 def load():
@@ -44,6 +50,27 @@ def validate_overlays(frame, mapping):
             p = world_to_camera_view(scene, scene.camera, coordinate)
             if not 0 < p.x < 1 or not .04 < p.y < .91 or p.z <= 0:
                 raise ValueError("atlas surface outside visible camera region")
+    if rectus:
+        from bpy_extras.object_utils import world_to_camera_view
+
+        scene = bpy.context.scene
+        for side, (vertices, faces, tendon) in rectus.items():
+            atlas = bpy.data.objects[f"atlas_rectus_Rectus abdominis muscle.{side}"]
+            surface = atlas.evaluated_get(bpy.context.evaluated_depsgraph_get())
+            mesh = surface.data
+            indices = np.empty(faces.size, dtype=np.int32)
+            mesh.loops.foreach_get("vertex_index", indices)
+            mask = np.empty(len(mesh.polygons), dtype=np.int32)
+            mesh.polygons.foreach_get("material_index", mask)
+            if atlas.hide_render or not np.array_equal(indices.reshape(-1, 3), faces) or not np.array_equal(mask, tendon):
+                raise ValueError("rectus topology, visibility or source tendon assignments differ")
+            for i, (vertex, target) in enumerate(zip(mesh.vertices, vertices[frame["frame"]], strict=True)):
+                coordinate = surface.matrix_world @ vertex.co
+                point(coordinate, target)
+                if i % 101 == 0:
+                    p = world_to_camera_view(scene, scene.camera, coordinate)
+                    if not .04 < p.x < .96 or not .1 < p.y < .9 or p.z <= 0:
+                        raise ValueError("rectus surface outside visible camera region")
     if "center_of_mass" in layers:
         point(bpy.data.objects["mass_weighted_COM"].matrix_world.translation, frame["com_world_m"])
     if "joint_axes" in layers:
@@ -157,11 +184,16 @@ load()
 positive = validate(expected)
 negatives = {}
 geom = next(g for g in expected["frames"][0]["geoms"] if "landmarks" in g)
-for fault in ("wrong_scale", "wrong_axis", "dropped_frame"):
+faults = ["wrong_scale", "wrong_axis", "dropped_frame"]
+if rectus:
+    faults.append("rectus_wrong_scale")
+for fault in faults:
     load()
     mapping = json.loads(json.dumps(expected))
     if fault == "dropped_frame":
         mapping["frames"][len(mapping["frames"]) // 2]["frame"] = 0
+    elif fault == "rectus_wrong_scale":
+        bpy.data.objects["atlas_rectus_Rectus abdominis muscle.r"].scale *= 100
     else:
         obj = bpy.data.objects["Mesh_" + geom["usd_name"]]
         for vertex in obj.data.vertices:

@@ -120,3 +120,8 @@ measurements. Check the scenario's named gates before rendering, and preserve
 failed controls and original states.
 
 [Anatomical evidence guide](../../docs/V08_ANATOMICAL_EVIDENCE.md)
+
+When adding a criterion, record its status in scientific acceptance and
+document its thresholds, units, window and source. Keep categorical scope
+statuses such as `NOT_ACHIEVED` and `NOT_VALIDATED`. Verify their values through
+`get_result` with `claim_id: "gate:<name>"` and in a saved-state render contract.

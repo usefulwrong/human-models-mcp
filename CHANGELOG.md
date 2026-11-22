@@ -14,6 +14,16 @@
 - Preserved the v0.7.1 simulation scenarios and results contract. Anatomical
   acceptance remains **PARTIAL**. See the [v0.8 handoff](docs/RELEASE_080.md).
 
+### Research workflow completion
+
+- Added one bounded study submission over the existing simulation worker and
+  Blender queue, accessible through MCP, Python and CLI.
+- Preserved scientific acceptance statuses in run evidence, finished render
+  jobs and render evidence, including `NOT_ACHIEVED` for muscle-only control.
+- Added a pinned, licensed bilateral Z-Anatomy rectus recipe with saved-site
+  registration, source tendon assignments and per-frame evidence.
+- Exported matched phase stills and a shared frame clock for multi-view demos.
+
 ## 0.7.1 — Public release hardening and contributor onboarding
 
 Release hardening and public documentation only: existing MuJoCo calculations,

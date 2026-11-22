@@ -25,6 +25,7 @@ PROFILES = {
 }
 LAYERS = {
     "pectoralis_atlas": "BodyParts3D right clavicular pectoralis major surface, illustrated with two-bone skinning.",
+    "rectus_atlas": "Bilateral Z-Anatomy rectus abdominis surfaces with illustrative saved-site registration.",
     "native_geometry": "Native visible model geoms; collision coverage and anatomy are incomplete.",
     "bones": "Native source skeletal meshes, not a new atlas or anatomical completeness claim.",
     "muscle_paths": "Selected native tendon paths, not volumetric muscles or tissue deformation.",
@@ -44,8 +45,10 @@ RECIPES = {
     "pushup_scientific": {"profile": "scientific", "layers": ["bones", "joint_axes", "contact_forces", "center_of_mass"]},
     "pushup_muscle_paths": {"profile": "scientific", "layers": ["bones", "muscle_paths"]},
     "pushup_anatomy": {"profile": "scientific", "layers": ["bones", "pectoralis_atlas"], "camera_view": "chest"},
+    "pushup_rectus": {"profile": "scientific", "layers": ["bones", "rectus_atlas"], "camera_view": "abdomen"},
     "pushup_cinematic": {"profile": "cinematic", "layers": ["bones", "muscle_paths"]},
 }
+ATLAS_LAYERS = {"pectoralis_atlas", "rectus_atlas"}
 MAX_CHUNK = 256 * 1024
 MAX_FILE = 128 * 1024 * 1024
 
@@ -240,8 +243,13 @@ def render_result(run_id, profile=None, layers=None, options=None, idempotency_k
             return error("invalid_input", "rendering requires an existing computed run")
         if run["scenario_id"] not in SUPPORTED:
             return error("unsupported", "this scenario has no supported saved dynamic trajectory transfer")
-        if (recipe is not None or "pectoralis_atlas" in selected) and run["scenario_id"] not in {"pushup", "pushup_palms"}:
-            return error("unsupported", "pushup recipes and atlas require pushup or pushup_palms")
+        duration = run.get("execution", {}).get("simulation_time_s")
+        if recipe and duration and "fps" not in (options or {}):
+            settings["fps"] = max(1, min(30, round((settings["frames"] - 1) / duration)))
+        if (recipe is not None or ATLAS_LAYERS.intersection(selected)) and not run["scenario_id"].startswith("pushup"):
+            return error("unsupported", "pushup recipes and atlas require a pushup scenario")
+        if ATLAS_LAYERS <= set(selected):
+            return error("unsupported", "select one atlas region per view")
         atlas = None
         if "pectoralis_atlas" in selected:
             from .atlas import atlas_inputs, atlas_lock_digest
@@ -249,6 +257,13 @@ def render_result(run_id, profile=None, layers=None, options=None, idempotency_k
                 atlas = atlas_inputs()
             except (OSError, ValueError) as exc:
                 return error("unsupported", "Atlas input unavailable: " + str(exc))
+        if "rectus_atlas" in selected:
+            from .atlas import atlas_lock_digest
+            from .rectus import rectus_inputs
+            try:
+                atlas = rectus_inputs()
+            except (OSError, ValueError) as exc:
+                return error("unsupported", "Rectus atlas input unavailable: " + str(exc))
         if settings["frames"] > run.get("execution", {}).get("integration_steps", 0) + 1:
             return error("invalid_input", "requested frames exceed the saved state count")
         if "contact_forces" in selected and "contacts" not in run["outputs"]:
@@ -328,6 +343,7 @@ def render_result(run_id, profile=None, layers=None, options=None, idempotency_k
                 "scientific": {
                     "validation_level": "unvalidated",
                     "limitations": run["scientific"]["limitations"],
+                    "acceptance": run["scientific"].get("acceptance", {}),
                     "anatomical_registration": "native_model_only; external registration_unverified",
                 },
             }

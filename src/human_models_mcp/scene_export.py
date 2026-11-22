@@ -115,6 +115,9 @@ def export_scene(job):
     layers = request["layers"]
     atlas = None
     atlas_report = None
+    rectus_meshes = None
+    rectus_frames = []
+    phases = {}
     if "pectoralis_atlas" in layers:
         from .atlas import atlas_lock, atlas_lock_digest
         from .atlas_registration import register, skin
@@ -124,6 +127,29 @@ def export_scene(job):
         mj.mj_forward(model, data)
         atlas = register(model, data, run["model"], source)
         atlas_report = atlas[-1]
+        atlas_report["faces"] = atlas[0].tolist()
+    elif "rectus_atlas" in layers:
+        from .atlas import atlas_lock_digest
+        from .rectus import ASSET, SOURCE, register as register_rectus, skin as skin_rectus
+
+        if request["atlas_lock_sha256"] != atlas_lock_digest(SOURCE):
+            raise ValueError("rectus registration lock changed between submission and rendering")
+        rectus_meshes = register_rectus(source / ASSET, run["model"])
+        atlas_report = {
+            "status": "illustrative", "source": SOURCE,
+            "anatomical_id": "Rectus abdominis muscle (bilateral)",
+            "method": "12 mm source vertex caps fitted to pubic and costal sites, proper rotation and axial display scale",
+            "activation_mapping": "unavailable; fixed fibre shading with source tendon assignments",
+            "structures": {side: {"source_object": f"Rectus abdominis muscle.{side}", "vertices": len(local),
+                                  "triangles": len(faces), "tendon_faces": int(tendon.sum()),
+                                  "target_sites": [f"rect_abd_{side}-P1", f"rect_abd_{side}-P4"]}
+                           for side, (local, _, faces, tendon) in rectus_meshes.items()},
+            "thresholds": {"anchor_error_m": 2e-6, "axial_scale": [.73, 1.35],
+                           "landmark_distance_m": [.2, .65], "median_signed_lateral_m": ">0"},
+            "limitations": ["Endpoint agreement is imposed by the fit. Interior landmarks and human correspondence were not tested.",
+                            "Affine geometric animation and source tendon materials provide no tissue stress, strain or activation."],
+        }
+    if atlas_report or pushup and request.get("recipe"):
         summary = json.loads((source / "summary.json").read_text())
         bottom = summary["key_indices"][1]
         if not 0 < bottom < len(times) - 1:
@@ -132,8 +158,9 @@ def export_scene(job):
             nearest = 1 + int(np.argmin(abs(indices[1:-1] - bottom)))
             indices[nearest] = bottom
             indices.sort()
-        atlas_report["phase_source_indices"] = {"start": 0, "bottom": bottom, "return": len(times) - 1}
-        atlas_report["faces"] = atlas[0].tolist()
+        phases = {"start": 0, "bottom": bottom, "return": len(times) - 1}
+        if atlas_report:
+            atlas_report["phase_source_indices"] = phases
     option = mj.MjvOption()
     option.flags[mj.mjtVisFlag.mjVIS_TENDON] = False
     if "bones" in layers and "native_geometry" not in layers:
@@ -192,6 +219,14 @@ def export_scene(job):
                 None if previous_atlas is None else float(np.linalg.norm(surface - previous_atlas, axis=1).max()))
             previous_atlas = surface
             atlas_fields = {"atlas_vertices_m": surface.tolist(), "atlas_checks": checks}
+        elif rectus_meshes is not None:
+            surfaces, checks, sites = skin_rectus(model, data, rectus_meshes)
+            for side, surface in surfaces.items():
+                checks[side]["max_vertex_motion_since_previous_sample_m"] = (
+                    float(np.linalg.norm(surface - rectus_frames[-1][side], axis=1).max()) if rectus_frames else None
+                )
+            rectus_frames.append(surfaces)
+            atlas_fields = {"atlas_checks": checks, "rectus_sites_m": sites}
         row = rows[index]
         if pushup:
             if np.any(data.xfrc_applied) or np.any(data.qfrc_applied[:6]):
@@ -429,6 +464,7 @@ def export_scene(job):
             "video_duration_s": len(frames) / settings["fps"],
             "interpolation": "no interpolated physics states; explicit source indices; final frame held one video interval",
         },
+        "phase_source_indices": phases,
         "geometry_validation": {
             "translation_tolerance_m": 2e-6,
             "rotation_matrix_tolerance": 2e-6,
@@ -441,5 +477,12 @@ def export_scene(job):
         "frames": frames,
         **({"atlas": atlas_report} if atlas_report else {}),
     }
+    if rectus_meshes is not None:
+        arrays = {}
+        for side, (_, _, faces, tendon) in rectus_meshes.items():
+            arrays[f"{side}_vertices"] = np.stack([frame[side] for frame in rectus_frames]).astype("float32")
+            arrays[f"{side}_faces"] = faces
+            arrays[f"{side}_tendon"] = tendon
+        np.savez_compressed(work / "atlas_surfaces.npz", **arrays)
     write_json(work / "expected.json", expected)
     return expected

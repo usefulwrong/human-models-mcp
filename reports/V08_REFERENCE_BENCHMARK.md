@@ -43,3 +43,10 @@ A second software control restored all 111 real saved model states and
 compared the resulting landmark series against itself. The overlay and zero
 alignment error exercise the saved-state reader and plotting; they provide no
 independent accuracy evidence.
+
+## Closure rerun
+
+The licensed-data CLI returned `NOT_RUN` with
+`LICENSED_DATA_NOT_PROVIDED` for the demonstration run. The synthetic
+controls remain software tests. The official terms were rechecked on
+2026-11-22. [Fit3D terms](https://fit3d.imar.ro/legal)

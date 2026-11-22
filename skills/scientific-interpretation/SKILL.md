@@ -206,3 +206,13 @@ activation as dimensionless, and skinning as a visual rig. A render or simulatio
 PASS gives no evidence of human safety, tissue mechanics or EMG.
 
 [Anatomical evidence guide](../../docs/V08_ANATOMICAL_EVIDENCE.md)
+
+## Claim-specific statuses
+
+Read the full `acceptance` map and the individually named `numeric_checks`.
+Use `get_result(run_id, claim_id="gate:muscle_driven")` for muscle-only control.
+A run can be completed with `full_pushup: FAIL`, or it can pass the exercise
+gates with `muscle_driven: NOT_ACHIEVED`. Treat use of residual assistance
+and prescribed sticking points as interpretation limits. Read
+`reference_comparison`, `human_validation_status` and `human_safety_status`
+before writing claims about people. Never infer a confidence percentage.

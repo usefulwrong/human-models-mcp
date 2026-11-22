@@ -159,3 +159,15 @@ reference and the deterministic arm replay command in the
 Read the open-edge, native path, and intersection reports alongside paired
 renders. Compare triangle-pair counts only for fixed topology. The replay is
 an illustrative Blender workflow with the original saved model states.
+
+## Regional anatomy and multiple views
+
+Use `run_scenario.visualization` to compute and queue multiple push-up
+recipes together, or `render_result` for a persisted run. The
+`pushup_rectus` recipe fits two named Z-Anatomy surfaces to the saved pubic
+and costal sites. Its `anatomy_registration.json` records source pins,
+scale, laterality, phase indices and crossings. The mapping is illustrative.
+Fibre shading and tendon face materials have no activation signal. Take
+activity from saved paths and the native numerical traces. Describe the
+fixed relative playback clock using `frames.json`; report presentation
+sampling separately from the physics timestep.

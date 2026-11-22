@@ -279,5 +279,134 @@
       "other_unchanged_meshes_per_reopened_phase": 375,
       "independent_anatomical_validation": "pending"
     }
+  },
+  "closure": {
+    "date": "2026-11-22",
+    "starting_git_sha": "8c4293386bb290b5733ab62ff1bd0387d0defdf9",
+    "version": "0.8.0",
+    "status": "PARTIAL",
+    "engineering_workflow": "PASS",
+    "source_run_id": "042a4b7e-95a0-4b1b-b0d2-4965a23f1861",
+    "cases": {
+      "docker_clean_build_and_locked_model_verification": {
+        "status": "PASS",
+        "locked_model_files": 251
+      },
+      "make_test": {
+        "status": "PASS",
+        "tests": 105,
+        "wheel_and_sdist": "PASS"
+      },
+      "pushup_e2e": {
+        "status": "PASS",
+        "expected_rejected_cases": [
+          "zero_strength",
+          "low_friction"
+        ]
+      },
+      "render_e2e_cpu_and_fallback": {
+        "status": "PASS"
+      },
+      "four_view_sdk_cpu": {
+        "status": "PASS",
+        "frames_per_view": 7,
+        "rectus_job_id": "7e6b728a-85b4-48e1-83a7-ca559f21e850"
+      },
+      "rectus_rtx_3070_ti": {
+        "status": "PASS",
+        "frames": 61,
+        "backend": "optix",
+        "job_id": "5f241582-5666-493c-9539-9add9b43a459",
+        "device_total_mib": 8192,
+        "peak_device_wide_used_mib": 2500,
+        "source_snapshot_digests_matched": 36
+      },
+      "cpu_legacy_pectoralis_cli": {
+        "status": "PASS",
+        "frames": 3
+      },
+      "render_faults": {
+        "status": "PASS",
+        "cases": 10,
+        "gpu_oom": "simulated after enumeration; actual CPU retry"
+      },
+      "native_time_and_geometry_checks": {
+        "status": "PASS",
+        "external_anatomical_mapping_status": "illustrative"
+      },
+      "legacy_numerical_replay": {
+        "status": "PASS",
+        "cases": 18,
+        "max_metric_difference": 0
+      },
+      "legacy_visual_regression": {
+        "status": "BLOCKED",
+        "reason": "V06_BASELINE_NUMERICS.json absent"
+      },
+      "external_mocap": {
+        "status": "NOT_RUN",
+        "reason": "LICENSED_DATA_NOT_PROVIDED"
+      },
+      "whole_body_atlas": {
+        "status": "PARTIAL",
+        "reason": "Prior intersection and attachment review limits remain"
+      },
+      "human_safety": {
+        "status": "unsupported"
+      },
+      "primary_closure_handoff": {
+        "status": "BLOCKED",
+        "reason": "HUMAN_MODELS_MCP_V08_CLOSURE_CODEX_SOL_HIGH_RU.md missing locally"
+      },
+      "mcp_stdio_http_and_fresh_clients": {
+        "status": "PASS",
+        "execution": "both make e2e commands completed separately"
+      },
+      "public_source_export": {
+        "status": "PASS",
+        "strict_tree": true,
+        "files": 264,
+        "asset_hashes_verified": 33
+      },
+      "readme_demo_visual_review": {
+        "status": "PASS",
+        "mp4_decode": "PASS",
+        "matched_phases": [
+          0,
+          55,
+          110
+        ]
+      },
+      "four_view_sdk_rtx_3070_ti": {
+        "status": "PASS",
+        "backend": "optix",
+        "frames_per_view": 61,
+        "job_ids": {
+          "pushup_scientific": "1329d0c4-78c8-41fb-8148-78baa6b00c41",
+          "pushup_rectus": "5f241582-5666-493c-9539-9add9b43a459",
+          "pushup_muscle_paths": "7d307f45-82db-46b7-b2fa-8ec45d8b2797",
+          "pushup_cinematic": "e865fecc-098b-48b8-9e66-c29ff531efa4"
+        }
+      }
+    },
+    "sdk_submission_measurement": {
+      "combined": {
+        "tool_calls": 1,
+        "argument_bytes": 283,
+        "result_bytes": 3445
+      },
+      "separate": {
+        "tool_calls": 6,
+        "argument_bytes": 869,
+        "result_bytes": 77007
+      }
+    },
+    "demo_manifest": "docs/demo/workflow/assets.json",
+    "demo_media": {
+      "count": 4,
+      "exact_saved_states_per_video": 61,
+      "fps": 14,
+      "image_interpolation": false
+    }
   }
 }

@@ -17,8 +17,17 @@ def texture_coordinates(mesh, anatomical_axis=None):
     if not len(points) or not np.isfinite(points).all():
         raise ValueError(f"cannot map muscle material coordinates on {mesh.name}")
     points -= points.mean(axis=0)
-    if anatomical_axis == "local_z":
+    if isinstance(anatomical_axis, str) and anatomical_axis == "local_z":
         coordinates = points
+    elif anatomical_axis is not None:
+        longitudinal = np.asarray(anatomical_axis, dtype=float)
+        length = np.linalg.norm(longitudinal)
+        if longitudinal.shape != (3,) or not np.isfinite(length) or length == 0:
+            raise ValueError("invalid anatomical material axis")
+        longitudinal = longitudinal / length
+        lateral = np.cross(np.eye(3)[np.argmin(abs(longitudinal))], longitudinal)
+        lateral /= np.linalg.norm(lateral)
+        coordinates = points @ np.column_stack((lateral, np.cross(longitudinal, lateral), longitudinal))
     else:
         _, basis = np.linalg.eigh(points.T @ points)
         for column in basis.T:

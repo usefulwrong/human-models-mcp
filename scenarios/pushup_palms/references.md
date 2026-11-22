@@ -160,3 +160,17 @@ the palm-floor interface, and elbow paths and toe spacing differ from the
 frontal photos. The run's fixed-point support diagnostics provide the
 stationarity test. The photos lack a measured floor projection, time
 alignment, a matching subject rig and a return frame.
+
+## Closure media review (2026-11-22)
+
+The standard-width ACE start and bottom side photographs and the start and
+bottom panels of Intziegianni Figure 1(a) were visually compared with saved
+indices 0, 55 and 110 of the four-view replay. Arms extend at the top and
+return, with chest descent and visible elbow flexion at the bottom. The exact
+bone and palm orientation remains model-specific. The frontal study shows
+closer toes than the model, and the oblique scientific camera does not
+resolve equivalent frontal elbow angles. Support stationarity comes from
+the saved model contact diagnostics. The human sources offer no matched
+return image or timestamp. This closure only changes the presentation.
+[ACE start and bottom](https://www.acefitness.org/resources/everyone/blog/5983/two-classic-exercises-everyone-should-master/) ·
+[Intziegianni et al., Fig. 1(a)](https://www.mdpi.com/2813-0413/5/1/18)
