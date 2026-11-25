@@ -4,11 +4,12 @@ USER root
 COPY render_vendor/blender-4.5.15-linux-x64.tar.xz /tmp/blender.tar.xz
 RUN echo '0d2b8bb2efe97e6c8eb57de6b7322f8800e1984e3125b60decca5f6771e4773e  /tmp/blender.tar.xz' | sha256sum -c - && python -c "import tarfile; tarfile.open('/tmp/blender.tar.xz').extractall('/opt', filter='data')"
 FROM ${SCIENCE_IMAGE}
+ARG SCIENCE_IMAGE
 USER root
 RUN apt-get update && apt-get install -y --no-install-recommends libsm6 libxrender1 libxi6 libxxf86vm1 libxfixes3 libxrandr2 libxcursor1 libxkbcommon0 libgomp1 ffmpeg && rm -rf /var/lib/apt/lists/*
 COPY --from=blender-install /opt/blender-4.5.15-linux-x64 /opt/blender
 COPY requirements-render.lock renderer.lock.json /app/
-RUN pip install --no-cache-dir --require-hashes -r requirements-render.lock && python scripts/capture_environment.py
+RUN pip install --no-cache-dir --require-hashes -r requirements-render.lock && python scripts/capture_environment.py --base-image "$SCIENCE_IMAGE"
 ENV BLENDER_BIN=/opt/blender/blender
 USER 1000:1000
 ENTRYPOINT ["python", "-m", "human_models_mcp.render_worker"]

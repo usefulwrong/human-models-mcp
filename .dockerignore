@@ -20,3 +20,14 @@ outputs
 output
 render_vendor
 render_jobs
+handoff
+HMM_v0*
+runtime-environment.json
+**/node_modules
+scripts/anatomy_lab/build_report.py
+scripts/anatomy_lab/report_site
+scripts/muscle_intelligence/package_review.py
+scripts/muscle_intelligence/review_media.py
+tests/anatomy_lab_e2e/prototypes
+tests/anatomy_lab_e2e/report.cjs
+tests/anatomy_lab_e2e/review_links.cjs

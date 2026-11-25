@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; connect-src 'self'; script-src 'self' 'sha256-VSNts6tNyWaSHh5Pb7lZIPfidIaOKc7j4sZ6XPfX2To='; style-src 'self'">
+<title>Anatomy Explorer · Human Models MCP</title>
+<link rel="stylesheet" href="style.css">
+<script type="importmap">{"imports":{"three":"./npm/node_modules/three/build/three.module.js"}}</script>
+<script type="module" src="start.js?v=moving-1"></script>
+</head>
+<body>
+<header class="masthead">
+  <div class="brand"><span class="mark" aria-hidden="true">+</span><div><span class="product">HUMAN MODELS MCP</span><h1>Anatomy Explorer</h1></div></div>
+  <div class="files">
+    <button id="export" type="button">Save scene</button>
+    <label class="file-button" for="import">Open scene</label><input type="file" id="import" accept="application/json,.json" aria-label="Open scene">
+  </div>
+</header>
+<main>
+  <nav class="browse" aria-label="Find anatomy">
+    <section class="find">
+      <label for="query">Find a structure</label>
+      <input id="query" type="search" placeholder="Try heart or left lung" maxlength="160" aria-controls="matches" autocomplete="off">
+      <ul id="matches" aria-label="Matching structures"></ul>
+      <output id="search-status" aria-live="polite"></output>
+      <div id="shortcuts" class="shortcuts" aria-label="Featured structures"></div>
+    </section>
+    <section class="taxonomy" aria-labelledby="systems-title">
+      <h2 id="systems-title">Anatomical systems</h2>
+      <div id="systems" class="systems"></div>
+      <section id="tree" hidden aria-label="Source hierarchy">
+        <div class="tree-controls">
+          <button id="tree-back" type="button" disabled>Back</button>
+          <label class="sr-only" for="hierarchy">Relationship type</label>
+          <select id="hierarchy">
+            <option value="PART-OF">Part of</option><option value="IS-A">Is a type of</option>
+          </select>
+        </div>
+        <div id="branch"></div>
+        <p id="tree-note" class="muted">Direct edges from the installed catalog.</p>
+        <div id="relations" aria-live="polite"></div>
+      </section>
+    </section>
+  </nav>
+  <section class="stage" aria-label="Spatial view">
+    <canvas id="view" aria-label="3D anatomy view. Drag to rotate and click to inspect a mesh."></canvas>
+    <div class="stage-actions">
+      <div><span class="stage-label">ATLAS VIEW</span><p id="viewport-title">Anterior surface</p></div>
+      <button id="reset" type="button">Reset view</button>
+    </div>
+    <div class="stage-footer">
+      <output id="stage-status" aria-live="polite">Loading local atlas…</output>
+      <span>Drag to orbit · Scroll or pinch to zoom</span>
+    </div>
+    <div id="motion-controls" role="group" aria-label="Saved motion playback" hidden>
+      <label>Saved frame <select id="frame"></select></label>
+      <button id="play" type="button">Play saved frames</button>
+    </div>
+    <div id="whole-controls" role="group" aria-label="Whole-body playback" hidden>
+      <button id="whole-play" type="button">Play</button>
+      <button id="whole-restart" type="button">Restart</button>
+      <label>Timeline <input id="whole-timeline" type="range" min="0" step="1" value="0"></label>
+      <output id="whole-time"></output>
+      <label>Speed <select id="whole-speed"><option value=".5">½×</option><option value="1" selected>1×</option><option value="2">2×</option></select></label>
+      <label>View <select id="whole-camera"><option value="side">Side</option><option value="oblique">Oblique</option><option value="torso">Torso</option></select></label>
+    </div>
+  </section>
+  <aside class="inspect" aria-labelledby="inspection-title">
+    <div class="inspector-heading">
+      <h2 id="inspection-title">Structure inspector</h2>
+      <output id="selection" hidden></output>
+      <h3 id="preferred-name">Human atlas</h3>
+      <p id="concept-meta" class="muted">BodyParts3D · anterior surface preview</p>
+      <p id="intro">Choose an organ, browse a system, or tap the model to inspect a mesh.</p>
+      <button id="locate" type="button" hidden>Browse related structures</button>
+    </div>
+    <div id="composite-controls" hidden>
+      <p id="coverage-summary" aria-live="polite"></p>
+      <div class="composite-actions">
+        <button id="focus" type="button">Focus</button>
+        <button id="isolate" type="button">Isolate</button>
+      </div>
+      <label for="constituent">Component mesh</label>
+      <select id="constituent"></select>
+    </div>
+    <section id="mesh-panel" aria-labelledby="mesh-title" hidden>
+      <h3 id="mesh-title">Mesh identity</h3>
+      <output id="constituent-info" aria-live="polite"></output>
+      <div id="mesh-candidates"></div>
+    </section>
+    <button id="whole-open" type="button">Open assisted push-up replay</button>
+    <section id="whole-layers" aria-label="Motion layers" hidden>
+      <div id="whole-layer-options"></div>
+      <button id="whole-static" type="button">Return to static atlas</button>
+    </section>
+    <details id="display">
+      <summary>Display layers</summary>
+      <p id="layer-scope" class="muted"></p>
+      <button id="layer-overview" type="button" hidden>Open atlas overview</button>
+      <output id="layer-status" role="status"></output>
+      <div id="layers" role="group" aria-label="Layers"></div>
+      <label id="opacity-control" hidden>Context opacity <input type="range" id="opacity" min="5" max="100" step="5" value="20"></label>
+    </details>
+    <details id="technical">
+      <summary>Sources &amp; advanced controls</summary>
+      <output id="source"></output>
+      <p>Research atlas. Coverage describes the installed data. Authored 4.3i inferred edges are unverified.</p>
+      <label id="membership-control" hidden>Visual membership version
+        <select id="membership">
+          <option value="4.3+4.3i">4.3 + 4.3i (explicit union)</option>
+          <option>4.3</option><option>4.3i</option>
+        </select>
+      </label>
+      <output id="coverage" aria-live="polite"></output>
+      <output id="source-details"></output>
+      <label>Atlas preset <select id="scenes"></select></label>
+      <label>Open saved motion <input type="file" id="motion" accept="application/json,.json"></label>
+    </details>
+    <output id="message" role="status">Loading the anatomy atlas…</output>
+    <footer>BodyParts3D © Database Center for Life Science</footer>
+  </aside>
+</main>
+</body>
+</html>

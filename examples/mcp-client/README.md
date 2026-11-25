@@ -25,3 +25,5 @@ not evidence of a new LLM conversation or biological validity.
 
 [Tool guide](../../docs/MCP_API.md) · [Rendering](../../docs/RENDERING.md) ·
 [Reproducibility](../../docs/REPRODUCIBILITY.md)
+
+The v0.9.0 Research Preview candidate uses Python 3.12 and the MCP SDK pinned in `requirements.lock`.

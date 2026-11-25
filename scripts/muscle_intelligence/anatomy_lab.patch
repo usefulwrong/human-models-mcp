@@ -1,0 +1,429 @@
+--- a/anatomy_lab.py
++++ b/anatomy_lab.py
+@@ -17,6 +17,7 @@
+ from pydantic.types import FiniteFloat
+ 
+ from human_models_mcp.results import error
++from muscle_contract import MUSCLE_REQUESTS, MuscleRegistration, MuscleSearch, MuscleSelect, MuscleSelection, MuscleSeries, MuscleView
+ 
+ 
+ Fma = Annotated[str, Field(pattern=r"^FMA[1-9][0-9]{0,8}$")]
+@@ -173,6 +174,7 @@
+     state_index: int = Field(ge=0, le=400)
+     layers: list[Literal["BODY", "SKELETON", "MUSCLES", "ORGANS", "SKIN", "OVERLAYS"]] = Field(max_length=6)
+     camera: WholeCamera
++    muscle: MuscleView | None = None
+ 
+ 
+ class WholeDiscover(Contract):
+@@ -204,7 +206,8 @@
+ 
+ 
+ Request = Annotated[SourceRequest | Search | ConceptRequest | Resolve | Identify | Spatial | SceneRequest | MotionRequest
+-                    | WholeDiscover | WholeOpen | WholeSetView | WholeArtifact,
++                    | WholeDiscover | WholeOpen | WholeSetView | WholeArtifact
++                    | MuscleSearch | MuscleSeries | MuscleSelect | MuscleSelection | MuscleRegistration,
+                     Field(discriminator="operation")]
+ REQUEST = TypeAdapter(Request)
+ FMA_ID = TypeAdapter(Fma)
+@@ -905,6 +908,10 @@
+                 from spatial import query
+ 
+                 return query(self, request)
++            if isinstance(request, MUSCLE_REQUESTS):
++                if self.whole is None or self.whole.muscles is None:
++                    return error("not_installed", "muscle analytics are not installed")
++                return self.whole.muscles.call(request)
+             if isinstance(request, WHOLE_REQUESTS):
+                 if self.whole is None:
+                     return error("not_installed", "whole-body motion is not installed")
+--- a/moving_transport.py
++++ b/moving_transport.py
+@@ -20,6 +20,7 @@
+         self.run_root = Path(run_root)
+         self.atlas_sha = atlas_sha
+         self.render_sha = render_sha
++        self.muscles = None
+ 
+     def verified(self):
+         raw = read_bounded(self.path, 1 << 20)
+@@ -72,7 +73,9 @@
+         if str(request.run_id) != scene["run_id"]:
+             raise LookupError("no whole-body animation for that run")
+         if request.operation == "whole.open":
+-            return {"status": "ok", "motion_sha256": self.sha, "motion": scene}
++            return {"status": "ok", "motion_sha256": self.sha, "motion": scene,
++                    **({"muscle_analytics": {"shared_selection": self.muscles.selection_path is not None}}
++                       if self.muscles else {})}
+         if request.operation == "whole.artifact":
+             with self.open_artifact(request.artifact_id, scene) as (_, identity):
+                 return {"status": "ok", **identity, "artifact_id": request.artifact_id,
+@@ -86,5 +89,10 @@
+                 or any(not scene["layers"][layer]["available"] for layer in chosen.layers)
+                 or chosen.camera.position == chosen.camera.target):
+             raise ValueError("invalid moving layers or camera")
+-        view = chosen.model_dump(mode="json")
++        if chosen.muscle is not None:
++            if self.muscles is None:
++                raise ValueError("muscle analytics are unavailable for this view")
++            context = self.muscles.context(request.run_id, scene)
++            self.muscles.validate_view(context, chosen.state_index, chosen.muscle, palette=False)
++        view = chosen.model_dump(mode="json", exclude={"muscle"} if chosen.muscle is None else set())
+         return {"status": "ok", "view": view, "view_sha256": digest(canonical(view))}
+--- a/lab_mcp.py
++++ b/lab_mcp.py
+@@ -21,6 +21,12 @@
+         installed.whole = WholeMotion(motion, os.environ["HMM_LAB_WHOLE_SHA"],
+                                       os.environ["HMM_LAB_WHOLE_RESULTS"], installed.atlas_sha256,
+                                       os.environ.get("HMM_LAB_WHOLE_RENDER_SHA"))
++        if crosswalk := os.environ.get("HMM_LAB_MUSCLE_CROSSWALK"):
++            from muscle_data import MuscleData
++
++            installed.whole.muscles = MuscleData(
++                installed.whole, crosswalk, os.environ["HMM_LAB_MUSCLE_CROSSWALK_SHA"],
++                os.environ.get("HMM_LAB_MUSCLE_SELECTION"))
+     return installed
+ 
+ 
+--- a/site/viewer.js
++++ b/site/viewer.js
+@@ -59,7 +59,7 @@
+ const order = new Map(Object.keys(metadata.parts).map((id, index) => [id, index]));
+ const loaded = new Map();
+ const loader = new GLTFLoader();
+-const whole = wholeMotion({ loader, group: wholeGroup, camera, orbit, invalidate, enter: () => {
++const whole = wholeMotion({ canvas, loader, group: wholeGroup, camera, orbit, invalidate, enter: () => {
+   sceneRequest++;
+   composite = undefined;
+   frameData = undefined;
+@@ -779,7 +779,11 @@
+ canvas.addEventListener("pointerup", e => {
+   const start = pointerStart;
+   pointerStart = undefined;
+-  if (!start || Math.hypot(e.clientX-start[0],e.clientY-start[1]) > (e.pointerType === "touch" ? 9 : 3) || frameData || whole.active()) return;
++  if (!start || Math.hypot(e.clientX-start[0],e.clientY-start[1]) > (e.pointerType === "touch" ? 9 : 3) || frameData) return;
++  if (whole.active()) {
++    whole.inspectPointer(e.clientX, e.clientY);
++    return;
++  }
+   const id = pick(e.clientX,e.clientY)[0];
+   if (id) inspect(id);
+ });
+@@ -811,7 +815,7 @@
+ }
+ window.hmmViewer = {
+   getScene, setScene, setComposite, pick, installMotion, showFrame, render,
+-  whole: { seek: whole.seek, status: whole.status, sample: whole.sample, matrix: whole.matrix, weights: whole.weights },
++  whole: { seek: whole.seek, status: whole.status, sample: whole.sample, matrix: whole.matrix, weights: whole.weights, muscleHit: whole.muscleHit, diagnosticCamera: whole.diagnosticCamera, faceCenters: whole.faceCenters, project: whole.project, muscleColor: whole.muscleColor, muscleNodes: whole.muscleNodes, muscleState: whole.muscleState, muscleRayAudit: whole.muscleRayAudit },
+   visibleFjIds: () => frameData ? [...motionParts.keys()] : pickTargets.map(o => o.name),
+   stats: () => ({revision, ...context.info.render}),
+   project: p => {
+--- a/site/whole_motion.js
++++ b/site/whole_motion.js
+@@ -1,21 +1,30 @@
+ import * as THREE from "three";
+ import { request } from "./lab_bridge.js";
+-
+-export function wholeMotion({ loader, group, camera, orbit, invalidate, enter }) {
++import { musclePanel } from "./muscle_panel.js";
++
++export function wholeMotion({ canvas, loader, group, camera, orbit, invalidate, enter }) {
+   const el = id => document.getElementById(id);
+   const timeline = el("whole-timeline");
+   const layerPanel = el("whole-layers");
+   const controls = el("whole-controls");
+   let clip, mixer, action, rig, run, layers, index, cameraName, motionSha;
+-  let pending = 0;
++  let pending = 0, analytics, verifiedAsset;
+   let started, offset, clock = 0;
+   const nodes = new Map();
+   const scratch = new THREE.Vector3();
++  const chestViews = {
++    chest_right: {position: [1.76, .30, 1.12], target: [1.23, .40, 0], fov: 35},
++    chest_left: {position: [1.76, .30, -1.12], target: [1.23, .40, 0], fov: 35},
++  };
++  const cameraView = name => run.cameras[name] ?? chestViews[name];
++  const panel = musclePanel({ target: canvas, root: () => rig, nodes, run: () => run, motionSha: () => motionSha,
++    stateIndex: () => run.frames[index].state_index, seek, invalidate, showLayers, focus });
+ 
+   function currentView() {
+     return {
+       schema_version: "hmm.anatomy.motion-view/1", run_id: run.run_id, motion_sha256: motionSha,
+       state_index: run.frames[index].state_index, layers: [...layers],
++      ...(panel.settings() ? { muscle: panel.settings() } : {}),
+       camera: { position: camera.position.toArray(), target: orbit.target.toArray(), fov: camera.fov },
+     };
+   }
+@@ -34,7 +43,8 @@
+     timeline.value = index;
+     el("whole-time").textContent = exact ?
+       `#${frame.state_index} · ${frame.frame_time.toFixed(2)} s · ${frame.phase}` :
+-      `${(clock + run.frames[0].frame_time).toFixed(2)} s · interpolated (near #${frame.state_index})`;
++      `${(clock + run.frames[0].frame_time).toFixed(2)} s · interpolated (sample #${frame.state_index})`;
++    panel.frame(exact);
+   }
+ 
+   function pause() {
+@@ -49,6 +59,7 @@
+     index = next;
+     pose(run.frames[index].frame_time - run.frames[0].frame_time);
+     readout(true);
++    if (analytics?.shared_selection) panel.publish();
+   }
+ 
+   function animate(now) {
+@@ -77,15 +88,40 @@
+     invalidate();
+   }
+ 
++  function focus(ids) {
++    const box = new THREE.Box3();
++    for (const id of ids) {
++      const mesh = nodes.get(id);
++      if (!mesh?.isMesh) continue;
++      for (let i = 0; i < mesh.geometry.attributes.position.count; i++) {
++        box.expandByPoint(mesh.getVertexPosition(i, scratch).applyMatrix4(mesh.matrixWorld));
++      }
++    }
++    if (box.isEmpty()) return;
++    const center = box.getCenter(new THREE.Vector3());
++    const distance = Math.max(.12, box.getSize(new THREE.Vector3()).length() * 1.8 / Math.min(1, camera.aspect));
++    const position = camera.position.clone().sub(orbit.target).normalize().multiplyScalar(distance).add(center);
++    setCamera({position: position.toArray(), target: center.toArray(), fov: 35});
++  }
++
+   function showLayers() {
++    if (!rig) return;
++    const visible = panel.settings()?.isolate ? new Set(panel.shown()) : null;
++    const selected = o => o.userData.layer === "MUSCLES";
+     rig.traverse(o => {
+       if (o.userData.layer) o.visible = layers.has(o.userData.layer);
+     });
++    if (visible) for (const [id, object] of nodes) {
++      if (object.isMesh && selected(object)) object.visible &&= visible.has(id);
++    }
+     invalidate();
+   }
+ 
+   function dispose() {
+     pause();
++    panel.close();
++    panel.open(null);
++    analytics = undefined;
+     controls.hidden = true;
+     layerPanel.hidden = true;
+     if (rig) {
+@@ -112,16 +148,20 @@
+     let chosen;
+     if (view) chosen = (await request("whole.set_view", { run_id: runId, view })).view;
+     const artifact = candidate.artifacts["motion.glb"];
+-    const response = await fetch(`/api/whole/motion.glb/${artifact.sha256}`);
+-    if (!response.ok) throw new Error("Verified whole-body asset unavailable");
+-    const bytes = await response.arrayBuffer();
+-    if (bytes.byteLength !== artifact.bytes) throw new Error("Motion asset size mismatch");
+-    // Plain LAN HTTP has no Web Crypto. The server hashes the stream before sending this header.
+-    const hash = crypto.subtle
+-      ? Array.from(new Uint8Array(await crypto.subtle.digest("SHA-256", bytes)),
+-        b => b.toString(16).padStart(2, "0")).join("")
+-      : response.headers.get("X-HMM-SHA256");
+-    if (hash !== artifact.sha256) throw new Error("Motion asset SHA-256 mismatch");
++    if (verifiedAsset?.sha !== artifact.sha256) {
++      const response = await fetch(`/api/whole/motion.glb/${artifact.sha256}`);
++      if (!response.ok) throw new Error("Verified whole-body asset unavailable");
++      const bytes = await response.arrayBuffer();
++      if (bytes.byteLength !== artifact.bytes) throw new Error("Motion asset size mismatch");
++      // Plain LAN HTTP has no Web Crypto. The server hashes the stream before sending this header.
++      const hash = crypto.subtle
++        ? Array.from(new Uint8Array(await crypto.subtle.digest("SHA-256", bytes)),
++          b => b.toString(16).padStart(2, "0")).join("")
++        : response.headers.get("X-HMM-SHA256");
++      if (hash !== artifact.sha256) throw new Error("Motion asset SHA-256 mismatch");
++      verifiedAsset = {sha: hash, bytes};
++    }
++    const {bytes} = verifiedAsset;
+     if (!isCurrent()) return;
+     const gltf = await loader.parseAsync(bytes, "");
+     if (!isCurrent()) {
+@@ -136,11 +176,18 @@
+     enter();
+     run = candidate;
+     motionSha = result.motion_sha256;
++    analytics = result.muscle_analytics;
++    panel.open(analytics);
+     rig = gltf.scene;
+     group.add(rig);
+     rig.traverse(o => {
+       const id = gltf.parser.associations.get(o)?.nodes;
+-      if (id !== undefined) nodes.set(id, o);
++      if (id !== undefined) {
++        // Animated normalized names can belong to a glTF node wrapping its only mesh.
++        const mesh = !o.isMesh && o.userData.layer === "MUSCLES" && o.children.find(child => child.isMesh);
++        if (mesh) mesh.userData.layer = o.userData.layer;
++        nodes.set(id, mesh || o);
++      }
+       if (o.isSkinnedMesh) o.frustumCulled = false;
+     });
+     clip = gltf.animations[0];
+@@ -172,11 +219,12 @@
+       }));
+     cameraName = run.default_camera;
+     el("whole-camera").value = cameraName;
+-    setCamera(chosen?.camera ?? run.cameras[cameraName]);
++    setCamera(chosen?.camera ?? cameraView(cameraName));
+     controls.hidden = false;
+     layerPanel.hidden = false;
+     showLayers();
+     seek(chosen ? run.frames.findIndex(f => f.state_index === chosen.state_index) : 0);
++    if (chosen?.muscle) await panel.inspect(chosen.muscle.display_node, chosen.muscle);
+   }
+ 
+   el("whole-play").addEventListener("click", () => {
+@@ -195,17 +243,65 @@
+   timeline.addEventListener("input", () => seek(Number(timeline.value)));
+   el("whole-camera").addEventListener("change", event => {
+     cameraName = event.target.value;
+-    setCamera(run.cameras[cameraName]);
++    setCamera(cameraView(cameraName));
+   });
+ 
+   return {
+-    open, dispose, seek, currentView, active: () => !!rig, reset: () => setCamera(run.cameras[cameraName]),
++    open, dispose, seek, currentView, active: () => !!rig, reset: () => setCamera(cameraView(cameraName)),
+     status: () => run && { frame: run.frames[index], duration: clip.duration, clock, playing: !!pending,
+       layers: [...layers], nodeCount: nodes.size },
+     sample: (node, vertices) => {
+       const object = nodes.get(node);
+       return vertices.map(i => object.getVertexPosition(i, scratch).applyMatrix4(object.matrixWorld).toArray());
+     },
++    inspectPointer: (x, y) => {
++      if (!analytics) return;
++      const node = panel.hit(x, y, camera);
++      if (node !== null) {
++        seek(index);
++        panel.inspect(node).catch(error => { el("message").textContent = error.message; });
++      }
++    },
++    muscleHit: (x, y, diagnostic) => panel.hit(x, y, camera, diagnostic),
++    diagnosticCamera: setCamera,
++    faceCenters: node => {
++      const obj = nodes.get(node);
++      const ids = obj.geometry.index;
++      const point = new THREE.Vector3();
++      return Array.from({length: ids.count / 3}, (_, i) => {
++        const sum = new THREE.Vector3();
++        for (let j = 0; j < 3; j++) sum.add(obj.getVertexPosition(ids.getX(3*i+j), point));
++        return sum.multiplyScalar(1/3).applyMatrix4(obj.matrixWorld).toArray();
++      });
++    },
++    project: points => points.map(p => {
++      const v = new THREE.Vector3(...p).project(camera);
++      const rect = canvas.getBoundingClientRect();
++      return [rect.left + (v.x + 1) * rect.width / 2, rect.top + (1 - v.y) * rect.height / 2];
++    }),
++    muscleColor: node => nodes.get(node).material.color.toArray(),
++    muscleNodes: () => [...nodes].filter(([,o]) => o.isMesh && o.userData.layer === "MUSCLES").map(([id]) => id),
++    muscleRayAudit: () => {
++      const ray = new THREE.Raycaster();
++      const a = new THREE.Vector3(), b = a.clone(), c = a.clone(), center = a.clone(), normal = a.clone();
++      return [...nodes].filter(([,o]) => o.isMesh && o.userData.layer === "MUSCLES").map(([node,o]) => {
++        if (o.isSkinnedMesh) o.boundingSphere = null;
++        const ids = o.geometry.index;
++        for (let i = 0; i < ids.count; i += 3) {
++          o.getVertexPosition(ids.getX(i), a).applyMatrix4(o.matrixWorld);
++          o.getVertexPosition(ids.getX(i+1), b).applyMatrix4(o.matrixWorld);
++          o.getVertexPosition(ids.getX(i+2), c).applyMatrix4(o.matrixWorld);
++          center.copy(a).add(b).add(c).multiplyScalar(1/3);
++          normal.copy(b).sub(a).cross(c.sub(a));
++          if (normal.lengthSq() < 1e-20) continue;
++          normal.normalize();
++          ray.set(center.clone().addScaledVector(normal, .01), normal.negate());
++          if (ray.intersectObject(o)[0]?.object === o) return {node, ray_hits_isolated_mesh: true};
++        }
++        return {node, ray_hits_isolated_mesh: false};
++      });
++    },
++    muscleState: node => ({visible: nodes.get(node).visible, opacity: nodes.get(node).material.opacity}),
+     matrix: node => nodes.get(node).matrixWorld.toArray(),
+     weights: node => nodes.get(node).geometry.attributes.skinWeight?.count,
+   };
+--- a/site/index.html
++++ b/site/index.html
+@@ -63,7 +63,7 @@
+       <label>Timeline <input id="whole-timeline" type="range" min="0" step="1" value="0"></label>
+       <output id="whole-time"></output>
+       <label>Speed <select id="whole-speed"><option value=".5">½×</option><option value="1" selected>1×</option><option value="2">2×</option></select></label>
+-      <label>View <select id="whole-camera"><option value="side">Side</option><option value="oblique">Oblique</option><option value="torso">Torso</option></select></label>
++      <label>View <select id="whole-camera"><option value="side">Side</option><option value="oblique">Oblique</option><option value="torso">Torso</option><option value="chest_right">Right chest</option><option value="chest_left">Left chest</option></select></label>
+     </div>
+   </section>
+   <aside class="inspect" aria-labelledby="inspection-title">
+@@ -94,6 +94,50 @@
+       <div id="whole-layer-options"></div>
+       <button id="whole-static" type="button">Return to static atlas</button>
+     </section>
++    <details id="muscle-browser" hidden>
++      <summary>Muscles</summary>
++      <form id="muscle-search">
++        <label>Find <input id="muscle-query" type="search" maxlength="80" placeholder="Name, ID, FMA, level"></label>
++        <label>Inventory <select id="muscle-inventory"><option value="native">Native actuators</option><option value="display">Moving surfaces</option></select></label>
++        <label>Region <select id="muscle-region"><option value="">All regions</option><option value="torso">Torso</option><option value="spine">Spine</option><option value="shoulder">Shoulder</option><option value="arm_hand">Arm and hand</option><option value="pelvis">Pelvis</option><option value="leg_foot">Leg and foot</option></select></label>
++        <label>Side <select id="muscle-side"><option value="">Both sides</option><option value="left">Left</option><option value="right">Right</option><option value="unknown">Unspecified</option></select></label>
++        <label>Status <select id="muscle-filter"><option value="">All statuses</option><option value="mapped">Mapped</option><option value="candidate">Candidate</option><option value="geometry_only">Geometry only</option><option value="unmapped">Unmapped</option><option value="missing_asset">Missing moving asset</option><option value="conflict">Conflict</option></select></label>
++        <button type="submit">Search muscles</button>
++      </form>
++      <output id="muscle-list-count" aria-live="polite"></output>
++      <div id="muscle-results"></div>
++      <button id="muscle-prev" type="button" disabled>Previous</button>
++      <button id="muscle-next" type="button" disabled>Next</button>
++    </details>
++    <button id="muscle-sync" type="button" hidden>Read shared muscle selection</button>
++    <section id="muscle-inspector" aria-labelledby="muscle-title" hidden>
++      <button id="muscle-close" type="button">Close muscle inspection</button>
++      <h3 id="muscle-title"></h3>
++      <p id="muscle-identity" class="muted"></p>
++      <div id="muscle-candidates"></div>
++      <button type="button" id="muscle-focus" disabled>Focus selected surfaces</button>
++      <label><input type="checkbox" id="muscle-isolate"> Isolate selected muscle surfaces</label>
++      <label>Selected opacity <input type="range" id="muscle-opacity" min=".1" max="1" step=".05" value="1"></label>
++      <label>Opacity target <select id="muscle-opacity-scope"><option value="selection">Selected group</option><option value="surface">Selected surface</option><option value="source">Selected source</option></select></label>
++      <div id="muscle-readings" hidden>
++        <label>Signal <select id="muscle-metric"></select></label>
++        <label>Native path <select id="muscle-path"></select></label>
++        <form id="muscle-window">
++          <label>From (s) <input id="muscle-from" type="number" min="0" step="any" required></label>
++          <label>To (s) <input id="muscle-to" type="number" min="0" step="any" required></label>
++          <label>Sample step <input id="muscle-stride" type="number" min="1" max="20" value="1" required></label>
++          <button type="submit">Apply time window</button>
++        </form>
++        <svg id="muscle-chart" viewBox="0 0 320 120" role="img" aria-label="Saved signal plot. Use the timeline slider for keyboard navigation."></svg>
++        <p id="muscle-axes"></p>
++        <p>Descent · dashed line marks bottom · ascent</p>
++        <p id="muscle-aggregation"></p>
++        <output id="muscle-value"></output>
++        <label><input type="checkbox" id="muscle-overlay"> Color linked parts by mean activation</label>
++        <p id="muscle-legend" hidden></p>
++      </div>
++      <p id="muscle-note" class="muted"></p>
++    </section>
+     <details id="display">
+       <summary>Display layers</summary>
+       <p id="layer-scope" class="muted"></p>
+--- a/site/style.css
++++ b/site/style.css
+@@ -172,3 +172,16 @@
+ 
+ #whole-layer-options { display: grid; gap: .35rem; margin: .5rem 0; }
+ #whole-timeline { width: clamp(5rem, 14vw, 12rem); vertical-align: middle; }
++
++#muscle-inspector { border-top: 1px solid var(--line); padding-top: .7rem; margin-top: .6rem; overflow-wrap: anywhere; }
++#muscle-inspector > * + *, #muscle-readings > * + * { margin-top: .32rem; }
++#muscle-inspector label, #muscle-value { display: block; }
++#muscle-inspector select { max-width: 100%; }
++#muscle-chart { width: 100%; display: block; background: #171e24; border: 1px solid var(--line); cursor: crosshair; }
++#muscle-inspector p, #muscle-value { font-size: .82rem; }
++#muscle-value { white-space: pre-line; min-height: 3em; }
++
++#muscle-search, #muscle-window, #muscle-results { display: grid; gap: .3rem; margin: .4rem 0; }
++#muscle-results { max-height: 15rem; overflow: auto; }
++#muscle-results button { text-align: left; }
++#muscle-search input, #muscle-window input { max-width: 8rem; }

@@ -1,0 +1,348 @@
+{
+  "catalog_sha256": "953a632513863a62fb65c8468ec16cee6cb195f4899516fbb254d10a6b5fe32c",
+  "model_sha256": "a32fc82227aebf5156d9efd067d3799513044a24ca12dd117d8b9b4be436d689",
+  "myosuite_revision": "afa8427188c8bd054925200c70db6757908dee45",
+  "myosuite_sha256": "1d74b59bf052f568b558eb05a4508b06e9482f342e1fe01fae543471c53ca9a4",
+  "sources": {
+    "pectoralis_major": "https://doi.org/10.1155/2019/6212039",
+    "triceps_brachii": "https://openstax.org/books/anatomy-and-physiology-2e/pages/11-5-muscles-of-the-pectoral-girdle-and-upper-limbs",
+    "deltoid": "https://openstax.org/books/anatomy-and-physiology-2e/pages/11-5-muscles-of-the-pectoral-girdle-and-upper-limbs",
+    "biceps_brachii": "https://openstax.org/books/anatomy-and-physiology-2e/pages/11-5-muscles-of-the-pectoral-girdle-and-upper-limbs",
+    "supraspinatus": "https://openstax.org/books/anatomy-and-physiology-2e/pages/11-5-muscles-of-the-pectoral-girdle-and-upper-limbs",
+    "infraspinatus": "https://openstax.org/books/anatomy-and-physiology-2e/pages/11-5-muscles-of-the-pectoral-girdle-and-upper-limbs",
+    "subscapularis": "https://openstax.org/books/anatomy-and-physiology-2e/pages/11-5-muscles-of-the-pectoral-girdle-and-upper-limbs",
+    "teres_minor": "https://openstax.org/books/anatomy-and-physiology-2e/pages/11-5-muscles-of-the-pectoral-girdle-and-upper-limbs",
+    "teres_major": "https://openstax.org/books/anatomy-and-physiology-2e/pages/11-5-muscles-of-the-pectoral-girdle-and-upper-limbs",
+    "coracobrachialis": "https://openstax.org/books/anatomy-and-physiology-2e/pages/11-5-muscles-of-the-pectoral-girdle-and-upper-limbs",
+    "brachialis": "https://openstax.org/books/anatomy-and-physiology-2e/pages/11-5-muscles-of-the-pectoral-girdle-and-upper-limbs",
+    "brachioradialis": "https://openstax.org/books/anatomy-and-physiology-2e/pages/11-5-muscles-of-the-pectoral-girdle-and-upper-limbs",
+    "anconeus": "https://openstax.org/books/anatomy-and-physiology-2e/pages/11-5-muscles-of-the-pectoral-girdle-and-upper-limbs",
+    "pronator_quadratus": "https://openstax.org/books/anatomy-and-physiology-2e/pages/11-5-muscles-of-the-pectoral-girdle-and-upper-limbs",
+    "adductor_brevis": "https://openstax.org/books/anatomy-and-physiology-2e/pages/11-6-appendicular-muscles-of-the-pelvic-girdle-and-lower-limbs",
+    "adductor_longus": "https://openstax.org/books/anatomy-and-physiology-2e/pages/11-6-appendicular-muscles-of-the-pelvic-girdle-and-lower-limbs",
+    "iliacus": "https://openstax.org/books/anatomy-and-physiology-2e/pages/11-6-appendicular-muscles-of-the-pelvic-girdle-and-lower-limbs",
+    "piriformis": "https://openstax.org/books/anatomy-and-physiology-2e/pages/11-6-appendicular-muscles-of-the-pelvic-girdle-and-lower-limbs",
+    "sartorius": "https://openstax.org/books/anatomy-and-physiology-2e/pages/11-6-appendicular-muscles-of-the-pelvic-girdle-and-lower-limbs",
+    "gracilis": "https://openstax.org/books/anatomy-and-physiology-2e/pages/11-6-appendicular-muscles-of-the-pelvic-girdle-and-lower-limbs",
+    "semimembranosus": "https://openstax.org/books/anatomy-and-physiology-2e/pages/11-6-appendicular-muscles-of-the-pelvic-girdle-and-lower-limbs",
+    "semitendinosus": "https://openstax.org/books/anatomy-and-physiology-2e/pages/11-6-appendicular-muscles-of-the-pelvic-girdle-and-lower-limbs",
+    "biceps_femoris": "https://openstax.org/books/anatomy-and-physiology-2e/pages/11-6-appendicular-muscles-of-the-pelvic-girdle-and-lower-limbs",
+    "soleus": "https://openstax.org/books/anatomy-and-physiology-2e/pages/11-6-appendicular-muscles-of-the-pelvic-girdle-and-lower-limbs",
+    "gastrocnemius": "https://openstax.org/books/anatomy-and-physiology-2e/pages/11-6-appendicular-muscles-of-the-pelvic-girdle-and-lower-limbs",
+    "rectus_femoris": "https://openstax.org/books/anatomy-and-physiology-2e/pages/11-6-appendicular-muscles-of-the-pelvic-girdle-and-lower-limbs",
+    "vastus_intermedius": "https://openstax.org/books/anatomy-and-physiology-2e/pages/11-6-appendicular-muscles-of-the-pelvic-girdle-and-lower-limbs",
+    "vastus_lateralis": "https://openstax.org/books/anatomy-and-physiology-2e/pages/11-6-appendicular-muscles-of-the-pelvic-girdle-and-lower-limbs",
+    "vastus_medialis": "https://openstax.org/books/anatomy-and-physiology-2e/pages/11-6-appendicular-muscles-of-the-pelvic-girdle-and-lower-limbs"
+  },
+  "reviewed": {
+    "PECM1": [
+      "pectoralis_major",
+      "Clavicular part of {side} pectoralis major",
+      "humerus_{suffix}",
+      "clavicle_{suffix}"
+    ],
+    "PECM2": [
+      "pectoralis_major",
+      "Sternocostal part of {side} pectoralis major",
+      "humerus_{suffix}",
+      "sternum"
+    ],
+    "PECM3": [
+      "pectoralis_major",
+      null,
+      "humerus_{suffix}",
+      "sternum"
+    ],
+    "TRIlong": [
+      "triceps_brachii",
+      "Long head of {side} triceps brachii",
+      "scapula_{suffix}",
+      "ulna_{suffix}"
+    ],
+    "TRIlat": [
+      "triceps_brachii",
+      "Lateral head of {side} triceps brachii",
+      "humerus_{suffix}",
+      "ulna_{suffix}"
+    ],
+    "TRImed": [
+      "triceps_brachii",
+      "Medial head of {side} triceps brachii",
+      "humerus_{suffix}",
+      "ulna_{suffix}"
+    ],
+    "DELT1": [
+      "deltoid",
+      "Clavicular part of {side} deltoid",
+      "humerus_{suffix}",
+      "clavicle_{suffix}",
+      "elv_angle"
+    ],
+    "DELT2": [
+      "deltoid",
+      "Acromial part of {side} deltoid",
+      "humerus_{suffix}",
+      "scapula_{suffix}",
+      "elv_angle"
+    ],
+    "DELT3": [
+      "deltoid",
+      "Spinal part of {side} deltoid",
+      "scapula_{suffix}",
+      "humerus_{suffix}",
+      "elv_angle"
+    ],
+    "BIClong": [
+      "biceps_brachii",
+      "Long head of {side} biceps brachii",
+      "scapula_{suffix}",
+      "radius_{suffix}",
+      "elbow_flexion"
+    ],
+    "BICshort": [
+      "biceps_brachii",
+      "Short head of {side} biceps brachii",
+      "scapula_{suffix}",
+      "radius_{suffix}",
+      "elbow_flexion"
+    ],
+    "SUPSP": [
+      "supraspinatus",
+      "{side} supraspinatus",
+      "humerus_{suffix}",
+      "scapula_{suffix}",
+      "elv_angle"
+    ],
+    "INFSP": [
+      "infraspinatus",
+      "{side} infraspinatus",
+      "humerus_{suffix}",
+      "scapula_{suffix}",
+      "elv_angle"
+    ],
+    "SUBSC": [
+      "subscapularis",
+      "{side} subscapularis",
+      "humerus_{suffix}",
+      "scapula_{suffix}",
+      "elv_angle"
+    ],
+    "TMIN": [
+      "teres_minor",
+      "{side} teres minor",
+      "humerus_{suffix}",
+      "scapula_{suffix}",
+      "elv_angle"
+    ],
+    "TMAJ": [
+      "teres_major",
+      "{side} teres major",
+      "humerus_{suffix}",
+      "scapula_{suffix}",
+      "elv_angle"
+    ],
+    "CORB": [
+      "coracobrachialis",
+      "{side} coracobrachialis",
+      "scapula_{suffix}",
+      "humerus_{suffix}",
+      "elv_angle"
+    ],
+    "BRA": [
+      "brachialis",
+      "{side} brachialis",
+      "humerus_{suffix}",
+      "ulna_{suffix}",
+      "elbow_flexion"
+    ],
+    "BRD": [
+      "brachioradialis",
+      "{side} brachioradialis",
+      "humerus_{suffix}",
+      "radius_{suffix}",
+      "elbow_flexion"
+    ],
+    "ANC": [
+      "anconeus",
+      "{side} anconeus",
+      "humerus_{suffix}",
+      "ulna_{suffix}",
+      "elbow_flexion"
+    ],
+    "PQ": [
+      "pronator_quadratus",
+      "{side} pronator quadratus",
+      "radius_{suffix}",
+      "ulna_{suffix}",
+      "pro_sup"
+    ],
+    "addbrev": [
+      "adductor_brevis",
+      "{side} adductor brevis",
+      "pelvis",
+      "femur_{suffix}",
+      "hip_adduction"
+    ],
+    "addlong": [
+      "adductor_longus",
+      "{side} adductor longus",
+      "pelvis",
+      "femur_{suffix}",
+      "hip_adduction"
+    ],
+    "iliacus": [
+      "iliacus",
+      "{side} iliacus",
+      "pelvis",
+      "femur_{suffix}",
+      "hip_flexion"
+    ],
+    "piri": [
+      "piriformis",
+      "{side} piriformis",
+      "pelvis",
+      "femur_{suffix}",
+      "hip_rotation"
+    ],
+    "sart": [
+      "sartorius",
+      "{side} sartorius",
+      "pelvis",
+      "tibia_{suffix}",
+      "knee_angle"
+    ],
+    "grac": [
+      "gracilis",
+      "{side} gracilis",
+      "pelvis",
+      "tibia_{suffix}",
+      "knee_angle"
+    ],
+    "semimem": [
+      "semimembranosus",
+      "{side} semimembranosus",
+      "pelvis",
+      "tibia_{suffix}",
+      "knee_angle"
+    ],
+    "semiten": [
+      "semitendinosus",
+      "{side} semitendinosus",
+      "pelvis",
+      "tibia_{suffix}",
+      "knee_angle"
+    ],
+    "bflh": [
+      "biceps_femoris",
+      "Long head of {side} biceps femoris",
+      "pelvis",
+      "tibia_{suffix}",
+      "knee_angle"
+    ],
+    "bfsh": [
+      "biceps_femoris",
+      "Short head of {side} biceps femoris",
+      "femur_{suffix}",
+      "tibia_{suffix}",
+      "knee_angle"
+    ],
+    "soleus": [
+      "soleus",
+      "{side} soleus",
+      "tibia_{suffix}",
+      "calcn_{suffix}",
+      "ankle_angle"
+    ],
+    "gaslat": [
+      "gastrocnemius",
+      "Lateral head of {side} gastrocnemius",
+      "femur_{suffix}",
+      "calcn_{suffix}",
+      "ankle_angle"
+    ],
+    "gasmed": [
+      "gastrocnemius",
+      "Medial head of {side} gastrocnemius",
+      "femur_{suffix}",
+      "calcn_{suffix}",
+      "ankle_angle"
+    ],
+    "recfem": [
+      "rectus_femoris",
+      "{side} rectus femoris",
+      "pelvis",
+      "tibia_{suffix}",
+      "knee_angle"
+    ],
+    "vasint": [
+      "vastus_intermedius",
+      "{side} vastus intermedius",
+      "femur_{suffix}",
+      "tibia_{suffix}",
+      "knee_angle"
+    ],
+    "vaslat": [
+      "vastus_lateralis",
+      "{side} vastus lateralis",
+      "femur_{suffix}",
+      "tibia_{suffix}",
+      "knee_angle"
+    ],
+    "vasmed": [
+      "vastus_medialis",
+      "{side} vastus medialis",
+      "femur_{suffix}",
+      "tibia_{suffix}",
+      "knee_angle"
+    ]
+  },
+  "candidate_aliases": {
+    "addbrev": "adductor brevis",
+    "addlong": "adductor longus",
+    "addmag": "adductor magnus",
+    "bflh": "biceps femoris",
+    "bfsh": "biceps femoris",
+    "edl": "extensor digitorum longus",
+    "ehl": "extensor hallucis longus",
+    "fdl": "flexor digitorum longus",
+    "fhl": "flexor hallucis longus",
+    "gaslat": "gastrocnemius",
+    "gasmed": "gastrocnemius",
+    "glmax": "gluteus maximus",
+    "glmed": "gluteus medius",
+    "glmin": "gluteus minimus",
+    "grac": "gracilis",
+    "iliacus": "iliacus",
+    "perbrev": "fibularis brevis",
+    "perlong": "fibularis longus",
+    "piri": "piriformis",
+    "recfem": "rectus femoris",
+    "sart": "sartorius",
+    "semimem": "semimembranosus",
+    "semiten": "semitendinosus",
+    "soleus": "soleus",
+    "tfl": "tensor fasciae latae",
+    "tibant": "tibialis anterior",
+    "tibpost": "tibialis posterior",
+    "vasint": "vastus intermedius",
+    "vaslat": "vastus lateralis",
+    "vasmed": "vastus medialis",
+    "Ps": "psoas major",
+    "BIC": "biceps brachii",
+    "DELT": "deltoid",
+    "rect_abd": "rectus abdominis",
+    "SERAT": "serratus anterior",
+    "serr_ant": "serratus anterior",
+    "extobl": "external oblique",
+    "intobl": "internal oblique",
+    "CORB": "coracobrachialis",
+    "INFSP": "infraspinatus",
+    "SUPSP": "supraspinatus",
+    "SUBSC": "subscapularis",
+    "TMIN": "teres minor",
+    "TMAJ": "teres major",
+    "BRA": "brachialis",
+    "BRD": "brachioradialis",
+    "ANC": "anconeus"
+  }
+}

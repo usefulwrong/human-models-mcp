@@ -26,6 +26,12 @@ REPORTS = ("PUBLIC_RELEASE_CHECK.json", "PUBLIC_RELEASE_AUDIT.md", "PUBLIC_RELEA
            "V08_SCIENCE.md", "V08_ANATOMY_REGISTRATION.md", "V08_REFERENCE_BENCHMARK.md",
            "V08_RENDER_E2E.md", "V08_RELEASE_CHECK.json", "V08_CODE_REVIEW.md", "V08_PUBLICATION_CHECK.json",
            "V08_FINAL_RELEASE_AUDIT.md", "V08_FINAL_RELEASE_CHECK.json")
+OPERATOR_ONLY = tuple(Path(name) for name in (
+    "scripts/anatomy_lab/build_report.py", "scripts/anatomy_lab/report_site",
+    "scripts/muscle_intelligence/package_review.py", "scripts/muscle_intelligence/review_media.py",
+    "tests/anatomy_lab_e2e/prototypes", "tests/anatomy_lab_e2e/report.cjs",
+    "tests/anatomy_lab_e2e/review_links.cjs",
+))
 MARKDOWN_LINK = re.compile(r"!?\[[^\]]*\]\((<[^>]+>|[^\s)]+)(?:\s+[^)]*)?\)")
 PRIVATE = {
     "personal_path": re.compile(r"/(?:home|Users)/[A-Za-z0-9_.-]+/"),
@@ -41,7 +47,8 @@ def public_files(root):
         paths.extend(p for p in (root / name).rglob("*") if p.is_file()
                      and "__pycache__" not in p.parts and not any(x.endswith('.egg-info') for x in p.parts))
     paths.extend(root / "reports" / name for name in REPORTS if (root / "reports" / name).exists())
-    return sorted(paths)
+    return sorted(p for p in paths if not any(p.relative_to(root).is_relative_to(local) for local in OPERATOR_ONLY)
+                  and "node_modules" not in p.relative_to(root).parts)
 
 
 class Links(HTMLParser):
@@ -220,11 +227,10 @@ def check(root, *, strict_tree=False):
                 failures.append({**entry, 'reason': 'missing/undelivered file or anchor'})
     demo = root / 'docs/demo/assets.json'
     checked_assets = 0
-    workflow = demo.parent / 'workflow/assets.json'
     if not demo.exists():
         failures.append({'path': 'docs/demo/assets.json', 'reason': 'public demo manifest missing'})
-    for manifest in (demo, workflow):
-        if not manifest.exists() and not (manifest == workflow and workflow.parent.exists()):
+    for manifest in (demo, demo.parent / 'workflow/assets.json', demo.parent / 'v09/assets.json'):
+        if not manifest.exists() and not manifest.is_symlink() and (manifest == demo or not manifest.parent.exists()):
             continue
         if not manifest.is_file() or manifest.is_symlink():
             failures.append({'path': manifest.relative_to(root).as_posix(), 'reason': 'public demo manifest missing or unsafe'})

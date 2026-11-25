@@ -1,9 +1,12 @@
 import argparse
 import os
 
+from . import __version__
+
 
 def main():
     parser = argparse.ArgumentParser(description="UsefulWrong local research MCP server")
+    parser.add_argument("--version", action="version", version=f"%(prog)s {__version__}")
     parser.add_argument("--transport", choices=["stdio", "http"], default="stdio")
     args = parser.parse_args()
     os.environ.setdefault("MUJOCO_GL", "osmesa")

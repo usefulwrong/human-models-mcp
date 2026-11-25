@@ -39,15 +39,16 @@ def test_public_demo_detects_changed_bytes_and_private_data_without_echoing(tmp_
     assert any(f['reason'] == 'demo size/hash mismatch' for f in CHECK.check(tmp_path)['failures'])
 
 
-def test_workflow_demo_manifest_is_checked_alongside_historical_manifest(tmp_path):
+@pytest.mark.parametrize("preview", ["workflow", "v09"])
+def test_preview_manifest_is_checked_alongside_historical_manifest(tmp_path, preview):
     archive = tmp_path / "docs/demo"
-    workflow = archive / "workflow"
+    workflow = archive / preview
     workflow.mkdir(parents=True)
     (archive / "assets.json").write_text('{"files": {}}')
-    assert any(f["path"] == "docs/demo/workflow/assets.json" for f in CHECK.check(tmp_path)["failures"])
+    assert any(f["path"] == f"docs/demo/{preview}/assets.json" for f in CHECK.check(tmp_path)["failures"])
     (workflow / "assets.json").write_text('{"files": {"animation.mp4": {"bytes": 1, "sha256": "bad"}}}')
     (workflow / "animation.mp4").write_bytes(b"a")
-    assert any(f["path"] == "docs/demo/workflow/animation.mp4" and f["reason"] == "demo size/hash mismatch"
+    assert any(f["path"] == f"docs/demo/{preview}/animation.mp4" and f["reason"] == "demo size/hash mismatch"
                for f in CHECK.check(tmp_path)["failures"])
 
 
@@ -121,6 +122,10 @@ def test_public_check_strict_tree_rejects_unlisted_files(tmp_path):
     (demo / "assets.json").write_text('{"files": {}}')
     (tmp_path / "README.md").write_text("# Research preview\n")
     (tmp_path / "operator_notes.txt").write_text("Do not publish")
+    report = tmp_path / "scripts/anatomy_lab/report_site/index.html.in"
+    report.parent.mkdir(parents=True)
+    report.write_text("Private report template")
     assert CHECK.check(tmp_path)["status"] == "pass"
     result = CHECK.check(tmp_path, strict_tree=True)
     assert any(item["reason"] == "unlisted public tree file" for item in result["failures"])
+    assert any(item["path"] == report.relative_to(tmp_path).as_posix() for item in result["failures"])

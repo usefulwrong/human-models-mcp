@@ -1,8 +1,9 @@
-# Public files, archives and operator handoff
+# Public source and release assets
 
 The public repository is [usefulwrong/human-models-mcp](https://github.com/usefulwrong/human-models-mcp).
-It is a source-checkout Research Preview. The current manifest and operator
-steps are in the [v0.8.0 release handoff](RELEASE_080.md).
+It is a source-checkout Research Preview. The current candidate is
+[v0.9.0rc1](RELEASE_090.md), with a [whole-body demo](demo/v09/README.md)
+and checksums for its preview media and data.
 
 The following material documents the v0.7.x delivery and its retention policy.
 

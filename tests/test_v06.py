@@ -157,21 +157,21 @@ def test_new_tools_are_additive_and_import_is_lightweight():
     import subprocess
     import sys
 
-    code = 'from human_models_mcp.server import list_render_profiles; import sys; list_render_profiles(); assert "bpy" not in sys.modules and "pxr" not in sys.modules and "mujoco" not in sys.modules'
-    subprocess.run([sys.executable, "-c", code], check=True)
-    from human_models_mcp.server import mcp
-    import asyncio
+    code = """
+import asyncio
+import sys
+from human_models_mcp.server import list_render_profiles, mcp
 
-    names = {t.name for t in asyncio.run(mcp.list_tools())}
-    assert {
-        "list_render_profiles",
-        "render_result",
-        "get_render_job",
-        "get_render_artifact",
-        "run_scenario",
-        "get_artifact",
-    } <= names
-    assert len(names) == 14
+list_render_profiles()
+assert not {"bpy", "pxr", "mujoco"} & sys.modules.keys()
+names = {tool.name for tool in asyncio.run(mcp.list_tools())}
+assert {
+    "list_render_profiles", "render_result", "get_render_job",
+    "get_render_artifact", "run_scenario", "get_artifact",
+} <= names
+assert len(names) == 14
+"""
+    subprocess.run([sys.executable, "-c", code], check=True)
 
 
 def test_queue_symlink_is_rejected(tmp_path, monkeypatch):
@@ -182,7 +182,7 @@ def test_queue_symlink_is_rejected(tmp_path, monkeypatch):
     assert not list((tmp_path / "outside").iterdir())
 
 
-def test_offline_package_rejects_stale_image_source_and_locks():
+def test_offline_package_rejects_stale_image_source_and_locks(tmp_path):
     import importlib.util
     import json
     from human_models_mcp.registry import home
@@ -191,13 +191,14 @@ def test_offline_package_rejects_stale_image_source_and_locks():
     spec = importlib.util.spec_from_file_location("package_check_v06", root / "scripts/package_release.py")
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
-    record = json.loads((root / "runtime-environment.json").read_text())
-    record.update(
-        {
-            n + "_sha256": hashlib.sha256((root / n).read_bytes()).hexdigest()
-            for n in ("models.lock.json", "renderer.lock.json", "requirements-render.lock")
-        }
+    spec = importlib.util.spec_from_file_location(
+        "capture_environment_v06", root / "scripts/capture_environment.py"
     )
+    recorder = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(recorder)
+    passport = tmp_path / "runtime-environment.json"
+    recorder.capture(root, passport)
+    record = json.loads(passport.read_text())
     assert module.image_matches_source(record)
     for key in (
         "source_sha256",

@@ -1,51 +1,52 @@
 # Human Models MCP
 
-**Run a musculoskeletal experiment, see the movement in Blender, and inspect the evidence behind every view.**
+**Watch a full-body simulation and inspect the muscle signals behind every frame.**
 
-UsefulWrong · v0.8.0 Research Preview · MuJoCo + MS-Human-700 · [MIT code](LICENSE) · [Asset licenses](notices/THIRD_PARTY.md)
+v0.9.0rc1 Research Preview · MuJoCo + MS-Human-700 · [MIT code](LICENSE) · [Asset licenses](notices/THIRD_PARTY.md)
 
-## One computed palm push-up, four views
+## Whole-body assisted push-up
 
-| Simulation | Muscle Activity |
-| --- | --- |
-| [![Skeleton, joint axes and ground-reaction forces at the bottom of the push-up](docs/demo/workflow/simulation.png)](docs/demo/workflow/simulation.mp4) | [![Native path activation and curves at the same phase](docs/demo/workflow/muscle.png)](docs/demo/workflow/muscle.mp4) |
-| Joint axes, centre of mass and saved ground reaction in newtons. | Native musculotendon paths and recorded actuator activation. [Activity and force plots](docs/demo/workflow/plot.png) |
-| **Anatomy** | **Cinematic** |
-| [![Bilateral Z-Anatomy rectus abdominis fitted to the computed push-up pose](docs/demo/workflow/anatomy.png)](docs/demo/workflow/anatomy.mp4) | [![The same computed movement under studio lighting in Blender Cycles](docs/demo/workflow/cinematic.png)](docs/demo/workflow/cinematic.mp4) |
-| Z-Anatomy rectus abdominis, bilateral two-landmark fit. Geometry and frame transfer checked. Registration remains illustrative. | The same states with studio materials, light and camera in Blender Cycles. |
+[![Whole-body Blender animation of an assisted palm push-up, from setup through lowering and return](docs/demo/v09/whole-body.gif)](docs/demo/v09/whole-body.mp4)
 
-### Evidence
+The browser and Blender replay the same **111 saved states over 4.4 seconds**.
+Anatomy Explorer shows **290 illustrative moving muscle surfaces** and lets you
+pause, seek and inspect a muscle by side, FMA concept or source mesh.
 
-| Observation | Result for this run |
-| --- | --- |
-| CPU MuJoCo calculation | **Completed** using pinned MS-Human-700 and a synthetic motion reference |
-| Exercise and declared numerical criteria | **PASS** for the scenario's named gates with fixed horizontal support guides |
-| Muscle-only control | **NOT_ACHIEVED**. Residual joint assistance was used. |
-| Regional atlas | **Illustrative**. Surface transfer checked against the fitted geometry. Attachment and crossing review remains open. |
-| Human biomechanics | **NOT_VALIDATED**. No paired motion capture, force plate or EMG measurements. Tissue mechanics and exercise safety are unsupported. |
+[Play the MP4](docs/demo/v09/whole-body.mp4) ·
+[Open the pectoralis inspector capture](docs/demo/v09/pectoralis-inspector.png) ·
+[See the demo evidence and credits](docs/demo/v09/README.md)
 
-[Animated preview](docs/demo/workflow/muscle.gif) · [Matched start / bottom / return](docs/demo/workflow/phases.png) · [Experiment passport and exact sources](docs/demo/workflow/README.md) · [Machine-readable evidence](docs/demo/workflow/evidence.json)
+### Muscle signals at the same time points
 
-Human Models MCP lets an AI agent run a named musculoskeletal experiment
-and inspect model-specific measurements of movement, force and activation.
-The agent can trace an answer to a saved result, its acceptance criteria
-and the exact states used for visualization.
+[![Native activation and force plots for left and right pectoralis and triceps, with the bottom of the push-up marked at 2.2 seconds](docs/demo/v09/muscle-signals.png)](docs/demo/v09/muscle-signals.png)
 
-```mermaid
-flowchart LR
-    A["Agent via MCP / CLI / Python"] --> B["Scenario + recipe settings"]
-    B --> C["MuJoCo on CPU"]
-    C --> D["Saved states + numerical gates"]
-    D --> E["Blender queue"]
-    F["Optional pinned atlas surfaces"] --> E
-    E --> G["MP4 / GIF / PNG + editable scene"]
-    D --> H["Evidence Contract"]
-    G --> H
+The MCP and browser expose eight signal fields for **all 700 native actuators**.
+The plot shows model activation and transmission-force magnitude for the left
+and right pectoralis and triceps. The dashed line marks the bottom at **2.2 s**.
+[Download the plotted data](docs/demo/v09/muscle-signals.csv)
+
+The crosswalk has **76 reviewed correspondences**. A geometry-only surface
+has no linked signal. The push-up uses recorded joint assistance
+(`muscle_driven=NOT_ACHIEVED`, `external_control=USED`).
+Surface motion is illustrative, activation is a model output, and human
+experimental validation remains `NOT_VALIDATED`.
+[Release notes and capability matrix](docs/RELEASE_090.md)
+
+## Start here
+
+Use Python 3.12 on Linux x86-64 with Docker Engine, Compose and Make:
+
+```sh
+make build
+make client
 ```
 
-## Run it
+The example opens a real MCP stdio session and runs the default elbow sweep.
+[Install the optional Anatomy Explorer and Muscle Intelligence overlay](docs/V09_ANATOMY_LAB.md).
 
-Linux x86-64, Docker Engine + Compose, GNU Make and Python 3.12 or 3.13 with `venv`.
+## Compute and render the push-up
+
+Linux x86-64, Docker Engine + Compose, GNU Make and Python 3.12 with `venv`.
 The first build downloads the pinned model and renderer. Start with the
 scientific and muscle views on CPU. [Setup and troubleshooting](docs/GETTING_STARTED.md)
 
@@ -75,7 +76,7 @@ python3 scripts/visualize.py render --run-id RUN_UUID --recipe pushup_rectus \
   --frames 61 --fps 14 --device cpu --wait --output outputs/palms-anatomy
 ```
 
-[Recreate the exact four-view demo, including settings for each recipe](docs/V08_WORKFLOW.md)
+[Reproduce the historical v0.8 four-view demo](docs/V08_WORKFLOW.md)
 
 ## Connect an agent
 

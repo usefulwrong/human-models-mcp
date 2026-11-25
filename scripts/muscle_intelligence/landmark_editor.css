@@ -1,0 +1,26 @@
+.landmark-editor [data-transform] {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.landmark-editor [data-stage] {
+  max-width: 420px;
+}
+
+.landmark-editor canvas {
+  display: block;
+  position: static;
+  width: 100%;
+  height: auto;
+  touch-action: none;
+}
+
+.landmark-editor form label {
+  display: block;
+  margin-bottom: .4rem;
+}
+
+.landmark-editor form input,
+.landmark-editor form select {
+  max-width: 100%;
+}

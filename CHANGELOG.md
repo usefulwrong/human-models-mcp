@@ -1,5 +1,16 @@
 # Release notes
 
+## 0.9.0rc1 — Research Preview candidate
+
+- Packages the optional Anatomy Explorer, BodyParts3D 4.3 registry and
+  composite views, saved-state motion and Muscle Intelligence integration.
+- Preserves all native actuator signals and mapping review categories.
+  Operator landmark evidence can be inspected and edited locally.
+- Captures runtime provenance from the source, locks and environment used
+  for the experiment. Requires Python 3.12.
+- Keeps assisted push-up control and illustrative registration explicit.
+  See [v0.9 release notes and scope](docs/RELEASE_090.md).
+
 ## 0.8.0 — Anatomical Grounding & Evidence v1
 
 - Added claim-level Evidence Contract retrieval and render evidence artifacts.

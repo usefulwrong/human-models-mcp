@@ -1,0 +1,86 @@
+{
+  "mirror-fd527e6.zip": {
+    "url": "https://codeload.github.com/olivercase/body_parts_3d_api/zip/fd527e6f4daf732fd814314d9257df5877b844bc",
+    "bytes": 1932914,
+    "sha256": "53b5ff255ebf857a725e6eb6093393560642d0672a3a62b54bd4c6ee0168e08d",
+    "terms_url": "https://creativecommons.org/licenses/by-sa/2.1/jp/"
+  },
+  "mirror-LICENSE": {
+    "url": "https://raw.githubusercontent.com/olivercase/body_parts_3d_api/fd527e6f4daf732fd814314d9257df5877b844bc/LICENSE",
+    "bytes": 1669,
+    "sha256": "f4fe9670e99172cd529403fbfb83d6172b2b677daa2ff54bab908888217ab611",
+    "terms_url": "https://creativecommons.org/licenses/by-sa/2.1/jp/"
+  },
+  "mirror-FMA2Obj.txt": {
+    "url": "https://raw.githubusercontent.com/olivercase/body_parts_3d_api/fd527e6f4daf732fd814314d9257df5877b844bc/metadata/FMA2Obj.txt",
+    "bytes": 605737,
+    "sha256": "a199eb9cb258266768b7690f4ac2591f67d4b146c95e14046c46091c35c09385",
+    "terms_url": "https://lifesciencedb.jp/bp3d/info_en/index.html#License"
+  },
+  "mirror-obj2FMA.html": {
+    "url": "https://raw.githubusercontent.com/olivercase/body_parts_3d_api/fd527e6f4daf732fd814314d9257df5877b844bc/metadata/obj2FMA.html",
+    "bytes": 4528437,
+    "sha256": "cab10eda6338a6935d0216810eaba78dd049877df496323a0a4916d290dd8e3a",
+    "terms_url": "https://lifesciencedb.jp/bp3d/info_en/index.html#License"
+  },
+  "original-FMA2Obj-43.zip": {
+    "url": "https://lifesciencedb.jp/bp3d/get-info.cgi?version=4.3&cmd=concept-objfiles-list",
+    "bytes": 92926,
+    "terms_url": "https://lifesciencedb.jp/bp3d/info_en/index.html#License",
+    "reference_archive_sha256": "7f0fe50c6d5c5b4d50bea46cdb91d871655c45d042d6b3d0bdf0071c823a2dd8",
+    "max_bytes": 2000000,
+    "membership": {
+      "path": "FMA2Obj.txt",
+      "bytes": 605737,
+      "sha256": "c3d16c891016da13447de2fc3241d05d92e8f9dc460e363233c03f420b935d4f"
+    }
+  },
+  "original-FMA2Obj-43i.zip": {
+    "url": "https://lifesciencedb.jp/bp3d/get-info.cgi?version=4.3i&cmd=concept-objfiles-list",
+    "bytes": 122131,
+    "terms_url": "https://lifesciencedb.jp/bp3d/info_en/index.html#License",
+    "reference_archive_sha256": "5b4b09c46d0eb01632b5297dfc169dffe940733f36bf1a3c0e934dd50bcaa14a",
+    "max_bytes": 2000000,
+    "membership": {
+      "path": "FMA2Obj.txt",
+      "bytes": 786406,
+      "sha256": "1a90f418b771987d39f8c54e737861581383d86bfdb4891fbd9c7affb85fadda"
+    }
+  },
+  "isa_parts_list_e.txt": {
+    "url": "https://dbarchive.biosciencedbc.jp/data/bodyparts3d/LATEST/isa_parts_list_e.txt",
+    "bytes": 128086,
+    "sha256": "ab7796deedd49205e77f3609a1cb8c53e2bbee14ecb5c9a6ca05227469780513",
+    "terms_url": "https://dbarchive.biosciencedbc.jp/en/bodyparts3d/lic.html"
+  },
+  "isa_inclusion_relation_list.txt": {
+    "url": "https://dbarchive.biosciencedbc.jp/data/bodyparts3d/LATEST/isa_inclusion_relation_list.txt",
+    "bytes": 207664,
+    "sha256": "26e7d818e03a8c909fe09c561f38d0d513423c87681f9450a803bc38f5b07564",
+    "terms_url": "https://dbarchive.biosciencedbc.jp/en/bodyparts3d/lic.html"
+  },
+  "partof_parts_list_e.txt": {
+    "url": "https://dbarchive.biosciencedbc.jp/data/bodyparts3d/LATEST/partof_parts_list_e.txt",
+    "bytes": 59351,
+    "sha256": "9224080557053e6f1322f1e13ab27f0ecde0db19bb3b505f0631afad230eeebd",
+    "terms_url": "https://dbarchive.biosciencedbc.jp/en/bodyparts3d/lic.html"
+  },
+  "partof_inclusion_relation_list.txt": {
+    "url": "https://dbarchive.biosciencedbc.jp/data/bodyparts3d/LATEST/partof_inclusion_relation_list.txt",
+    "bytes": 91241,
+    "sha256": "1b40738270931e3c1d955ce34e0fce0d8d10d8c5ad543463e40b4b4c0243007c",
+    "terms_url": "https://dbarchive.biosciencedbc.jp/en/bodyparts3d/lic.html"
+  },
+  "open-atlas.tar.gz": {
+    "url": "https://codeload.github.com/CognitionLabSNUC/open-anatomy-atlas/tar.gz/b2488616c5d7b8cb5b03bb9ee86eda911e3b6232",
+    "bytes": 5058641,
+    "sha256": "681f5e901e291e6ed0e9bcd1c064fe6417103fc9ba00700fa8103a103fa249b1",
+    "terms_url": "https://github.com/CognitionLabSNUC/open-anatomy-atlas/blob/b2488616c5d7b8cb5b03bb9ee86eda911e3b6232/LICENSE"
+  },
+  "three-0.180.0.tgz": {
+    "url": "https://registry.npmjs.org/three/-/three-0.180.0.tgz",
+    "bytes": 7750248,
+    "sha256": "ad66d724565ee29a2467277fa84daa5ed0211d6b8d446e9ef29f6bae0cd14144",
+    "terms_url": "https://github.com/mrdoob/three.js/blob/r180/LICENSE"
+  }
+}

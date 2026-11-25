@@ -7,7 +7,7 @@ science container uses Python 3.12 and MuJoCo 3.17.0. The renderer uses Blender
 ## Requirements
 
 - Docker Engine with Compose, accessible to your local account.
-- GNU Make and Python 3.12 or 3.13 with `venv` and pip.
+- GNU Make and Python 3.12 with `venv` and pip.
 - Internet during the first build: PyPI, Debian, GitHub raw assets and the
   official Blender download server. Both runtimes then have networking disabled.
 - Science: 2 CPU cores / 3 GiB RAM. Renderer: 4 cores / 8 GiB. Allow at least

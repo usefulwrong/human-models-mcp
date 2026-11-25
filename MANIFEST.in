@@ -4,9 +4,15 @@ recursive-include scenarios *.yaml *.md
 recursive-include skills *.md
 recursive-include docs *.md
 recursive-include scripts *.py *.sh
+recursive-include scripts/anatomy_lab *.css *.html *.html.in *.js *.json
+recursive-include scripts/muscle_intelligence *.cjs *.js *.json *.patch
+exclude scripts/anatomy_lab/build_report.py scripts/muscle_intelligence/package_review.py scripts/muscle_intelligence/review_media.py
+prune scripts/anatomy_lab/report_site
+prune scripts/anatomy_lab/site/npm/node_modules
 recursive-include examples *.py *.toml *.md
 recursive-include notices *
 recursive-include tests *.py *.json
+prune tests/anatomy_lab_e2e/prototypes
 recursive-include benchmarks *.xml *.csv *.json *.md
 recursive-include .github *.yml *.yaml
 
