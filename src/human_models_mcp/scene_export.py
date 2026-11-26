@@ -4,12 +4,15 @@ import csv
 import hashlib
 import json
 import zipfile
+from pathlib import PureWindowsPath
+import xml.etree.ElementTree as ET
 
 import numpy as np
 from .anatomy import CAMERA_REGIONS, PATH_LAYERS, selected_paths
 
+from .adapters.mujoco import model_file
 from .catalog import model_card
-from .registry import home
+from .runtime.paths import is_link
 from .rendering import write_json
 
 
@@ -32,11 +35,19 @@ def safe_archive(path):
                     raise ValueError("unbounded or object trajectory array")
 
 
+def asset_relative_xml(xml):
+    root = ET.fromstring(xml)
+    for element in root.findall("asset/*"):
+        if path := element.get("file"):
+            element.set("file", PureWindowsPath(path).name)
+    return ET.tostring(root)
+
+
 def load_saved_run(source):
     """Compile the exact recorded model and verify the saved state layout and clock."""
     import mujoco as mj
 
-    run = json.loads((source / "manifest.json").read_text())
+    run = json.loads((source / "manifest.json").read_text(encoding="utf-8"))
     card = model_card(verify=True, model_id=run["model"]["id"])
     if card.get("status") != "available":
         raise ValueError("pinned model unavailable or hash invalid: " + str(card))
@@ -48,12 +59,12 @@ def load_saved_run(source):
     if pushup:
         from .adapters.pushup import pushup_model
 
-        recipe = json.loads((source / "model_recipe.json").read_text())
+        recipe = json.loads((source / "model_recipe.json").read_text(encoding="utf-8"))
         parameters = recipe["parameters"]
         profile = recipe.get("contact_profile")
         margin = recipe.get("contact_floor_margin_m")
         if profile and margin is None:
-            original = json.loads((source / "contact_manifest.json").read_text())
+            original = json.loads((source / "contact_manifest.json").read_text(encoding="utf-8"))
             margin = original["floor"].get("margin_m", .001)
         _, model, data = pushup_model(
             recipe["timestep_s"], recipe["friction"], recipe["muscle_strength_scale"],
@@ -66,12 +77,19 @@ def load_saved_run(source):
 
         recipe = {}
         _, model, data, xml = fixture_model(run["execution"]["timestep_s"])
-        if hashlib.sha256(xml.encode()).hexdigest() != run["model"]["derivation"]["derived_mjcf_sha256"]:
-            raise ValueError("source fixture recipe differs")
+        expected = run["model"]["derivation"]["derived_mjcf_sha256"]
+        if hashlib.sha256(xml.encode("utf-8")).hexdigest() != expected:
+            # rc2's diagnostic XML embedded the installed asset directory.
+            path = source / "derived_model.xml"
+            if is_link(path) or not path.is_file() or path.stat().st_size > 2 * 1024 * 1024:
+                raise ValueError("source fixture recipe differs; original derived XML is required")
+            original = path.read_bytes()
+            if hashlib.sha256(original).hexdigest() != expected or asset_relative_xml(original) != asset_relative_xml(xml):
+                raise ValueError("source fixture recipe differs")
     else:
-        model = mj.MjModel.from_xml_path(str(home() / "models/ms_human_700/scene_locomotion.xml"))
+        model = model_file(mj, "scene_locomotion.xml")
         data = mj.MjData(model)
-        recipe = json.loads((source / "model_recipe.json").read_text())
+        recipe = json.loads((source / "model_recipe.json").read_text(encoding="utf-8"))
         model.opt.timestep = recipe["timestep_override_s"]
         model.opt.tolerance, model.opt.iterations = recipe["solver_tolerance"], recipe["solver_iterations"]
     safe_archive(source / "trajectory.npz")
@@ -161,7 +179,7 @@ def export_scene(job):
                             "Affine geometric animation and source tendon materials provide no tissue stress, strain or activation."],
         }
     if atlas_report or pushup and request.get("recipe"):
-        summary = json.loads((source / "summary.json").read_text())
+        summary = json.loads((source / "summary.json").read_text(encoding="utf-8"))
         bottom = summary["key_indices"][1]
         if not 0 < bottom < len(times) - 1:
             raise ValueError("atlas rendering requires an interior bottom frame")
@@ -215,11 +233,11 @@ def export_scene(job):
     landmarks = {}
     pelvis = model.body("pelvis").id
     source_support = (
-        json.loads((source / "support.json").read_text())["samples"]
+        json.loads((source / "support.json").read_text(encoding="utf-8"))["samples"]
         if (source / "support.json").exists()
         else None
     )
-    source_wrists = json.loads((source / "wrists.json").read_text())["samples"] if (source / "wrists.json").exists() else None
+    source_wrists = json.loads((source / "wrists.json").read_text(encoding="utf-8"))["samples"] if (source / "wrists.json").exists() else None
     previous_atlas = None
     for frame, index in enumerate(indices):
         restore_state(model, data, states[index], state_spec, qpos[index], times[index])

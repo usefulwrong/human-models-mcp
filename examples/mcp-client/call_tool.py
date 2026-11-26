@@ -82,7 +82,7 @@ async def main():
         }
         args.trace_dir.mkdir(parents=True, exist_ok=True)
         trace = args.trace_dir / (str(uuid4()) + ".json")
-        trace.write_text(json.dumps(receipt, indent=2) + "\n")
+        trace.write_text(json.dumps(receipt, indent=2) + "\n", encoding="utf-8", newline="\n")
         if args.artifact_output:
             if args.tool != "get_artifact" or result.get("status") != "ok":
                 raise ValueError("artifact-output requires a successful get_artifact")

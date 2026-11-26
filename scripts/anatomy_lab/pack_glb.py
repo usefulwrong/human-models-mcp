@@ -11,9 +11,9 @@ import numpy as np
 target = pathlib.Path(sys.argv[1])
 packed = target / "build"
 site = target / "site/full/site"
-catalog = json.loads((target / "catalog.json").read_text())
-index = json.loads((packed / "index.json").read_text())
-receipt = json.loads((site / "assets.json").read_text())
+catalog = json.loads((target / "catalog.json").read_text(encoding="utf-8"))
+index = json.loads((packed / "index.json").read_text(encoding="utf-8"))
+receipt = json.loads((site / "assets.json").read_text(encoding="utf-8"))
 source_ids = sorted(receipt["files"])
 digest = hashlib.sha256(json.dumps({k: receipt["files"][k]["sha256"] for k in source_ids},
                                    sort_keys=True, separators=(",",":")).encode()).hexdigest()
@@ -158,6 +158,6 @@ for edge in catalog["relations"]:
             {"fma": f"FMA{object_id}", "label": labels[object_id]})
 site.joinpath("scenes.json").write_text(json.dumps({"source_sha256":digest,"scenes":scenes,"parts":parts,
     "bbox":index["bbox"],"relationships":relationships,"dataset":receipt["dataset"],"license":receipt["license"],
-    "attribution":receipt["attribution"],"source_pin":receipt["source_pin"]},separators=(",",":"))+"\n")
+    "attribution":receipt["attribution"],"source_pin":receipt["source_pin"]},separators=(",",":"))+"\n", encoding="utf-8", newline="\n")
 print(json.dumps({"parts":len(parts),"triangles":sum(r["triangles"] for r in parts.values()),
                   "glb_bytes":site.joinpath("atlas.glb").stat().st_size,"source_sha256":digest}))

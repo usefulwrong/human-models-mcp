@@ -41,3 +41,4 @@ node_modules/
 /tests/anatomy_lab_e2e/report.cjs
 /tests/anatomy_lab_e2e/review_links.cjs
 reports/*
+/.runtime/

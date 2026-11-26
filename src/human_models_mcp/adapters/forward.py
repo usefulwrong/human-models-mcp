@@ -53,11 +53,11 @@ def forward(params: dict, output: Path, validation: dict) -> dict:
                {"name": "final_actuator_force", "value": rows[-1]["actuator_force_N"], "unit": "N",
                 "definition": "Signed MuJoCo actuator_force; negative denotes pulling along the muscle transmission."},
                {"name": "final_length", "value": rows[-1]["length_m"], "unit": "m"}]
-    (output / "summary.json").write_text(json.dumps({"metrics": metrics, "rows": rows}, indent=2))
+    (output / "summary.json").write_text(json.dumps({"metrics": metrics, "rows": rows}, indent=2), encoding="utf-8", newline="\n")
     (output / "poses.json").write_text(json.dumps({"model_id": "ms_human_700", "muscle": p.muscle,
         "method": "dynamic_forward", "simulation_time_s": elapsed, "integration_steps": p.steps,
         "timestep_s": m.opt.timestep, "time_s": [r["time_s"] for r in rows], "qpos": poses,
-        "joint_order": [m.joint(i).name for i in range(m.njnt)]}, indent=2))
+        "joint_order": [m.joint(i).name for i in range(m.njnt)]}, indent=2), encoding="utf-8", newline="\n")
     render_info = {"status": "not_requested", "render_backend": "none"}
     if p.render:
         try:

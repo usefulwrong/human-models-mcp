@@ -700,7 +700,7 @@ def prepare_scene(path, expected):
 def main():
     started = time.monotonic()
     path = Path(sys.argv[sys.argv.index("--") + 1])
-    expected = json.loads((path / "work/expected.json").read_text())
+    expected = json.loads((path / "work/expected.json").read_text(encoding="utf-8"))
     imported, baked, camera, atlas, paths, connectors = prepare_scene(path, expected)
     device = select_device(os.environ.get("HMM_BLENDER_DEVICE", expected["request"]["options"]["device"]))
     # Explicit host-controlled fault injection; never accepted from MCP/render parameters.
@@ -715,7 +715,7 @@ def main():
     artifacts.mkdir(exist_ok=True)
 
     def write(name, value):
-        (artifacts / name).write_text(json.dumps(value, indent=2) + "\n")
+        (artifacts / name).write_text(json.dumps(value, indent=2) + "\n", encoding="utf-8", newline="\n")
 
     write(
         "geometry_validation.json",
@@ -740,7 +740,7 @@ def main():
                     "total_frames": len(expected["frames"]),
                 }
             )
-        )
+        , encoding="utf-8", newline="\n")
     write(
         "blender_render.json",
         {

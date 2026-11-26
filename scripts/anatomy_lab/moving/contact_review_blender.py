@@ -56,7 +56,7 @@ def audit(scene, motion, output):
     (output / "surface-audit.json").write_text(json.dumps({"run_id": motion["run_id"],
         "trajectory_sha256": scene["trajectory_sha256"], "meshes_checked": [obj.name for obj, _ in meshes],
         "unavailable_layers": {"SKIN": "UNMEASURABLE"},
-        "frames": frames}, separators=(",", ":")) + "\n")
+        "frames": frames}, separators=(",", ":")) + "\n", encoding="utf-8", newline="\n")
 
 
 def render(scene, motion, output, backend):
@@ -126,12 +126,12 @@ def render(scene, motion, output, backend):
                      "display_floor_hidden": bool(floor.hide_render),
                      "sha256": hashlib.sha256(path.read_bytes()).hexdigest()})
     (output / f"{prefix}-renders.json").write_text(json.dumps({"devices": devices, "backend": backend,
-        "version": bpy.app.version_string, "run_id": motion["run_id"], "frames": rows}, indent=2) + "\n")
+        "version": bpy.app.version_string, "run_id": motion["run_id"], "frames": rows}, indent=2) + "\n", encoding="utf-8", newline="\n")
 
 
 if __name__ == "__main__":
     clip, output, mode = sys.argv[sys.argv.index("--") + 1:]
-    motion = json.loads((Path(clip) / "motion.json").read_text())
+    motion = json.loads((Path(clip) / "motion.json").read_text(encoding="utf-8"))
     scene = bpy.context.scene
     assert scene["trajectory_sha256"] == motion["trajectory_sha256"]
     output = Path(output)

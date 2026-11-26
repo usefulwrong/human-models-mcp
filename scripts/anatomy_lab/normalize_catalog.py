@@ -34,7 +34,7 @@ def side(label):
 
 def obj2fma(up, pins):
     allowed = {p["fj_id"] for p in pins}
-    body = (up / "mirror-obj2FMA.html").read_text()
+    body = (up / "mirror-obj2FMA.html").read_text(encoding="utf-8")
     rows = {}
     for row in re.findall(r"<tr>\s*(.*?)\s*</tr>", body, re.S):
         values = {key: html.unescape(value).strip() for key, value in
@@ -48,7 +48,7 @@ def obj2fma(up, pins):
 
 
 def membership(up, filename, source_id):
-    lines = (up / filename).read_text().splitlines()
+    lines = (up / filename).read_text(encoding="utf-8").splitlines()
     definitions = []
     for line in lines:
         if not line or line.startswith("#"):

@@ -133,8 +133,8 @@ def verify(folder, motion, basis):
     if contact:
         contact = json.loads(contact.as_string())
         assert scene.frame_current == contact_receipt(motion, contact)
-    samples = json.loads((folder / "samples.json").read_text())
-    coverage = json.loads((folder / "coverage.json").read_text())
+    samples = json.loads((folder / "samples.json").read_text(encoding="utf-8"))
+    coverage = json.loads((folder / "coverage.json").read_text(encoding="utf-8"))
     assert all(bpy.data.collections.get(name) is not None for name in motion["layers"])
     print("action ranges", sorted({tuple(a.frame_range) for a in bpy.data.actions}))
     native = {row["name"]: row for row in coverage["native_bones"]}
@@ -200,7 +200,7 @@ def verify(folder, motion, basis):
         result["contact_receipt"] = contact
     result["blender_vertex_samples"] = {row["name"]: list(remap) for row, (remap, _) in
                                          zip(samples["points"], mapped_samples, strict=True)}
-    (folder / "render/reopen.json").write_text(json.dumps(result, indent=2) + "\n")
+    (folder / "render/reopen.json").write_text(json.dumps(result, indent=2) + "\n", encoding="utf-8", newline="\n")
     print({k: v for k, v in result.items() if k not in {"frames", "blender_vertex_samples"}}, flush=True)
     if result["point_max_m"] > .0001 or result["maximum_native_matrix_component_error"] > .0001:
         raise ValueError("Blender keyframe/geometry parity exceeded 0.1 mm/matrix component bound")
@@ -236,7 +236,7 @@ def render(folder, motion):
 def main():
     folder, operation, *extra = sys.argv[sys.argv.index("--") + 1:]
     folder = Path(folder)
-    motion = json.loads((folder / "motion.json").read_text())
+    motion = json.loads((folder / "motion.json").read_text(encoding="utf-8"))
     basis = np.asarray(motion["coordinates"]["world_to_glb"])[:3, :3]
     if digest(folder / "motion.glb") != motion["artifacts"]["motion.glb"]["sha256"]:
         raise ValueError("motion GLB digest differs")

@@ -5,7 +5,7 @@ import xml.etree.ElementTree as ET
 
 import numpy as np
 
-from ..registry import home
+from .mujoco import model_file
 
 HAND_MUSCLES = ("ECRL", "ECRB", "ECU", "FCR", "FCU", "PL", "FDSL", "FDSR", "FDSM", "FDSI",
                 "FDPL", "FDPR", "FDPM", "FDPI", "EDCL", "EDCR", "EDCM", "EDCI", "EDM", "EIP", "EPL", "EPB", "FPL", "APL")
@@ -15,7 +15,7 @@ PALM_PLACEMENT_TOLERANCE_M = .05
 def source_hand(support):
     import mujoco as mj
 
-    spec = mj.MjSpec.from_file(str(home() / "models/ms_human_700/MS-Human-700-Manipulation.xml"))
+    spec = model_file(mj, "MS-Human-700-Manipulation.xml", spec=True)
     model = spec.compile()
     data = mj.MjData(model)
     posture = {}
@@ -164,7 +164,9 @@ def configure_hands(primary, support, *, articulated=False):
             ET.SubElement(target_hand, "geom", name=f"palm_{side}" if i == 0 else f"palm_{side}_{i}",
                           type="sphere", size="0.009", pos=" ".join(map(str, reflection @ position)),
                           mass="0", contype="2", conaffinity="4", friction="1.3 .005 .0001", solref=".01 1", rgba=".05 .65 .6 .5")
-    return mj.MjSpec.from_string(ET.tostring(root, encoding="unicode")), {
+    assembled = mj.MjSpec.from_string(ET.tostring(root, encoding="unicode"))
+    assembled.assets.update(primary.assets | source.assets)
+    return assembled, {
         "support": support, "source": "pinned MS-Human-700-Manipulation.xml right articulated hand and native mirrored left meshes",
         "source_finger_joint_posture_rad": posture, "finger_dynamics": ("native digit hinges and 4/5 CMC coupling; passive patch loads are proxy mechanics" if articulated
                             else "rigid posture; no independent finger integration or grip-force estimation"),

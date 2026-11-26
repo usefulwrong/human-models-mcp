@@ -3,7 +3,7 @@
 import csv
 import hashlib
 import json
-import os
+from ..runtime.graphics import actual_backend
 from pathlib import Path
 
 
@@ -90,7 +90,7 @@ def render_motion(mj, model, output: Path, joint: int, derivation: dict) -> dict
     dashboards[0].save(output / "animation.gif", save_all=True, append_images=dashboards[1:],
                        duration=durations, loop=0, optimize=True)
     (output / "pose.png").write_bytes((output / frames[-1]["artifact_id"]).read_bytes())
-    backend = "nvidia_egl" if os.environ.get("MUJOCO_GL") == "egl" and "NVIDIA" in vendor else os.environ.get("MUJOCO_GL", "osmesa")
+    backend = actual_backend(vendor)
     camera_info = {"lookat": camera.lookat.tolist(), "distance": camera.distance,
                    "azimuth": camera.azimuth, "elevation": camera.elevation}
     info = {"status": "rendered", "render_backend": backend, "gl_vendor": vendor, "gl_renderer": device,
@@ -107,5 +107,5 @@ def render_motion(mj, model, output: Path, joint: int, derivation: dict) -> dict
     info["qpos_hash_encoding"] = "UTF-8 json.dumps(qpos) with Python default separators"
     info["state_hash_encoding"] = {"numpy_dtype": saved["states"].dtype.str, "order": "C", "operation": "states[index].tobytes()"}
     for name in ("frame.json", "frames.json"):
-        (output / name).write_text(json.dumps(info, indent=2))
+        (output / name).write_text(json.dumps(info, indent=2), encoding="utf-8", newline="\n")
     return info

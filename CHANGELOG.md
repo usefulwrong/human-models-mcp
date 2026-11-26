@@ -1,5 +1,13 @@
 # Release notes
 
+## 0.9.1rc1 — Windows portability candidate
+
+- Adds an unsigned Windows x64 bootstrap ZIP with project-local CPython,
+  separately pinned Core, Explorer and Renderer components, and local MCP connectors.
+- Ports interprocess locks, process containment and artifact paths. Preserves the
+  existing model, scenario contracts and saved-state replay.
+- Preserves the flat-palm full-cycle failure and the unvalidated human experimental status.
+
 ## 0.9.0rc2 — Research Preview candidate
 
 - Sets `pushup_flat_palm` as the current palm preview and research default.

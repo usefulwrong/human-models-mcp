@@ -1,6 +1,6 @@
 """Verified, bounded reads of recorded native signals for one installed MotionScene."""
 
-from fcntl import LOCK_EX, flock
+from human_models_mcp.runtime.locking import file_lock
 from functools import lru_cache
 from io import BytesIO
 import json
@@ -526,8 +526,7 @@ class MuscleData:
             if self.selection_path is None:
                 raise ValueError("shared selection storage not installed")
             raw = canonical(request.model_dump(mode="json", exclude={"if_match"}))
-            with self.selection_path.with_suffix(".lock").open("a") as lock:
-                flock(lock, LOCK_EX)
+            with file_lock(self.selection_path.with_suffix(".lock")):
                 if request.if_match and (not self.selection_path.exists() or
                         digest(read_bounded(self.selection_path, 8 << 10)) != request.if_match):
                     raise ValueError("shared selection changed")

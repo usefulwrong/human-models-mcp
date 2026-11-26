@@ -6,6 +6,15 @@ checks the import and bakes rigid transforms for Cycles. It never integrates
 physics again. Materials, light, camera and tube radii are presentation settings.
 Physics always runs on CPU.
 
+## Windows renderer
+
+Provision the Renderer with `Install.cmd renderer` and start the local worker
+with `Start.cmd start-service renderer`. The portable stack uses Blender
+4.5.15, OpenUSD 26.11 and pinned FFmpeg/FFprobe. Submit a saved run with
+`Start.cmd render RUN-UUID --output outputs\preview`. This path selects CPU
+Cycles and replays the recorded integration states. The job keeps Blender's
+log and the original scientific passport. [Windows setup](../README-WINDOWS.md)
+
 ## Run
 
 ```sh

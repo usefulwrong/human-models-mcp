@@ -8,45 +8,13 @@ from pathlib import Path
 import subprocess
 import time
 
+from public_check import public_files
+
 ROOT = Path(__file__).resolve().parents[1]
-ROOT_FILES = (
-    "README.md",
-    "pyproject.toml",
-    "requirements.in",
-    "requirements.lock",
-    "models.lock.json",
-    "Dockerfile",
-    "compose.yaml",
-    "Makefile",
-    "MANIFEST.in",
-    ".dockerignore",
-    "LICENSE",
-    "CITATION.cff",
-    "Dockerfile.render",
-    "Dockerfile.render.dockerignore",
-    "compose.render-gpu.yaml",
-    "renderer.lock.json",
-    "requirements-render.lock",
-    "visual_sources.json",
-)
-
-
 def source_fingerprint(root):
-    files = [root / name for name in ROOT_FILES]
-    for name in ("src", "scenarios", "scripts", "tests", "skills", "examples", "notices", "benchmarks"):
-        files += [
-            p
-            for p in (root / name).rglob("*")
-            if p.is_file() and "__pycache__" not in p.parts and ".egg-info" not in str(p)
-        ]
-    files += [
-        p
-        for p in (root / "docs").rglob("*.md")
-        if not any(part.startswith("demo") for part in p.relative_to(root / "docs").parts)
-    ]
     digest = hashlib.sha256()
-    for p in sorted(files):
-        digest.update(str(p.relative_to(root)).encode() + b"\0" + p.read_bytes())
+    for path in public_files(root):
+        digest.update(path.relative_to(root).as_posix().encode() + b"\0" + path.read_bytes())
     return digest.hexdigest()
 
 

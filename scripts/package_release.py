@@ -259,7 +259,8 @@ No publication, clinical validation or new LLM session is implied by this bundle
         clients[scenario] = json.loads(output.read_text())["run"]["run_id"]
     visual = None
     if renderer_id:
-        dc = ["docker", "compose", "-f", str(destination / "compose.yaml"), "-p", "human-models-mcp-night"]
+        project = "human-models-mcp-night-package-" + uuid4().hex
+        dc = ["docker", "compose", "-f", str(destination / "compose.yaml"), "-p", project]
         subprocess.run([*dc, "up", "-d", "--no-deps", "renderer"], cwd=destination, check=True)
         try:
             subprocess.run(
@@ -280,6 +281,7 @@ No publication, clinical validation or new LLM session is implied by this bundle
                     str(destination / "outputs/first-visual"),
                 ],
                 cwd=destination,
+                env={**os.environ, "COMPOSE_PROJECT_NAME": project},
                 check=True,
                 timeout=180,
             )

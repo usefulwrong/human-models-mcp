@@ -8,6 +8,7 @@ import subprocess
 import sys
 from uuid import uuid4
 
+from public_check import public_files
 from visual_release_check import source_fingerprint
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -17,42 +18,12 @@ def main():
     tag = str(uuid4())
     destination = ROOT / ".cache" / ("clean-v06-" + tag)
     destination.mkdir(parents=True)
-    for name in (
-        "src",
-        "scenarios",
-        "scripts",
-        "tests",
-        "skills",
-        "examples",
-        "notices",
-        "benchmarks",
-        "docs",
-    ):
-        shutil.copytree(
-            ROOT / name, destination / name, ignore=shutil.ignore_patterns("__pycache__", "*.egg-info")
-        )
-    for path in ROOT.iterdir():
-        if path.is_file() and path.name in (
-            "README.md",
-            "LICENSE",
-            "CITATION.cff",
-            "requirements.in",
-            "requirements.lock",
-            "requirements-render.lock",
-            "renderer.lock.json",
-            "visual_sources.json",
-            "models.lock.json",
-            "Dockerfile",
-            "Dockerfile.render",
-            "Dockerfile.render.dockerignore",
-            "compose.yaml",
-            "compose.render-gpu.yaml",
-            "Makefile",
-            "MANIFEST.in",
-            ".dockerignore",
-            "pyproject.toml",
-        ):
-            shutil.copy2(path, destination / path.name)
+    for source in public_files(ROOT):
+        if source.is_symlink() or source.is_junction():
+            raise ValueError(f"invalid public source path: {source.relative_to(ROOT)}")
+        target = destination / source.relative_to(ROOT)
+        target.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(source, target)
     fingerprint = source_fingerprint(ROOT)
     assert source_fingerprint(destination) == fingerprint
     assert not any((destination / n).exists() for n in ("results", "models", "render_jobs", ".git"))
@@ -95,7 +66,10 @@ def main():
     for name in ("results", "reports/logs", "render_jobs"):
         (destination / name).mkdir(parents=True, exist_ok=True)
     env.update(HMM_CLIENT_PYTHON=str(ROOT / ".client-venv/bin/python"), HMM_RENDER_IMAGE=renderer)
-    dc = ["docker", "compose", "-f", str(compose), "-p", "human-models-mcp-night"]
+    project = "hmm-visual-clean-" + tag
+    env["COMPOSE_PROJECT_NAME"] = project
+    env["HMM_RUNTIME_IMAGE"] = science
+    dc = ["docker", "compose", "-f", str(compose), "-p", project]
     run(
         [
             *dc,
@@ -111,7 +85,7 @@ def main():
         ],
         900,
     )
-    run([sys.executable, "scripts/render_e2e.py"], 1200)
+    run([env["HMM_CLIENT_PYTHON"], "scripts/render_e2e.py"], 1200)
     run([*dc, "stop", "renderer"])
     result = {
         "status": "pass",

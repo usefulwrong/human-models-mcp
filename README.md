@@ -4,14 +4,14 @@ A local, programmable anatomy atlas and MuJoCo research environment. Inspect the
 model signals and contact evidence behind each saved frame in a browser, over
 MCP or in Blender.
 
-**0.9.0rc2 Research Preview** · Linux x86-64 · [MCP](docs/MCP_API.md) ·
+**0.9.1rc1 Research Preview candidate** · Linux x86-64 · [MCP](docs/MCP_API.md) ·
 [Blender](docs/RENDERING.md) · [Asset licenses](notices/THIRD_PARTY.md)
 
 ## Experimental flat-palm replay
 
 The preview uses `pushup_flat_palm` with articulated fingers, distributed
 frictional contacts and external joint assistance. Its palm-and-digit
-distribution criterion passed. The full cycle, four supports, stationary
+distribution criterion passed. The full push-up gate, four supports, stationary
 supports and numerical bounds **failed**.
 
 [![Experimental flat-palm replay from exact MuJoCo states. Full push-up failed.](docs/demo/whole-body.gif)](docs/demo/whole-body.mp4)
@@ -19,7 +19,13 @@ supports and numerical bounds **failed**.
 [Demo evidence and credits](docs/demo/README.md) ·
 [Contact measurements and limitations](docs/CONTACT_MODEL_AND_LIMITATIONS.md)
 
-## Start locally
+## Windows Quick Start
+
+Extract the Windows x64 ZIP and open `Start.cmd`. Confirm the Core installation,
+then select **Run first experiment**. The Windows release candidate is under
+acceptance testing. [Windows setup and known limits](README-WINDOWS.md)
+
+## Linux Quick Start
 
 Use Linux x86-64, Docker Engine with Compose, GNU Make and Python 3.12 with
 `venv`. Run from the root of the full public source tree.

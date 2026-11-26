@@ -142,14 +142,14 @@ def test_completion_during_stale_job_recovery_is_not_overwritten(experiment, mon
     path = root / "render_jobs" / record["job_id"] / "job.json"
     record["status"] = "running"
     rendering.write_json(path, record)
-    original = rendering.fcntl.flock
+    original = rendering.file_lock
 
-    def completed_before_lock(fd, operation):
+    def completed_before_lock(lock_path, *, blocking=True):
         record["status"] = "completed"
         rendering.write_json(path, record)
-        return original(fd, operation)
+        return original(lock_path, blocking=blocking)
 
-    monkeypatch.setattr(rendering.fcntl, "flock", completed_before_lock)
+    monkeypatch.setattr(rendering, "file_lock", completed_before_lock)
     assert rendering.get_render_job(record["job_id"])["status"] == "completed"
 
 

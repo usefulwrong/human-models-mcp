@@ -20,6 +20,7 @@ services:
     stdin_open: true
     environment:
       MUJOCO_GL: osmesa
+      NVIDIA_VISIBLE_DEVICES: "void"
       OMP_NUM_THREADS: "1"
       OPENBLAS_NUM_THREADS: "1"
   renderer:
@@ -45,6 +46,7 @@ services:
       - ./render_jobs:/app/render_jobs
     environment:
       MUJOCO_GL: osmesa
+      NVIDIA_VISIBLE_DEVICES: "void"
       OMP_NUM_THREADS: "1"
       OPENBLAS_NUM_THREADS: "1"
       BLENDER_USER_CONFIG: /tmp/blender-config

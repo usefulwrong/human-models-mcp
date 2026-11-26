@@ -1,13 +1,37 @@
 """Compare all nine scientific defaults with this iteration's actual pre-change baseline."""
 
+import argparse
 import json
+import os
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 
 
+def baseline_metrics(path):
+    source = json.loads(path.read_text(encoding="utf-8"))
+    if source.get("status") != "pass":
+        raise ValueError("baseline SDK evidence must have passed")
+    def metrics(run):
+        return run["outputs"]["metrics"]
+
+    output = {}
+    for transport in ("stdio", "http"):
+        report = source[transport]
+        output[transport] = {"old_run": metrics(report["run"]), "knee": metrics(report["knee"]["run"]),
+                             "forward": metrics(report["forward"]["run"])}
+        for version in ("v03", "v04", "v05"):
+            output[transport][version] = {name: metrics(record["run"])
+                                          for name, record in report[version].items() if "run" in record}
+    return output
+
+
 def main():
-    baseline = json.loads((ROOT / "reports/V06_BASELINE_NUMERICS.json").read_text())
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--baseline-e2e", type=Path, default=os.environ.get("HMM_VISUAL_BASELINE_E2E"))
+    args = parser.parse_args()
+    baseline = (baseline_metrics(args.baseline_e2e) if args.baseline_e2e else
+                json.loads((ROOT / "reports/V06_BASELINE_NUMERICS.json").read_text()))
     current = json.loads((ROOT / "reports/e2e.json").read_text())
     cases = {}
     for transport in ("stdio", "http"):
@@ -41,8 +65,10 @@ def main():
     assert len(cases) == 18
     evidence = {
         "status": "pass",
-        "baseline_head": "03ad1df34cf7ee95b4cfcef107960f9d5a5e0190",
-        "baseline_store": "reports/e2e-model-runs/3bf66c23fc6fe5d0",
+        **({"baseline_report": args.baseline_e2e.name} if args.baseline_e2e else {
+            "baseline_head": "03ad1df34cf7ee95b4cfcef107960f9d5a5e0190",
+            "baseline_store": "reports/e2e-model-runs/3bf66c23fc6fe5d0",
+        }),
         "absolute_guard": 1e-10,
         "cases": cases,
     }

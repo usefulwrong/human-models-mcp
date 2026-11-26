@@ -19,5 +19,29 @@
       "Source": "https://github.com/PixarAnimationStudios/OpenUSD"
     }
   },
-  "access_date": "2026-11-06"
+  "access_date": "2026-11-06",
+  "windows_x64": {
+    "blender": {
+      "version": "4.5.15",
+      "url": "https://download.blender.org/release/Blender4.5/blender-4.5.15-windows-x64.zip",
+      "sha256": "52dd02fd74877fa08e74b67d7854cf32468a232c02aaa19b6844c91285574f8d",
+      "license": "GPL-3.0-or-later",
+      "source_url": "https://projects.blender.org/blender/blender/src/tag/v4.5.15",
+      "bytes": 398649826
+    },
+    "usd_core": {
+      "version": "26.11",
+      "url": "https://files.pythonhosted.org/packages/e1/2b/c5a9b06b0c28cbbfbf7ef7c2d75e7c941a76ab123c1fd3d42aa68e1a4e50/usd_core-26.11-cp312-none-win_amd64.whl",
+      "sha256": "2e7df4865f9e997b460b29d397e3a3e802a6c08837c0b8ac8deb91bd88e7da4b",
+      "license": "LicenseRef-TOST-1.0",
+      "project_urls": {
+        "Developer Docs": "https://www.openusd.org/release/apiDocs.html",
+        "Discussion Group": "https://forum.openusd.org",
+        "Documentation": "https://openusd.org",
+        "Homepage": "https://openusd.org",
+        "Source": "https://github.com/PixarAnimationStudios/OpenUSD"
+      },
+      "bytes": 13116270
+    }
+  }
 }

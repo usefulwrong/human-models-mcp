@@ -40,7 +40,7 @@ def check(args):
         bp = catalog[a["fj_label"]]
         path = args.catalog.parent / "meshes" / bp["filename"]
         verify_asset(path, bp)
-        obj = [line.split() for line in path.read_text().splitlines()]
+        obj = [line.split() for line in path.read_text(encoding="utf-8").splitlines()]
         vertices = np.asarray([[float(v) for v in parts[1:]] for parts in obj if parts and parts[0] == "v"])
         triangles = [parts[1:] for parts in obj if parts and parts[0] == "f"]
         prim, = source_doc["meshes"][source_doc["nodes"][a["source_node"]]["mesh"]]["primitives"]
@@ -56,7 +56,7 @@ def check(args):
     result = {"run_id": manifest["run_id"], "manifest_sha256": digest(manifest_raw), "artifacts": results,
               "acceptance": manifest["scientific"]["acceptance"], "bodyparts3d_control": controls,
               "method": "Actual pinned raw OBJ vs actual MyoSuite GLB. Extents use each source basis."}
-    args.output.write_text(json.dumps(result, indent=2) + "\n")
+    args.output.write_text(json.dumps(result, indent=2) + "\n", encoding="utf-8", newline="\n")
     print("Original artifact hashes", {s: sum(r["status"] == s for r in results.values())
                                        for s in ("PASS", "NOT_INSTALLED")}, "paired raw geometries", len(controls))
 

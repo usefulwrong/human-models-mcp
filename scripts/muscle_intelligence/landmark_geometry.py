@@ -22,7 +22,7 @@ def surface(vertices, faces, unit_mm):
 
 def obj(path: Path):
     vertices, faces = [], []
-    for line in path.read_text().splitlines():
+    for line in path.read_text(encoding="utf-8").splitlines():
         fields = line.split()
         if not fields:
             continue

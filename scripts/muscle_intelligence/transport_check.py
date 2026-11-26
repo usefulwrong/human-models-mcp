@@ -97,7 +97,7 @@ async def audit_all(parity, source, manifest, arrays, out, elapsed):
         {"status": "PASS", "run_id": RUN, "samples": 111, "artifact_sha256": artifacts,
          "audit_source_sha256": sha(Path(__file__)), "latency_ms_all_calls": summaries,
          "transport": "Official MCP SDK over stdio, live HTTP and independent NumPy reads",
-         "display_node_ids_resolved": sorted(assets), "rows": rows}, indent=2) + "\n")
+         "display_node_ids_resolved": sorted(assets), "rows": rows}, indent=2) + "\n", encoding="utf-8", newline="\n")
     print(f"PASS {len(rows)} exact native identities, {len(expected)} fields at all 111 states, "
           f"{len(assets)} display nodes over both transports", flush=True)
 
@@ -243,14 +243,14 @@ async def check(origin, out):
         loser, = [item for item in parallel if item["status"] != "ok"]
         assert loser["error"]["code"] == "integrity_error"
         assert await parity("muscle.selection") == winner
-        (out / "selection-race.json").write_text(json.dumps(parallel, indent=2))
+        (out / "selection-race.json").write_text(json.dumps(parallel, indent=2), encoding="utf-8", newline="\n")
         await parity("muscle.select", motion_sha256=sha, state_index=55,
                      selection=restore["selection"]["selection"], publish=True)
         if "--full" in sys.argv:
             await audit_all(parity, source, result, data, out, elapsed)
-        (out / "selection-controls.json").write_text(json.dumps({"orphan": selected_orphan, "native": bare}, indent=2))
-    (out / "transport.json").write_text(json.dumps(record, indent=2))
-    (out / "transport-timing.json").write_text(json.dumps(elapsed, indent=2))
+        (out / "selection-controls.json").write_text(json.dumps({"orphan": selected_orphan, "native": bare}, indent=2), encoding="utf-8", newline="\n")
+    (out / "transport.json").write_text(json.dumps(record, indent=2), encoding="utf-8", newline="\n")
+    (out / "transport-timing.json").write_text(json.dumps(elapsed, indent=2), encoding="utf-8", newline="\n")
     print("PASS official stdio MCP == HTTP == native NPZ for five sided groups, seven metrics and all 111 states.")
     print("PASS exact view, signed vs magnitude, aggregation, phase bounds and invalid requests.")
 

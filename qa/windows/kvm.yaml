@@ -1,0 +1,4 @@
+services:
+  windows:
+    devices:
+      - /dev/kvm:/dev/kvm

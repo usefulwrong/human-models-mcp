@@ -22,7 +22,7 @@ with GLB.open("rb") as stream:
     assert binary_tag == 0x004E4942
     binary = stream.read(binary_bytes)
     assert not stream.read(1)
-metadata = json.loads((args.scenes or GLB.parent / "scenes.json").read_text())
+metadata = json.loads((args.scenes or GLB.parent / "scenes.json").read_text(encoding="utf-8"))
 presets = {k: set(s["visible_parts"]) for k,s in metadata["scenes"].items() if "visible_parts" in s}
 groups = defaultdict(list)
 for node in source["nodes"]:
@@ -133,7 +133,7 @@ for name, (signature, nodes) in files.items():
 assert {n for v in manifest["packs"].values() for n in v["parts"]} == metadata["parts"].keys()
 assert sum(len(v["parts"]) for v in manifest["packs"].values()) == len(metadata["parts"])
 manifest["original_glb_sha256"]=hashlib.sha256(GLB.read_bytes()).hexdigest()
-(OUT/"manifest.json").write_text(json.dumps(manifest,sort_keys=True,separators=(",",":"))+"\n")
+(OUT/"manifest.json").write_text(json.dumps(manifest,sort_keys=True,separators=(",",":"))+"\n", encoding="utf-8", newline="\n")
 print(f"{len(files)} packs, {max_bytes} total bytes")
 for name,ids in presets.items():
     loaded = [x for x in manifest["packs"].values() if name in x["presets"]]

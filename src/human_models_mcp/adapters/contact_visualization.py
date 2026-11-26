@@ -3,7 +3,7 @@
 import csv
 import hashlib
 import json
-import os
+from ..runtime.graphics import actual_backend
 from pathlib import Path
 
 
@@ -17,7 +17,7 @@ def render_contact(mj, model, output: Path, recipe: dict):
 
     saved = np.load(output / "trajectory.npz", allow_pickle=False)
     states, times, specification = saved["states"], saved["time_s"], int(saved["state_spec"])
-    support = json.loads((output / "support.json").read_text())["samples"]
+    support = json.loads((output / "support.json").read_text(encoding="utf-8"))["samples"]
     with (output / "series.csv").open() as stream:
         rows = list(csv.DictReader(stream))
     data = mj.MjData(model)
@@ -143,7 +143,7 @@ def render_contact(mj, model, output: Path, recipe: dict):
     (output / "pose.png").write_bytes((output / frames[-1]["artifact_id"]).read_bytes())
     def digest(name):
         return hashlib.sha256((output/name).read_bytes()).hexdigest()
-    info = {"status": "rendered", "model_id": "ms_human_700_locomotion", "method": "dynamic_forward", "render_backend": "nvidia_egl" if os.environ.get("MUJOCO_GL") == "egl" and "NVIDIA" in vendor else os.environ.get("MUJOCO_GL", "osmesa"),
+    info = {"status": "rendered", "model_id": "ms_human_700_locomotion", "method": "dynamic_forward", "render_backend": actual_backend(vendor),
             "gl_vendor": vendor, "gl_renderer": device, "sample": len(states)-1, "simulation_time_s": float(times[-1]),
             "timestep_s": model.opt.timestep, "integration_steps": len(states)-1, "width": 640, "height": 640,
             "camera": {"lookat": camera.lookat.tolist(), "distance": camera.distance, "azimuth": camera.azimuth, "elevation": camera.elevation},
@@ -156,5 +156,5 @@ def render_contact(mj, model, output: Path, recipe: dict):
             "note": "Native geometry restored from actual integration state. Auxiliary markers do not add collision geometry. Point-contact hull and CoP inclusion do not establish balance or medical safety."}
     info["qpos_sha256"] = hashlib.sha256(json.dumps(info["qpos"]).encode()).hexdigest()
     for name in ("frames.json", "frame.json"):
-        (output/name).write_text(json.dumps(info, indent=2))
+        (output/name).write_text(json.dumps(info, indent=2), encoding="utf-8", newline="\n")
     return info

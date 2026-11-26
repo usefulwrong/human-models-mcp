@@ -31,3 +31,38 @@ jobs:
         run: make pushup-e2e
       - name: Public links, privacy patterns and demo hashes
         run: python3 scripts/public_check.py
+
+  windows-native:
+    runs-on: windows-2025
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version: '3.12'
+      - name: Review and build source archives
+        run: |
+          python scripts/windows_package.py --output release/qa
+      - name: Clean portable bootstrap and scientific model smoke
+        shell: cmd
+        run: call Install.cmd --yes core development
+      - name: Installed launcher, Windows locks, scientific contracts and packages
+        shell: cmd
+        env:
+          PYTHONUTF8: '1'
+          MUJOCO_GL: disable
+        run: |
+          call Doctor.cmd --no-probe
+          if errorlevel 1 exit /b 1
+          call Start.cmd config --mode native --format toml
+          if errorlevel 1 exit /b 1
+          .runtime\python\python.exe -X utf8 -m ruff check --no-cache src tests scripts examples qa
+          if errorlevel 1 exit /b 1
+          .runtime\python\python.exe -X utf8 -m pytest -q -p no:cacheprovider tests/test_native_runtime.py tests/test_v04.py tests/test_contact_integrity.py tests/test_public_release.py
+          if errorlevel 1 exit /b 1
+          .runtime\python\python.exe -X utf8 scripts/check_package.py
+      - name: Real native MCP stdio and local HTTP
+        shell: cmd
+        run: .runtime\python\python.exe -X utf8 scripts/native_acceptance.py reports/windows-ci

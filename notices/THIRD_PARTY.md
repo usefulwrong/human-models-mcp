@@ -87,3 +87,18 @@ The source packages preserve code, notices and source pins. Third-party
 model and renderer binaries, the full-resolution atlas and external human
 reference media are provisioned separately. Blender's GPL applies to the
 program. The current scene and media retain their underlying component terms.
+
+The Windows bootstrap retrieves CPython 3.12.10 under the PSF license and
+the separately pinned pip wheel under the MIT license. The optional Viewer
+preparation retrieves the official Node.js x64 archive and its bundled
+notices. Renderer provisioning uses the official Blender portable ZIP
+and the Windows FFmpeg essentials build linked by the FFmpeg project.
+The pinned URLs and digests are in the vendor locks. The project ZIPs
+contain the provisioning code and notices.
+[CPython release](https://www.python.org/downloads/release/python-31210/) ·
+[Node.js v22.22.2](https://nodejs.org/dist/v22.22.2/) ·
+[FFmpeg downloads](https://ffmpeg.org/download.html)
+
+Core also fetches Microsoft's x64 Visual C++ desktop framework package.
+It provisions the pinned C++ runtime DLLs locally for MuJoCo and records
+their source and digests. [Microsoft C++ deployment guidance](https://learn.microsoft.com/en-us/cpp/windows/choosing-a-deployment-method)

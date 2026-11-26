@@ -26,12 +26,14 @@ with tempfile.TemporaryDirectory() as temp:
         "notices",
         "benchmarks",
         ".github",
+        "qa",
     ):
         shutil.copytree(
             ROOT / name, project / name, ignore=shutil.ignore_patterns("__pycache__", "*.egg-info")
         )
     for name in (
         "pyproject.toml",
+        "setup.cfg",
         "README.md",
         "LICENSE",
         "CITATION.cff",
@@ -52,6 +54,16 @@ with tempfile.TemporaryDirectory() as temp:
         "renderer.lock.json",
         "requirements-render.lock",
         "visual_sources.json",
+        "README-WINDOWS.md",
+        "Start.cmd",
+        "Install.cmd",
+        "Doctor.cmd",
+        "Stop.cmd",
+        ".gitattributes",
+        "dependencies-windows-x64.json",
+        "requirements-windows-x64.lock",
+        "requirements-render-windows-x64.lock",
+        "requirements-dev-windows-x64.lock",
     ):
         shutil.copy2(ROOT / name, project / name)
     subprocess.run(
@@ -61,6 +73,10 @@ with tempfile.TemporaryDirectory() as temp:
     )
     with tarfile.open(next((project / "dist").glob("*.tar.gz"))) as source:
         members = source.getnames()
+        assert all(member.uname in {"", "root"} and member.gname in {"", "root"}
+                   and member.uid == member.gid == 0 for member in source.getmembers()), (
+            "sdist contains build-account ownership metadata"
+        )
         assert not any(p.endswith((".zip", ".mp4", ".gif", ".blend", ".usdc", ".obj")) for p in members)
         assert not any('/outputs/' in p or '/reports/' in p or '/render_vendor/' in p for p in members)
         assert next((project / "dist").glob("*.tar.gz")).stat().st_size < 2 * 1024 * 1024
@@ -103,7 +119,7 @@ with tempfile.TemporaryDirectory() as temp:
         subprocess.run(
             [sys.executable, "-m", "pip", "install", "--no-index", "--no-deps", "--no-build-isolation",
              "--no-cache-dir", "--target", str(installed), str(artifact)],
-            cwd="/tmp",
+            cwd=temp,
             check=True,
         )
         subprocess.run(
@@ -118,7 +134,7 @@ with tempfile.TemporaryDirectory() as temp:
                 str(installed),
                 VERSION,
             ],
-            cwd="/tmp",
+            cwd=temp,
             check=True,
         )
     destination = ROOT / "reports/packages" / VERSION

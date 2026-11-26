@@ -57,7 +57,7 @@ def main():
         "trajectory_sha256": scene["trajectory_sha256"], "frames": frames,
         "camera": {"name": scene.camera.name, "matrix_world": [list(row) for row in scene.camera.matrix_world],
                    "vertical_fov_rad": scene.camera.data.angle_y, "size_px": [960, 600]},
-    }, indent=2) + "\n")
+    }, indent=2) + "\n", encoding="utf-8", newline="\n")
 
 
 if __name__ == "__main__":

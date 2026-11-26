@@ -84,7 +84,7 @@ def add_owl(catalog, path, known):
 
 def add_sample(catalog, path, known):
     verify(path, SAMPLE)
-    data = json.loads(path.read_text())
+    data = json.loads(path.read_text(encoding="utf-8"))
     sources = {}
     for row in data["relations"]:
         version = row["version"]

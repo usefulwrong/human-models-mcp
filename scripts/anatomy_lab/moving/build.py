@@ -162,7 +162,7 @@ def bones_probe(args, model, neutral, bp, poses, times, selected, folder):
         path = args.atlas / "meshes" / obj["filename"]
         verify_asset(path, obj)
         vertices, triangles = [], []
-        for line in path.read_text().splitlines():
+        for line in path.read_text(encoding="utf-8").splitlines():
             fields = line.split()
             if fields and fields[0] == "v":
                 vertices.append([float(v) for v in fields[1:]])
@@ -337,13 +337,13 @@ def main(args):
     }.items():
         if not (args.atlas / file).is_file() or digest(args.atlas / file) != expected:
             raise ValueError("BodyParts3D license or provisioning receipt unavailable or changed")
-    catalog = json.loads((args.atlas / "catalog.json").read_text())
+    catalog = json.loads((args.atlas / "catalog.json").read_text(encoding="utf-8"))
     bp = {item["fj_id"]: item for item in catalog["meshes"]}
     for fj in TRIAL_BONES:
         obj = bp[fj]
         verify_asset(args.atlas / "meshes" / obj["filename"], obj)
     manifest_path = args.run / "manifest.json"
-    manifest = json.loads(manifest_path.read_text())
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
     if digest(manifest_path) != args.manifest_sha:
         raise ValueError("run manifest revision differs")
     for name in ("trajectory.npz", "summary.json", "series.csv", "model_recipe.json", "validation.json"):
@@ -355,7 +355,7 @@ def main(args):
     control = run["execution"]["parameters"]["control"]
     if run["scientific"]["acceptance"]["muscle_driven"] == "PASS" or control != "assisted_muscle":
         raise ValueError("This binding is pinned to the assisted palm run")
-    key_indices = json.loads((args.run / "summary.json").read_text())["key_indices"]
+    key_indices = json.loads((args.run / "summary.json").read_text(encoding="utf-8"))["key_indices"]
     if key_indices[1] in (key_indices[0], key_indices[2]):
         key_indices[1] = int(np.argmin(abs(times - 2.2)))
         phase_names = ("start", "target bottom", "return time")
@@ -374,8 +374,8 @@ def main(args):
         for name in ("contact_manifest.json", "contact_surfaces.json"):
             if digest(args.run / name) != run["artifacts"][name]["sha256"]:
                 raise ValueError("contact artifact changed: " + name)
-        manifest = json.loads((args.run / "contact_manifest.json").read_text())
-        surface_frames = json.loads((args.run / "contact_surfaces.json").read_text())["frames"]
+        manifest = json.loads((args.run / "contact_manifest.json").read_text(encoding="utf-8"))
+        surface_frames = json.loads((args.run / "contact_surfaces.json").read_text(encoding="utf-8"))["frames"]
         pads = [row["geom_id"] for row in manifest["collision_geoms"].values()]
         layers["OVERLAYS"] = {"mode": "registered_rigid", "available": True,
                              "description": "Floor-only proxy envelopes, native normals and visible depth markers"}

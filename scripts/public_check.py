@@ -15,12 +15,14 @@ import zlib
 from urllib.parse import unquote, urlsplit
 
 ROOT = Path(__file__).resolve().parents[1]
-DIRECTORIES = ("src", "scenarios", "scripts", "tests", "skills", "examples", "notices", "benchmarks", "docs", ".github")
+DIRECTORIES = ("src", "scenarios", "scripts", "tests", "skills", "examples", "notices", "benchmarks", "docs", ".github", "qa")
 ROOT_FILES = ("README.md", "LICENSE", "CITATION.cff", "CONTRIBUTING.md", "CHANGELOG.md", "SECURITY.md",
-              "pyproject.toml", "MANIFEST.in", "Makefile", "Dockerfile", "Dockerfile.render", "compose.yaml",
+              "pyproject.toml", "setup.cfg", "MANIFEST.in", "Makefile", "Dockerfile", "Dockerfile.render", "compose.yaml",
               "compose.render-gpu.yaml", ".gitignore", ".dockerignore", "Dockerfile.render.dockerignore",
               "requirements.in", "requirements.lock", "requirements-render.lock", "models.lock.json",
-              "renderer.lock.json", "visual_sources.json")
+              "renderer.lock.json", "visual_sources.json", "README-WINDOWS.md", "Start.cmd", "Install.cmd",
+              "Doctor.cmd", "Stop.cmd", "dependencies-windows-x64.json", "requirements-windows-x64.lock",
+              "requirements-render-windows-x64.lock", "requirements-dev-windows-x64.lock", ".gitattributes")
 OPERATOR_ONLY = tuple(Path(name) for name in (
     "scripts/anatomy_lab/build_report.py", "scripts/anatomy_lab/report_site",
     "scripts/muscle_intelligence/package_review.py", "scripts/muscle_intelligence/review_media.py",
@@ -60,7 +62,7 @@ class Links(HTMLParser):
 
 
 def anchors(path):
-    content = path.read_text()
+    content = path.read_text(encoding="utf-8")
     if path.suffix == '.html':
         parsed = Links()
         parsed.feed(content)
@@ -90,7 +92,7 @@ ARCHIVE_MAX_DEPTH = 4
 LOCAL_ONLY = {".git", ".venv", ".client-venv", "__pycache__", ".pytest_cache",
               ".ruff_cache", ".cache", "dist", "build", "results", "release",
               "outputs", "output", "render_vendor", "render_jobs", ".agent-input",
-              ".playwright-mcp", ".agents", ".codex"}
+              ".playwright-mcp", ".agents", ".codex", ".runtime"}
 
 
 def scan_archive_bytes(payload, location, failures, budget, depth=1):
@@ -184,7 +186,7 @@ def check(root, *, strict_tree=False):
             else:
                 scan_archive_bytes(path.read_bytes(), rel, failures, archive_budget)
         try:
-            content = path.read_text()
+            content = path.read_text(encoding="utf-8")
         except (UnicodeError, ValueError):
             continue
         for label, pattern in PRIVATE.items():
@@ -230,7 +232,7 @@ def check(root, *, strict_tree=False):
         if not manifest.is_file() or manifest.is_symlink():
             failures.append({'path': manifest.relative_to(root).as_posix(), 'reason': 'public demo manifest missing or unsafe'})
             continue
-        for name, meta in json.loads(manifest.read_text())['files'].items():
+        for name, meta in json.loads(manifest.read_text(encoding="utf-8"))['files'].items():
             p = manifest.parent / name
             rel = (manifest.parent.relative_to(root) / name).as_posix()
             if not p.is_file() or p.is_symlink() or not p.resolve().is_relative_to(manifest.parent):

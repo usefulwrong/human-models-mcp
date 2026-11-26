@@ -1,6 +1,6 @@
 # Public source and release assets
 
-Human Models MCP 0.9.0rc2 is a Research Preview candidate for the
+Human Models MCP 0.9.1rc1 is a Research Preview candidate for the
 [public repository](https://github.com/usefulwrong/human-models-mcp).
 The reviewed source archive includes the documentation, workflows, tests,
 notices and the current preview media and passport. Generated
@@ -12,6 +12,8 @@ Explorer capture with source-specific credits. [Current demo and credits](demo/R
 | Deliverable | Contents |
 | --- | --- |
 | Public source archive | Local Compose/MCP workflows, optional atlas scripts, scenarios, pinned inputs and offline-linked demo media |
+| Windows x64 bootstrap ZIP | Unsigned portable launcher, project sources, notices and platform locks |
+| SHA256SUMS | Checksums for the public source and Windows ZIPs |
 | Wheel and sdist | Core Python distribution and compact build inputs, respectively |
 | Demo media | Versioned renders, signal plots, receipts and per-asset attribution |
 | Optional editable scene | Separately distributed geometry and credits, with SHA-256 |
@@ -19,6 +21,15 @@ Explorer capture with source-specific credits. [Current demo and credits](demo/R
 Use the [asset notices](../notices/THIRD_PARTY.md) to determine the terms for
 each input and derivative. Retain historical manifests and acceptance
 statuses with their original versions.
+
+Generate and check the two public ZIPs in a local output folder.
+
+```sh
+python3 scripts/windows_package.py --output release/0.9.1rc1
+```
+
+Provider binary archives, model caches, BodyParts3D metadata and crosswalks
+remain outside the public ZIPs. Publish after reviewing platform acceptance.
 
 ## Publication checklist
 

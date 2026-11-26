@@ -16,6 +16,16 @@ criterion passed in the reference run. The full push-up, four-support,
 stationary-support and numerical-bound checks failed. Choose a fresh output
 directory. [Run receipt and media](demo/README.md)
 
+## Platform evidence
+
+The same MuJoCo 3.17.0 scenario contracts apply to Linux and Windows.
+Windows records its own wheel lock and uses the pinned native assets
+through the MuJoCo virtual filesystem. Its renderer records the platform
+vendor locks. A skipped MuJoCo graphics request is recorded separately
+from CPU computation. Numerical criteria and source hashes apply on each
+platform. Software graphics and GPU artifacts can have different pixels.
+[Portability decisions](WINDOWS_PORTABILITY.md)
+
 ## Evidence chain
 
 The SDK exporter checks each size/SHA-256 before writing the success page.

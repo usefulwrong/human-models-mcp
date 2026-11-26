@@ -11,6 +11,8 @@ import numpy as np
 import mujoco as mj
 from PIL import Image
 
+from human_models_mcp.adapters.mujoco import model_file
+
 folder = Path(sys.argv[1])
 output = folder / "unpacked"
 output.mkdir(exist_ok=True)
@@ -27,7 +29,6 @@ run = json.loads((source / "manifest.json").read_text())
 expected = json.loads((output / "scene/expected.json").read_text())
 for name, sha in expected["source_files"].items():
     assert hashlib.sha256((source / name).read_bytes()).hexdigest() == sha
-root = Path("/app/models/ms_human_700")
 pushup_scenarios = {"pushup", "pushup_palms", "pushup_knuckles", "pushup_palms_contact", "pushup_flat_palm"}
 if run["scenario_id"] in {"pushup_palms_contact", "pushup_flat_palm"}:
     from human_models_mcp.scene_export import load_saved_run
@@ -35,7 +36,7 @@ if run["scenario_id"] in {"pushup_palms_contact", "pushup_flat_palm"}:
     _, model, _, _, recipe, *_ = load_saved_run(source)
 elif run["scenario_id"] in pushup_scenarios:
     recipe = json.loads((source / "model_recipe.json").read_text())
-    spec = mj.MjSpec.from_file(str(root / "MS-Human-700.xml"))
+    spec = model_file(mj, "MS-Human-700.xml", spec=True)
     if recipe.get("hand_support", "legacy_point") != "legacy_point":
         from human_models_mcp.adapters.hands import configure_hands
         spec, _ = configure_hands(spec, recipe["hand_support"])
@@ -83,7 +84,7 @@ elif run["scenario_id"] in pushup_scenarios:
     model.actuator_biasprm[:, 2] *= recipe["muscle_strength_scale"]
     assert model.nu == 700 and model.neq == 42 + len(recipe.get("fixed_supports", []))
 elif run["model"]["id"] == "ms_human_700":
-    spec = mj.MjSpec.from_file(str(root / "MS-Human-700.xml"))
+    spec = model_file(mj, "MS-Human-700.xml", spec=True)
     spec.option.timestep = run["execution"]["timestep_s"]
     base = spec.compile()
     initial = mj.MjData(base)
@@ -101,7 +102,7 @@ elif run["model"]["id"] == "ms_human_700":
     eq.solimp[:] = [0.95, 0.95, 0.001, 0.5, 2]
     model = spec.compile()
 else:
-    model = mj.MjModel.from_xml_path(str(root / "scene_locomotion.xml"))
+    model = model_file(mj, "scene_locomotion.xml")
 data = mj.MjData(model)
 archive = np.load(source / "trajectory.npz", allow_pickle=False)
 stationarity = None

@@ -18,3 +18,9 @@ recursive-include .github *.yml *.yaml
 
 include Dockerfile.render Dockerfile.render.dockerignore compose.render-gpu.yaml renderer.lock.json requirements-render.lock visual_sources.json
 global-exclude *.orig *.rej *.pyc
+
+include README-WINDOWS.md Start.cmd Install.cmd Doctor.cmd Stop.cmd .gitattributes
+include dependencies-windows-x64.json requirements-windows-x64.lock requirements-render-windows-x64.lock requirements-dev-windows-x64.lock
+include setup.cfg
+recursive-include scripts/windows *.cmd *.ps1
+recursive-include qa/windows *.bat *.md *.ps1 *.py *.sh *.yaml

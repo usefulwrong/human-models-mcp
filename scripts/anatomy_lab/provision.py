@@ -5,6 +5,7 @@ from datetime import UTC, datetime
 import hashlib
 from io import BytesIO
 import json
+import os
 from pathlib import Path
 import re
 import shutil
@@ -35,7 +36,7 @@ build43({rawDir,listDir,outDir,mirror:{categories:[]}})
 
 
 def write_json(path, data):
-    with path.open("x") as out:
+    with path.open("x", encoding="utf-8", newline="\n") as out:
         json.dump(data, out, ensure_ascii=False, separators=(",", ":"))
         out.write("\n")
 
@@ -113,8 +114,8 @@ def obj_claims(path, fj_id):
     return fields
 
 
-def provision(root, cache, offline):
-    pins = json.loads((SOURCE / "sources.lock.json").read_text())
+def provision(root, cache, offline, *, cache_only=False):
+    pins = json.loads((SOURCE / "sources.lock.json").read_text(encoding="utf-8"))
     upstream = cache / "upstream"
     meshes = cache / "meshes"
     upstream.mkdir(parents=True, exist_ok=True)
@@ -124,6 +125,8 @@ def provision(root, cache, offline):
     receipt = provision_sources(upstream, pins, offline)
     fetch_mirror.install(upstream, meshes, offline=offline)
 
+    if cache_only:
+        return
     catalog, _ = normalize_catalog.build(upstream)
     with TemporaryDirectory(prefix=".anatomy-lab-", dir=root.parent) as work:
         temporary = Path(work)
@@ -150,8 +153,11 @@ def provision(root, cache, offline):
         meta.mkdir()
         for raw, name in (("mirror-FMA2Obj.txt", "FMA2Obj.txt"), ("mirror-obj2FMA.html", "obj2FMA.html")):
             shutil.copyfile(upstream / raw, meta / name)
-        (temporary / "objs").symlink_to(data / "meshes", target_is_directory=True)
-        subprocess.run(["node", "-e", BUILD, str(temporary / PACKER / "src/data/bp3d43.js"),
+        if os.name == "nt":
+            shutil.copytree(data / "meshes", temporary / "objs")
+        else:
+            (temporary / "objs").symlink_to(data / "meshes", target_is_directory=True)
+        subprocess.run([os.environ.get("HMM_NODE_BIN", "node"), "-e", BUILD, str(temporary / PACKER / "src/data/bp3d43.js"),
                         str(temporary), str(upstream), str(data / "build")], check=True)
         site = data / "site/full/site"
         site.mkdir(parents=True)
@@ -180,16 +186,20 @@ def main():
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument("destination", type=Path)
     p.add_argument("--cache", type=Path)
+    p.add_argument("--cache-only", action="store_true")
     p.add_argument("--offline", action="store_true", help="Require all source bytes in the specified cache")
     args = p.parse_args()
     root = args.destination.resolve()
-    if args.destination.is_symlink() or root.exists():
+    if not args.cache_only and (args.destination.is_symlink() or args.destination.is_junction() or root.exists()):
         p.error("destination must be new")
     root.parent.mkdir(parents=True, exist_ok=True)
     cache = args.cache.resolve() if args.cache else root.with_name(root.name + "-sources")
     if cache == root or cache.is_relative_to(root):
         p.error("source cache must be outside the installation")
-    provision(root, cache, args.offline)
+    if os.name == "nt" and not args.offline:
+        import truststore
+        truststore.inject_into_ssl()
+    provision(root, cache, args.offline, cache_only=args.cache_only)
 
 
 if __name__ == "__main__":

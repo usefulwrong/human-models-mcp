@@ -378,7 +378,7 @@ def build(args):
             annotations = pinned_annotations(log, pair, mesh, LANDMARKS[structure])
             selected = [Correspondence.model_validate({k: v for k, v in item.items()
                         if k not in {"status", "decision"}}) for item in annotations]
-            raw = np.asarray([[float(v) for v in line.split()[1:4]] for line in source_path.read_text().splitlines()
+            raw = np.asarray([[float(v) for v in line.split()[1:4]] for line in source_path.read_text(encoding="utf-8").splitlines()
                               if line.startswith("v ")])
             target = native_bone(model, neutral, name)
             source_sample = raw[sample_indices(len(raw), 1200)]
@@ -463,7 +463,7 @@ def build(args):
     receipt = args.output / "REGISTRATION_INSPECTION_QA.json"
     write(receipt, report)
     raw_receipt = read_bounded(receipt, MAX_REPORT)
-    (args.output / "registration-evidence.sha256").write_text(digest(raw_receipt) + "\n")
+    (args.output / "registration-evidence.sha256").write_text(digest(raw_receipt) + "\n", encoding="utf-8", newline="\n")
     write(args.output / "REFERENCE_SOURCE_MATRIX.json", sources)
     write(args.output / "LANDMARK_AND_CORRESPONDENCE.json", template)
     write(args.output / "ATTACHMENT_EVIDENCE.json", {"pilots": pilots, "blockers": blockers})

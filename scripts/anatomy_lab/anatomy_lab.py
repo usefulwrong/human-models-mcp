@@ -13,6 +13,8 @@ from threading import Lock
 from typing import Annotated, Literal
 from uuid import UUID
 
+from human_models_mcp.runtime.paths import is_link
+
 from pydantic import BaseModel, ConfigDict, Field, TypeAdapter
 from pydantic.types import FiniteFloat
 
@@ -266,7 +268,7 @@ def digest(data):
 
 
 def read_bounded(path, limit):
-    if path.is_symlink() or not path.is_file():
+    if is_link(path) or not path.is_file():
         raise ValueError(f"invalid local asset: {path.name}")
     with path.open("rb") as stream:
         data = stream.read(limit + 1)
@@ -276,7 +278,7 @@ def read_bounded(path, limit):
 
 
 def installed(path, size):
-    return size is not None and not path.is_symlink() and path.is_file() and path.stat().st_size == size
+    return size is not None and not is_link(path) and path.is_file() and path.stat().st_size == size
 
 
 class PackRecord(Contract):
@@ -316,7 +318,7 @@ class Registry:
         if self.catalog.get("schema_version") != 1:
             raise ValueError("unsupported atlas catalog schema")
         self.mesh_dir = Path(mesh_dir)
-        if self.mesh_dir.is_symlink():
+        if is_link(self.mesh_dir):
             raise ValueError("mesh directory cannot be a symlink")
         inventory = Path(catalog).with_name("verified_mesh_inventory.json")
         self.inventory = json.loads(read_bounded(inventory, MAX_CATALOG_BYTES)) if inventory.is_file() else {}
@@ -501,7 +503,7 @@ class Registry:
 
     @cached_property
     def display(self):
-        if any(path.is_symlink() for path in (self.pack_dir, *list(self.pack_dir.parents)[:2])):
+        if any(is_link(path) for path in (self.pack_dir, *list(self.pack_dir.parents)[:2])):
             raise ValueError("invalid display pack location")
         path = self.pack_dir / "manifest.json"
         if not path.is_file():
@@ -814,7 +816,7 @@ class Registry:
         if metadata["schema_version"] != "1.0" or metadata["atlas_hash"] != atlas_lock_digest(lock):
             raise ValueError("unexpected motion schema or regional atlas hash")
         run = self.motion_path.parent.parent / "results" / str(UUID(metadata["run_id"]))
-        if run.is_symlink():
+        if is_link(run):
             raise ValueError("invalid motion run location")
         manifest_bytes = read_bounded(run / "manifest.json", 2 * 1024 * 1024)
         if digest(manifest_bytes) != metadata["source_manifest_sha256"]:

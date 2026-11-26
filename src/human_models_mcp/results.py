@@ -1,14 +1,16 @@
 """Bounded artifact access through identifiers, never user-supplied paths."""
 
 import base64
-import fcntl
 import hashlib
 import json
+import os
 from pathlib import Path
 from uuid import UUID
 from datetime import datetime, timezone
 
 from .registry import home
+from .runtime.locking import file_lock
+from .runtime.paths import flat_name, is_link, replace
 
 MAX_ARTIFACT_BYTES = 2 * 1024 * 1024
 
@@ -18,14 +20,17 @@ def error(code: str, message: str) -> dict:
 
 
 def store() -> Path:
-    return home() / "results"
+    root = home() / "results"
+    if os.name == "nt" and is_link(root):
+        raise ValueError("results directory is a link or reparse point")
+    return root
 
 
 def run_dir(run_id: str) -> Path:
     if str(UUID(run_id)) != run_id:
         raise ValueError("run_id must be a canonical UUID")
     path = store() / run_id
-    if path.is_symlink() or path.resolve().parent != store().resolve():
+    if is_link(path) or path.resolve().parent != store().resolve():
         raise ValueError("invalid run location")
     return path
 
@@ -33,21 +38,16 @@ def run_dir(run_id: str) -> Path:
 def get_run(run_id: str) -> dict:
     try:
         p = run_dir(run_id) / "manifest.json"
-        if p.is_symlink() or p.stat().st_size > MAX_ARTIFACT_BYTES:
+        if is_link(p) or p.stat().st_size > MAX_ARTIFACT_BYTES:
             return error("invalid_input", "invalid manifest")
-        manifest = json.loads(p.read_text())
+        manifest = json.loads(p.read_text(encoding="utf-8"))
         if not isinstance(manifest, dict):
             return error("invalid_input", "invalid manifest shape")
         if manifest.get("status") == "running":
-            with (store() / ".executor.lock").open("a") as lock:
-                try:
-                    fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
-                except BlockingIOError:
-                    return manifest
-                try:
-                    manifest = interrupt_run(p, manifest)
-                finally:
-                    fcntl.flock(lock, fcntl.LOCK_UN)
+            with file_lock(store() / ".executor.lock", blocking=False) as acquired:
+                if acquired:
+                    # The executor may have published the final record since our read.
+                    manifest = interrupt_run(p, json.loads(p.read_text(encoding="utf-8")))
         return manifest
     except (OSError, ValueError):
         return error("invalid_input", "unknown or invalid run_id")
@@ -65,18 +65,18 @@ def interrupt_run(path: Path, manifest: dict) -> dict:
     manifest["error"] = {"code": "interrupted", "message": "No executor owns this running record; execution was interrupted. Partial files are retained."}
     manifest["completed_at"] = datetime.now(timezone.utc).isoformat()
     temporary = path.with_suffix(".tmp")
-    temporary.write_text(json.dumps(manifest, indent=2, allow_nan=False) + "\n")
-    temporary.replace(path)
+    temporary.write_text(json.dumps(manifest, indent=2, allow_nan=False) + "\n", encoding="utf-8", newline="\n")
+    replace(temporary, path)
     return manifest
 
 
 def get_artifact(run_id: str, artifact_id: str) -> dict:
     manifest = get_run(run_id)
     artifacts = manifest.get("artifacts", {})
-    if artifact_id not in artifacts:
+    if not flat_name(artifact_id) or artifact_id not in artifacts:
         return error("invalid_input", "artifact_id is not present in this run manifest")
     p = run_dir(run_id) / artifact_id
-    if p.is_symlink() or p.resolve().parent != run_dir(run_id).resolve():
+    if is_link(p) or p.resolve().parent != run_dir(run_id).resolve():
         return error("invalid_input", "invalid artifact location")
     if not p.is_file():
         return error("integrity_error", "manifest-listed artifact is missing")

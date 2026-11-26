@@ -28,7 +28,7 @@ def read(path):
 
 def main(out):
     def write(name, data):
-        (out / name).write_text(json.dumps(data, ensure_ascii=False, indent=2, allow_nan=False) + "\n")
+        (out / name).write_text(json.dumps(data, ensure_ascii=False, indent=2, allow_nan=False) + "\n", encoding="utf-8", newline="\n")
 
     before = read(out / "baseline-crosswalk.json")
     data = read(out / "MUSCLE_CROSSWALK_V2.json")
@@ -76,7 +76,7 @@ def main(out):
     write("BASELINE_ACTUAL.json", {
         "repository": {"head": subprocess.check_output(["git", "rev-parse", "HEAD"], text=True).strip(),
                        "branch": subprocess.check_output(["git", "branch", "--show-current"], text=True).strip(),
-                       "initial_status": (out / "changes/git-status-before.txt").read_text().splitlines(),
+                       "initial_status": (out / "changes/git-status-before.txt").read_text(encoding="utf-8").splitlines(),
                        "source_state": "Pilot patch present in staged app. Working Anatomy Lab is patch input."},
         "host": {"python": sys.version, "packages": {name: version(name) for name in ("mujoco", "numpy", "mcp", "pydantic", "pytest")}},
         "docker_images": [r for r in docker_images if r.startswith(("hmm-", "mcr.microsoft.com/playwright:"))],

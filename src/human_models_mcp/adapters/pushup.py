@@ -8,7 +8,8 @@ from pathlib import Path
 
 import numpy as np
 
-from ..registry import ForwardValidation, PushupParameters, home
+from .mujoco import model_file
+from ..registry import ForwardValidation, PushupParameters
 from .contact import dump, measure_contacts, momentum_rates
 from .articulated_palms import PROFILE as ARTICULATED_PROFILE
 
@@ -35,7 +36,7 @@ def pushup_model(timestep_s=0.001, friction=1.3, muscle_strength_scale=1.0, hand
                  knuckle_technique="legacy_flared", palm_technique="legacy_reach", contact_profile=None, *, contact_floor_margin_m=0.):
     import mujoco as mj
 
-    spec = mj.MjSpec.from_file(str(home() / "models/ms_human_700/MS-Human-700.xml"))
+    spec = model_file(mj, "MS-Human-700.xml", spec=True)
     if hand_support != "legacy_point":
         from .hands import configure_hands
         spec, _ = configure_hands(spec, hand_support, articulated=contact_profile == ARTICULATED_PROFILE)
@@ -626,7 +627,7 @@ def simulate_pushup(params: dict, output: Path, validation: dict):
         dump(output / "contact_manifest.json", contact_map)
         (output / "contact_surfaces.json").write_text(json.dumps(
             {"fields": ["signed_distance_m", "vertex_world_m"], "frames": surface_history},
-            separators=(",", ":"), allow_nan=False) + "\n")
+            separators=(",", ":"), allow_nan=False) + "\n", encoding="utf-8", newline="\n")
         history = floor_history.report()
         chunk_names = []
         for start in range(0, len(floor_history.rows), 256):
@@ -670,7 +671,7 @@ def simulate_pushup(params: dict, output: Path, validation: dict):
             "friction_check": "native contact cones plus aggregate Coulomb bound for each hand/foot; no pressure-map claim"}
     if p.hand_support != "legacy_point":
         from .hands import configure_hands
-        _, recipe["hands"] = configure_hands(mj.MjSpec.from_file(str(home() / "models/ms_human_700/MS-Human-700.xml")), p.hand_support, articulated=articulated)
+        _, recipe["hands"] = configure_hands(model_file(mj, "MS-Human-700.xml", spec=True), p.hand_support, articulated=articulated)
     if p.palm_technique == "chest_full":
         raw_reference = Path(__file__).with_name("palms_full_reference_v1.json").read_bytes()
         (output / "palm_reference_input.json").write_bytes(raw_reference)
@@ -704,7 +705,7 @@ def simulate_pushup(params: dict, output: Path, validation: dict):
         wrists = {"samples": wrist_samples, "ligament_forces": "not modeled",
                   "moments": "ground contact wrench about wrist origin; not joint reaction or ligament tension"}
         if articulated:
-            (output / "wrists.json").write_text(json.dumps(wrists, separators=(",", ":"), allow_nan=False) + "\n")
+            (output / "wrists.json").write_text(json.dumps(wrists, separators=(",", ":"), allow_nan=False) + "\n", encoding="utf-8", newline="\n")
         else:
             dump(output / "wrists.json", wrists)
     atlas = [{"id": i, "name": model.actuator(i).name, "group": anatomical_group(model.actuator(i).name),

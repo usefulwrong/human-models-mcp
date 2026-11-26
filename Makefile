@@ -40,7 +40,7 @@ release-check:
 	python3 scripts/public_check.py
 
 package:
-	python3 scripts/package_release.py
+	.client-venv/bin/python scripts/package_release.py
 
 clean-check:
 	python3 scripts/clean_check.py
@@ -71,10 +71,10 @@ render-preview:
 	python3 scripts/render_demo.py --preview
 
 render-e2e:
-	python3 scripts/render_e2e.py
+	.client-venv/bin/python scripts/render_e2e.py
 
 render-gpu-smoke:
-	python3 scripts/render_e2e.py --gpu
+	.client-venv/bin/python scripts/render_e2e.py --gpu
 
 .PHONY: render-faults render-demo visual-clean-check visual-release-check
 render-faults:

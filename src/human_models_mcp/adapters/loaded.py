@@ -5,7 +5,8 @@ import hashlib
 import json
 from pathlib import Path
 
-from ..registry import LoadedParameters, TrackingParameters, ForwardValidation, home
+from .mujoco import model_file
+from ..registry import LoadedParameters, TrackingParameters, ForwardValidation
 
 
 def reference_motion(time_s: float, target_rad: float):
@@ -21,7 +22,7 @@ def controller_torque(time_s: float, angle: float, velocity: float, target_rad: 
 
 def fixture_model(timestep_s: float):
     import mujoco as mj
-    spec = mj.MjSpec.from_file(str(home() / "models/ms_human_700/MS-Human-700.xml"))
+    spec = model_file(mj, "MS-Human-700.xml", spec=True)
     spec.option.timestep = timestep_s
     base = spec.compile()
     initial = mj.MjData(base)
@@ -44,7 +45,7 @@ def loaded_elbow(params: dict, output: Path, validation: dict, *, tracking: bool
     p = (TrackingParameters if tracking else LoadedParameters).model_validate(params)
     ForwardValidation.model_validate(validation)
     mj, m, d, xml = fixture_model(p.timestep_s)
-    (output / "derived_model.xml").write_text(xml)
+    (output / "derived_model.xml").write_text(xml, encoding="utf-8", newline="\n")
     derivation = {"source_variant": "primary", "fixture": "soft pelvis-to-world weld anchored at initial pelvis origin",
                   "added_equality": "fixture_pelvis", "added_equalities_count": 1,
                   "derived_mjcf_sha256": hashlib.sha256(xml.encode()).hexdigest(),
@@ -107,7 +108,7 @@ def loaded_elbow(params: dict, output: Path, validation: dict, *, tracking: bool
                         time_s=times, qpos=np.array(poses))
     (output / "poses.json").write_text(json.dumps({"model_id": "ms_human_700", "method": "dynamic_forward",
         "simulation_time_s": float(d.time), "integration_steps": p.steps, "timestep_s": p.timestep_s,
-        "time_s": times.tolist(), "qpos": poses, "joint_order": [m.joint(i).name for i in range(m.njnt)]}, indent=2))
+        "time_s": times.tolist(), "qpos": poses, "joint_order": [m.joint(i).name for i in range(m.njnt)]}, indent=2), encoding="utf-8", newline="\n")
     metrics = [{"name": "elapsed_time", "value": float(d.time), "unit": "s"},
                {"name": "final_angle", "value": rows[-1]["angle_rad"], "unit": "rad"},
                {"name": "final_activation", "value": rows[-1]["activation"], "unit": "1"},
@@ -124,7 +125,7 @@ def loaded_elbow(params: dict, output: Path, validation: dict, *, tracking: bool
         metrics += [{"name": "rms_tracking_error", "value": float(np.sqrt(np.mean([r["tracking_error_rad"]**2 for r in rows]))), "unit": "rad"},
                     {"name": "final_tracking_error", "value": rows[-1]["tracking_error_rad"], "unit": "rad"},
                     {"name": "max_control_torque", "value": max(abs(r["applied_torque_Nm"]) for r in rows), "unit": "N*m"}]
-    (output / "summary.json").write_text(json.dumps({"metrics": metrics, "rows": rows}, indent=2))
+    (output / "summary.json").write_text(json.dumps({"metrics": metrics, "rows": rows}, indent=2), encoding="utf-8", newline="\n")
     render_info = {"status": "not_requested", "render_backend": "none"}
     if p.render:
         try:

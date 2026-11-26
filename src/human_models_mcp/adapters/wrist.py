@@ -24,7 +24,7 @@ def reference():
         rows = list(csv.DictReader(stream))
     if len(rows) != 10:
         raise ValueError("reference must contain ten nonimpaired muscle/axis observations")
-    return rows, json.loads((folder / "reference.json").read_text())
+    return rows, json.loads((folder / "reference.json").read_text(encoding="utf-8"))
 
 
 def mesh_points(m, d, name):
@@ -180,7 +180,7 @@ def benchmark(params: dict, output: Path, validation: dict) -> dict:
     for name, value in (("comparison.json", protocol), ("summary.json", {"metrics": metrics, "rows": rows}),
                         ("poses.json", {"model_id": "ms_human_700", "method": "static_pose", "simulation_time_s": 0.0,
                                         "integration_steps": 0, "qpos": [neutral_pose.tolist()] * len(rows)})):
-        (output / name).write_text(json.dumps(value, indent=2))
+        (output / name).write_text(json.dumps(value, indent=2), encoding="utf-8", newline="\n")
     with (output / "series.csv").open("w", newline="") as stream:
         writer = csv.DictWriter(stream, fieldnames=list(rows[0]))
         writer.writeheader()

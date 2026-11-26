@@ -5,6 +5,8 @@ from pathlib import Path
 from typing import Literal
 
 import yaml
+from .runtime.paths import is_link
+
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 
@@ -237,21 +239,21 @@ def discover(root: Path | None = None) -> dict:
         if not folder.is_dir():
             continue
         try:
-            if folder.is_symlink():
+            if is_link(folder):
                 raise ValueError("symlinked scenario folders are forbidden")
             manifest = folder / "scenario.yaml"
-            if manifest.is_symlink() or manifest.stat().st_size > 16384:
+            if is_link(manifest) or manifest.stat().st_size > 16384:
                 raise ValueError("manifest must be a regular file <=16 KiB")
             for name in ("README.md", "references.md", "validation.yaml"):
                 p = folder / name
-                if p.is_symlink() or not p.is_file():
+                if is_link(p) or not p.is_file():
                     raise ValueError(f"missing regular {name}")
-            scenario = Scenario.model_validate(yaml.safe_load(manifest.read_text()))
+            scenario = Scenario.model_validate(yaml.safe_load(manifest.read_text(encoding="utf-8")))
             validation_file = folder / "validation.yaml"
             if validation_file.stat().st_size > 16384:
                 raise ValueError("validation.yaml exceeds 16 KiB")
             validator = ContactValidation if scenario.backend in ("standing_contact_probe", "assisted_stance") else Validation if scenario.method == "static_pose" else ForwardValidation
-            validation = validator.model_validate(yaml.safe_load(validation_file.read_text()))
+            validation = validator.model_validate(yaml.safe_load(validation_file.read_text(encoding="utf-8")))
             if scenario.id != folder.name:
                 raise ValueError("scenario id must equal folder name")
             schema = PARAMETER_TYPES[scenario.backend].model_json_schema()

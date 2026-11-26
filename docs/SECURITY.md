@@ -1,6 +1,6 @@
 # Local trust boundaries
 
-This preview is single-user and local. Use stdio through Docker. HTTP binds
+This preview is single-user and local. Connect over local stdio using the native or Docker connector. HTTP binds
 only to `127.0.0.1:8765` inside the container, has no published port, checks Host
 and rejects browser Origins. It has no remote authentication or tenant isolation.
 Do not advertise it as a public service.
@@ -13,7 +13,7 @@ Model XML/native libraries are trusted inputs; only locked, verified source file
 are loaded. SHA-256 establishes byte consistency, not upstream authenticity or
 scientific validity.
 
-Provisioning downloads official HTTPS assets and hash-locked packages. Runtime
+Provisioning downloads official HTTPS assets and hash-locked packages. Docker
 science and rendering have `network_mode: none`, dropped capabilities,
 `no-new-privileges`, read-only roots, a non-root owner UID and bounded tmpfs/CPU/RAM/PIDs.
 Science mounts project results, reports and render jobs; the renderer sees
@@ -36,8 +36,13 @@ before queueing. Host-local writable storage is trusted: an owner can rewrite
 files, so hashes are not tamper-proof signatures against a hostile co-user.
 
 Client exporters refuse existing destinations, check file names/sizes/hashes
-and escape HTML. Direct Python execution lacks the Docker OS containment and
-is for trusted local users. Optional GPU access relies on an existing host
+and escape HTML. Native execution inherits the trusted local user's filesystem and network
+access. Docker provides the stronger isolation controls described above.
+Windows uses OS-owned file locks and per-job process tree, time and memory
+controls. Windows limits committed memory and user-mode CPU time for the
+scientific job and rejects starts when assignment fails. Per-artifact limits
+are checked at publication and retrieval. Provisioning runs separately and
+requires consent. The Windows bootstrap ZIP is unsigned. Optional GPU access relies on an existing host
 runtime; no system or driver modifications are performed.
 
 Do not place credentials, patient records, private scans or personal information

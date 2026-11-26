@@ -2,16 +2,21 @@
 
 import argparse
 import csv
-import ctypes
-import fcntl
+import importlib.metadata
 import json
 import os
 from pathlib import Path
+import platform
 import signal
 import subprocess
 import time
+import tempfile
 import zipfile
 
+from .registry import home
+from .runtime.locking import file_lock
+from .runtime.processes import managed_process
+from .runtime.paths import flat_name, is_link
 from .evidence import code_sha256, evidence_context
 from .rendering import (
     LAYERS,
@@ -29,32 +34,14 @@ from .rendering import (
 
 
 def source_integrity(folder, record):
-    if (folder / "input").is_symlink():
+    if is_link(folder / "input"):
         raise ValueError("symlinked render input")
     for name, expected in (record["source_files"] | record.get("atlas_source_files", {})).items():
-        if Path(name).name != name or name in (".", ".."):
+        if not flat_name(name):
             raise ValueError("invalid source filename")
         path = folder / "input" / name
-        if path.is_symlink() or path.stat().st_size > 2 * 1024 * 1024 or digest(path) != expected:
+        if is_link(path) or path.stat().st_size > 2 * 1024 * 1024 or digest(path) != expected:
             raise ValueError("immutable input hash mismatch: " + name)
-
-
-def child_setup(parent_pid):
-    os.setsid()
-    # Kill an orphaned Blender when the worker is abruptly killed; no host process control.
-    ctypes.CDLL(None).prctl(1, signal.SIGKILL)
-    if os.getppid() != parent_pid:
-        os.kill(os.getpid(), signal.SIGKILL)
-
-
-def stop_child(process):
-    if process.poll() is None:
-        os.killpg(process.pid, signal.SIGTERM)
-        try:
-            process.wait(timeout=5)
-        except subprocess.TimeoutExpired:
-            os.killpg(process.pid, signal.SIGKILL)
-            process.wait(timeout=5)
 
 
 def gpu_memory():
@@ -72,16 +59,14 @@ def gpu_memory():
 
 def blender(folder, options, device_override=None):
     log = folder / "blender.log"
-    env = {
-        **os.environ,
-        "BLENDER_USER_CONFIG": "/tmp/blender-config",
-        "CUDA_CACHE_PATH": "/tmp/cuda-cache",
-        "XDG_CACHE_HOME": "/tmp/.cache",
-    }
+    env = dict(os.environ)
+    for name, subdirectory in (("BLENDER_USER_CONFIG", "blender-config"),
+                               ("CUDA_CACHE_PATH", "cuda-cache"), ("XDG_CACHE_HOME", ".cache")):
+        env.setdefault(name, str(Path(tempfile.gettempdir()) / subdirectory))
     if device_override:
         env["HMM_BLENDER_DEVICE"] = device_override
     command = [
-        os.environ.get("BLENDER_BIN", "/opt/blender/blender"),
+        os.environ.get("BLENDER_BIN", "blender.exe" if os.name == "nt" else "/opt/blender/blender"),
         "-b",
         "--factory-startup",
         "--threads",
@@ -95,29 +80,19 @@ def blender(folder, options, device_override=None):
     ]
     memory = []
     started = time.monotonic()
-    parent_pid = os.getpid()
-    with log.open("a") as stream:
-        process = subprocess.Popen(
-            command,
-            stdout=stream,
-            stderr=subprocess.STDOUT,
-            env=env,
-            preexec_fn=lambda: child_setup(parent_pid),
-        )
-        try:
-            while process.poll() is None:
-                if time.monotonic() - started > options["timeout_s"]:
-                    stop_child(process)
-                    raise TimeoutError("Blender wall time exceeded")
-                m = gpu_memory()
-                if m is not None:
-                    memory.append(m)
-                time.sleep(0.5)
-        except BaseException:
-            stop_child(process)
-            raise
+    with log.open("ab") as stream, managed_process(
+        command, stdout=stream, stderr=subprocess.STDOUT, stdin=subprocess.DEVNULL,
+        env=env, memory=8 * 1024**3, linux_group=True,
+    ) as process:
+        while process.poll() is None:
+            if time.monotonic() - started > options["timeout_s"]:
+                raise TimeoutError("Blender wall time exceeded")
+            m = gpu_memory() if options["device"] != "cpu" and device_override != "cpu" else None
+            if m is not None:
+                memory.append(m)
+            time.sleep(0.5)
     if process.returncode:
-        text = log.read_text(errors="replace")[-5000:]
+        text = log.read_text(errors="replace", encoding="utf-8")[-5000:]
         raise RuntimeError("Blender exit " + str(process.returncode) + ": " + text)
     return {
         "seconds": time.monotonic() - started,
@@ -327,9 +302,9 @@ def package_media(folder, expected):
         gif_clock="GIF centisecond-quantized presentation; physical times are in each frame",
     )
     write_json(work / "expected.json", expected)
-    subprocess.run(
+    with managed_process(
         [
-            "ffmpeg",
+            os.environ.get("HMM_FFMPEG", "ffmpeg"),
             "-hide_banner",
             "-loglevel",
             "error",
@@ -353,9 +328,10 @@ def package_media(folder, expected):
             "+faststart",
             str(out / "animation.mp4"),
         ],
-        check=True,
-        timeout=90,
-    )
+        memory=2 * 1024**3, linux_group=True, stdin=subprocess.DEVNULL,
+    ) as encoder:
+        if encoder.wait(timeout=90):
+            raise RuntimeError(f"FFmpeg exited {encoder.returncode}")
     with zipfile.ZipFile(out / "frames.zip", "w", compression=zipfile.ZIP_DEFLATED) as archive:
         for frame in expected["frames"]:
             name = f"frame_{frame['frame']:04d}.png"
@@ -367,7 +343,7 @@ def package_media(folder, expected):
     with zipfile.ZipFile(out / "scene.zip", "w", compression=zipfile.ZIP_DEFLATED) as archive:
         for path in (work / "usd").rglob("*"):
             if path.is_file():
-                archive.write(path, str(path.relative_to(work)))
+                archive.write(path, path.relative_to(work).as_posix())
         archive.write(work / "expected.json", "expected.json")
         if (work / "atlas_surfaces.npz").is_file():
             archive.write(work / "atlas_surfaces.npz", "atlas_surfaces.npz")
@@ -434,8 +410,14 @@ def process_job(job_id):
         if time.monotonic() - started > options["timeout_s"]:
             raise TimeoutError("Render job wall-time budget exceeded")
         out = folder / "artifacts"
-        source_run = json.loads((folder / "input/manifest.json").read_text())
-        info = json.loads((out / "blender_render.json").read_text())
+        source_run = json.loads((folder / "input/manifest.json").read_text(encoding="utf-8"))
+        info = json.loads((out / "blender_render.json").read_text(encoding="utf-8"))
+        environment = Path(os.environ.get("HMM_RENDER_ENVIRONMENT", home() / "runtime-environment.json"))
+        renderer_environment = (json.loads(environment.read_text(encoding="utf-8")) if environment.is_file() else {
+            "source_sha256": code_sha256(), "python": platform.python_version(),
+            "platform": platform.platform(), "lock_sha256": render_lock_digests(),
+            "packages": {name: importlib.metadata.version(name) for name in ("mujoco", "usd-core")},
+        })
         passport = {
             "schema_version": "1.0",
             "job_id": job_id,
@@ -454,7 +436,7 @@ def process_job(job_id):
             "timing": expected["timing"],
             "coordinates": expected["coordinates"],
             "units": expected["units"],
-            "geometry_validation": json.loads((out / "geometry_validation.json").read_text()),
+            "geometry_validation": json.loads((out / "geometry_validation.json").read_text(encoding="utf-8")),
             "mesh_normalization": expected["mesh_normalization"],
             "layers": {n: LAYERS[n] for n in record["request"]["layers"]},
             "anatomy": {
@@ -475,8 +457,8 @@ def process_job(job_id):
                     "Native soft knee couplings can drift during the original dynamics; replay does not correct them.",
                 ],
             },
-            "software_licenses": json.loads((Path("/app") / "renderer.lock.json").read_text()),
-            "renderer_environment": json.loads((Path("/app") / "runtime-environment.json").read_text()),
+            "software_licenses": json.loads((home() / "renderer.lock.json").read_text(encoding="utf-8")),
+            "renderer_environment": renderer_environment,
             "total_seconds": time.monotonic() - started,
             "test_failure_injection": os.environ.get("HMM_TEST_RENDER_FAILURE"),
         }
@@ -496,7 +478,7 @@ def process_job(job_id):
         write_json(out / "passport.json", passport)
         def source_json(name):
             path = folder / "input" / name
-            return json.loads(path.read_text()) if name in record["source_files"] else None
+            return json.loads(path.read_text(encoding="utf-8")) if name in record["source_files"] else None
 
         contract = evidence_context(source_run, source_json("summary.json"), source_json("validation.json"))
         contract["render_job_id"] = job_id
@@ -602,10 +584,8 @@ def main():
         raise KeyboardInterrupt
 
     signal.signal(signal.SIGTERM, stop)
-    with (root / ".worker.lock").open("a") as lock:
-        try:
-            fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
-        except BlockingIOError:
+    with file_lock(root / ".worker.lock", blocking=False) as acquired:
+        if not acquired:
             raise RuntimeError("one render worker already owns this queue")
         for path in sorted(root.glob("*/job.json")):
             record = read_job(path.parent.name)

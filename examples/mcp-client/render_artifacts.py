@@ -42,7 +42,7 @@ async def download(client, job_id, artifact_id, destination, trace_dir=None):
                             indent=2,
                         )
                         + "\n"
-                    )
+                    , encoding="utf-8", newline="\n")
                 if not 0 <= result["bytes"] <= 128 * 1024 * 1024:
                     raise ValueError("artifact exceeds client bound")
                 if meta is not None and (meta["sha256"], meta["bytes"]) != (

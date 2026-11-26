@@ -4,6 +4,13 @@ The supported workflow uses Linux x86-64 with Docker Engine and Compose. The
 science container uses Python 3.12 and MuJoCo 3.17.0. The renderer uses Blender
 4.5.15.
 
+## Windows Native
+
+Extract the Windows x64 candidate and run `Start.cmd` from the extracted
+directory. Approve Core and select **Run first experiment**. Use the same menu
+for graphics diagnostics or optional component setup. The standalone commands
+also work with absolute launcher paths. [Windows commands and offline setup](../README-WINDOWS.md)
+
 ## Requirements
 
 - Docker Engine with Compose, accessible to your local account.

@@ -128,7 +128,7 @@ def main():
     parser.add_argument("output", type=Path)
     args = parser.parse_args()
     result = audit(args.run, args.clip)
-    args.output.write_text(json.dumps(result, indent=2) + "\n")
+    args.output.write_text(json.dumps(result, indent=2) + "\n", encoding="utf-8", newline="\n")
     print(f"native transforms: {len(result['frames'])} exact checks; body reconstruction "
           f"{result['body_bind_reconstruction_error_max']:.3g}; {len(result['native_signals'])} signal groups")
 

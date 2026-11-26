@@ -1,0 +1,21 @@
+services:
+  windows:
+    image: dockurr/windows@sha256:59f8bed19cfd49cf1701debe34f9df6311e61a4e2ae68aa9f41206e2184e31cc
+    environment:
+      VERSION: win11x64-enterprise-ltsc-eval
+      CPU_CORES: "6"
+      RAM_SIZE: 12G
+      DISK_SIZE: 100G
+      NETWORK: slirp
+      USERNAME: QASetup
+      PASSWORD: ${HMM_QA_PASSWORD:?Set a dedicated guest password}
+      TPM: "Y"
+    volumes:
+      - ${HMM_QA_ROOT:?Set the local absolute QA work directory}/vm:/storage
+      - ${HMM_QA_ROOT}/enterprise-ltsc.iso:/custom.iso:ro
+      - ${HMM_QA_ROOT}/oem:/oem:ro
+      - ${HMM_QA_ROOT}/share:/shared
+    ports:
+      - "127.0.0.1:18006:8006"
+      - "127.0.0.1:18389:3389"
+    stop_grace_period: 120s

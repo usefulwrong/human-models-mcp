@@ -2,10 +2,10 @@
 
 import base64
 from datetime import datetime, timezone
-import fcntl
 import hashlib
 import json
 import mimetypes
+import os
 from pathlib import Path
 import re
 import shutil
@@ -16,6 +16,8 @@ from pydantic import BaseModel, ConfigDict, Field, ValidationError, model_valida
 
 from .evidence import code_sha256
 from .registry import home
+from .runtime.locking import file_lock
+from .runtime.paths import flat_name, is_link, replace
 from .results import error, get_run, run_dir
 
 PROFILES = {
@@ -83,19 +85,19 @@ def digest(path):
 
 
 def render_lock_digests():
-    return {name: digest(path) for name in ("renderer.lock.json", "requirements-render.lock")
-            if (path := home() / name).is_file()}
+    requirements = "requirements-render-windows-x64.lock" if os.name == "nt" else "requirements-render.lock"
+    return {name: digest(path) for name in ("renderer.lock.json", requirements) if (path := home() / name).is_file()}
 
 
 def write_json(path, value):
     temporary = path.with_name("." + path.name + "." + str(uuid4()))
-    temporary.write_text(json.dumps(value, indent=2, allow_nan=False) + "\n")
-    temporary.replace(path)
+    temporary.write_text(json.dumps(value, indent=2, allow_nan=False) + "\n", encoding="utf-8", newline="\n")
+    replace(temporary, path)
 
 
 def queue_root():
     root = home() / "render_jobs"
-    if root.is_symlink():
+    if is_link(root):
         raise ValueError("render queue must not be a symlink")
     root.mkdir(exist_ok=True)
     return root
@@ -106,16 +108,16 @@ def job_dir(job_id):
         raise ValueError("job_id must be a canonical UUID")
     root = queue_root()
     path = root / job_id
-    if path.is_symlink() or path.resolve().parent != root.resolve():
+    if is_link(path) or path.resolve().parent != root.resolve():
         raise ValueError("invalid render job location")
     return path
 
 
 def read_job(job_id):
     path = job_dir(job_id) / "job.json"
-    if path.is_symlink() or path.stat().st_size > 2 * 1024 * 1024:
+    if is_link(path) or path.stat().st_size > 2 * 1024 * 1024:
         raise ValueError("invalid job record")
-    result = json.loads(path.read_text())
+    result = json.loads(path.read_text(encoding="utf-8"))
     if not isinstance(result, dict) or result.get("job_id") != job_id:
         raise ValueError("invalid job record shape")
     return result
@@ -124,7 +126,7 @@ def read_job(job_id):
 def list_render_profiles():
     source_registry = home() / "visual_sources.json"
     registry = (
-        json.loads(source_registry.read_text())
+        json.loads(source_registry.read_text(encoding="utf-8"))
         if source_registry.is_file()
         else {"sources": [], "status": "registry_not_installed"}
     )
@@ -158,13 +160,14 @@ def list_render_profiles():
 def snapshot(run, destination):
     source = run_dir(run["run_id"])
     manifest = source / "manifest.json"
-    if manifest.is_symlink() or json.loads(manifest.read_text()) != run:
+    if is_link(manifest) or json.loads(manifest.read_text(encoding="utf-8")) != run:
         raise ValueError("source manifest changed during submission")
     destination.mkdir()
     shutil.copyfile(manifest, destination / "manifest.json")
     files = {"manifest.json": digest(manifest)}
     selected = {
         "trajectory.npz",
+        "derived_model.xml",
         "trajectory_metadata.json",
         "series.csv",
         "model_recipe.json",
@@ -192,7 +195,7 @@ def snapshot(run, destination):
     total = 0
     for name in sorted(selected & run["artifacts"].keys()):
         path = source / name
-        if path.is_symlink() or not path.is_file() or path.stat().st_size > 2 * 1024 * 1024:
+        if is_link(path) or not path.is_file() or path.stat().st_size > 2 * 1024 * 1024:
             raise ValueError("invalid source artifact: " + name)
         if digest(path) != run["artifacts"][name]["sha256"]:
             raise ValueError("source checksum mismatch: " + name)
@@ -291,8 +294,7 @@ def render_result(run_id, profile=None, layers=None, options=None, idempotency_k
             request["atlas_lock_sha256"] = atlas_lock_digest(atlas)
         request_hash = hashlib.sha256(json.dumps(request, sort_keys=True).encode()).hexdigest()
         root = queue_root()
-        with (root / ".submit.lock").open("a") as lock:
-            fcntl.flock(lock, fcntl.LOCK_EX)
+        with file_lock(root / ".submit.lock"):
             key = hashlib.sha256(idempotency_key.encode()).hexdigest() if idempotency_key else None
             jobs = sorted(root.glob("*/job.json"))
             if key or recipe is not None:
@@ -311,7 +313,7 @@ def render_result(run_id, profile=None, layers=None, options=None, idempotency_k
                                 if name not in run["artifacts"] and name != "manifest.json":
                                     continue
                                 current = run_dir(run_id) / name
-                                if current.is_symlink() or not current.is_file() or current.stat().st_size > 2 * 1024 * 1024 or digest(current) != expected:
+                                if is_link(current) or not current.is_file() or current.stat().st_size > 2 * 1024 * 1024 or digest(current) != expected:
                                     raise ValueError("source checksum mismatch: " + name)
                             return cached
             if len(jobs) >= 128:
@@ -364,10 +366,8 @@ def get_render_job(job_id):
     try:
         record = read_job(job_id)
         if record["status"] == "running":
-            with (queue_root() / ".worker.lock").open("a") as lock:
-                try:
-                    fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
-                except BlockingIOError:
+            with file_lock(queue_root() / ".worker.lock", blocking=False) as acquired:
+                if not acquired:
                     return record
                 record = read_job(job_id)
                 if record["status"] != "running":
@@ -388,7 +388,7 @@ def get_render_job(job_id):
 
 def artifact_metadata(path):
     size = path.stat().st_size
-    if path.is_symlink() or not 0 < size <= MAX_FILE:
+    if is_link(path) or not 0 < size <= MAX_FILE:
         raise ValueError("render artifact is empty or exceeds 128 MiB")
     return {
         "sha256": digest(path),
@@ -403,12 +403,12 @@ def get_render_artifact(job_id, artifact_id, offset=0, length=MAX_CHUNK):
             return error("invalid_input", "offset >= 0, chunk length 1–262144 bytes required")
         record = get_render_job(job_id)
         meta = record.get("artifacts", {}).get(artifact_id)
-        if not meta or not re.fullmatch(r"[A-Za-z0-9_-]+\.[A-Za-z0-9]+", artifact_id):
+        if not meta or not flat_name(artifact_id) or not re.fullmatch(r"[A-Za-z0-9_-]+\.[A-Za-z0-9]+", artifact_id):
             return error("invalid_input", "artifact_id is not in this render manifest")
         path = job_dir(job_id) / "artifacts" / artifact_id
         if (
-            path.parent.is_symlink()
-            or path.is_symlink()
+            is_link(path.parent)
+            or is_link(path)
             or path.resolve().parent != (job_dir(job_id) / "artifacts").resolve()
         ):
             return error("invalid_input", "invalid artifact location")

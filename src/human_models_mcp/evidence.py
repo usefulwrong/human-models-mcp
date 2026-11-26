@@ -13,7 +13,7 @@ def code_sha256():
     root = Path(__file__).resolve().parent
     hashed = hashlib.sha256()
     for path in sorted(root.rglob("*.py")):
-        hashed.update(str(path.relative_to(root)).encode() + b"\0" + path.read_bytes())
+        hashed.update(path.relative_to(root).as_posix().encode() + b"\0" + path.read_bytes())
     return hashed.hexdigest()
 
 

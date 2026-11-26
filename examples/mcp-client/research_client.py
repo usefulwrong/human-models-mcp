@@ -63,7 +63,7 @@ async def main():
         for label, calls in (("combined", trace[:1]), ("separate", trace[1:])):
             counts[label] = {"tool_calls": len(calls), "argument_bytes": sum(c["argument_bytes"] for c in calls),
                              "result_bytes": sum(c["result_bytes"] for c in calls)}
-        (args.output / "calls.json").write_text(json.dumps(counts, indent=2) + "\n")
+        (args.output / "calls.json").write_text(json.dumps(counts, indent=2) + "\n", encoding="utf-8", newline="\n")
         unsupported = await call("get_result", {"run_id": run_id, "claim_id": "computed_muscle_strain"})
         assert unsupported["status"] == "unsupported"
         manifest_digests = {k: v["sha256"] for k, v in separate["artifacts"].items()}
@@ -87,22 +87,22 @@ async def main():
             if recipe == "pushup_rectus":
                 artifact_ids += ["anatomy_registration.json", "scene.zip", "scene.blend", "source.zip", "frames.zip"]
             receipts = {name: await download(client, job_id, name, dest / name) for name in artifact_ids}
-            (dest / "client.json").write_text(json.dumps({"job": job, "downloads": receipts}, indent=2) + "\n")
-            clock = json.loads((dest / "frames.json").read_text())
+            (dest / "client.json").write_text(json.dumps({"job": job, "downloads": receipts}, indent=2) + "\n", encoding="utf-8", newline="\n")
+            clock = json.loads((dest / "frames.json").read_text(encoding="utf-8"))
             keys = ("source_index", "time_s", "state_sha256")
             current = [tuple(f[k] for k in keys) for f in clock["frames"]]
             assert frame_reference is None or current == frame_reference
             frame_reference = current
-            evidence = json.loads((dest / "evidence.json").read_text())
+            evidence = json.loads((dest / "evidence.json").read_text(encoding="utf-8"))
             assert evidence["run_id"] == run_id and evidence["acceptance"] == gate["acceptance"]
             assert evidence["human_safety_status"] == "unsupported"
             if recipe == "pushup_rectus":
-                anatomy = json.loads((dest / "anatomy_registration.json").read_text())
+                anatomy = json.loads((dest / "anatomy_registration.json").read_text(encoding="utf-8"))
                 assert anatomy["status"] == "illustrative" and set(anatomy["structures"]) == {"r", "l"}
                 assert anatomy["source"]["license"] == "CC-BY-SA-4.0"
         original = await call("get_result", {"run_id": run_id})
         assert {k: v["sha256"] for k, v in original["artifacts"].items()} == manifest_digests
-    (args.output / "status.json").write_text(json.dumps({"status": "PASS", "run_id": run_id, "calls": trace}, indent=2) + "\n")
+    (args.output / "status.json").write_text(json.dumps({"status": "PASS", "run_id": run_id, "calls": trace}, indent=2) + "\n", encoding="utf-8", newline="\n")
 
 
 if __name__ == "__main__":

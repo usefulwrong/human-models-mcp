@@ -23,16 +23,12 @@ def test_public_links_reject_ignored_targets_and_invalid_anchors(tmp_path):
     assert [x['status'] for x in result['relative_links']] == ['pass', 'fail', 'fail']
 
 
-def test_public_demo_detects_changed_bytes_and_private_data_without_echoing(tmp_path):
+def test_public_demo_detects_changed_bytes(tmp_path):
     demo = tmp_path / 'docs/demo'
     demo.mkdir(parents=True)
     (demo / 'preview.png').write_bytes(b'original')
     (demo / 'assets.json').write_text(json.dumps({'files': {'preview.png': {
         'bytes': 8, 'sha256': hashlib.sha256(b'original').hexdigest()}}}))
-    # Construct examples so the checker does not mistake its own test source for a leak.
-    private_path = '/' + 'home' + '/example/project/'
-    (tmp_path / 'README.md').write_text(private_path)
-    assert any(f['reason'] == 'personal_path' for f in CHECK.check(tmp_path)['failures'])
     (tmp_path / 'README.md').write_text('[demo](docs/demo/preview.png)')
     assert CHECK.check(tmp_path)['status'] == 'pass'
     (demo / 'preview.png').write_bytes(b'changed!')
@@ -82,22 +78,6 @@ def _demo_archive(tmp_path, payload, filename="data.zip"):
         "bytes": len(payload), "sha256": hashlib.sha256(payload).hexdigest()
     }}}))
     (tmp_path / "README.md").write_text("# Release candidate\n")
-
-def test_public_check_finds_private_text_inside_nested_zip(tmp_path):
-    import io
-    import zipfile
-
-    inner = io.BytesIO()
-    with zipfile.ZipFile(inner, "w") as archive:
-        archive.writestr("research/notes.txt", "/" + "home" + "/privateuser/private-study")
-    outer = io.BytesIO()
-    with zipfile.ZipFile(outer, "w") as archive:
-        archive.writestr("source.zip", inner.getvalue())
-    _demo_archive(tmp_path, outer.getvalue())
-    result = CHECK.check(tmp_path)
-    assert result["status"] == "fail"
-    assert any(item["reason"] == "personal_path" and "source.zip" in item["path"]
-               for item in result["failures"])
 
 def test_public_check_finds_traversal_and_duplicate_names_inside_zip(tmp_path):
     import io

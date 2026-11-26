@@ -45,7 +45,7 @@ def main(args):
                "endpoints_m": positions, "moment_dL_dq_at_saved_states": source}
     args.output.mkdir(exist_ok=True)
     for name, content in (("native.json", results), ("endpoints.json", receipt)):
-        (args.output / name).write_text(json.dumps(content, indent=2) + "\n")
+        (args.output / name).write_text(json.dumps(content, indent=2) + "\n", encoding="utf-8", newline="\n")
     print("Exact state/native matrices:", len(results["frames"]), results["native_matrix_component_error_max"])
     print("Saved sparse J vs finite difference:", len(source), crosswalk["moment_arm_check"]["max_error"])
 

@@ -5,6 +5,19 @@ and an optional read-only MCP query tool. The source package contains the
 installer, viewer and source pins. The installer retrieves the atlas and
 builds its derived scene on your machine.
 
+## Windows launcher
+
+Use `Install.cmd explorer` to provision the pinned atlas and project-local
+Node.js. Choose **Open Anatomy Explorer** or run `Start.cmd start-service explorer`.
+Generate the Anatomy Lab MCP connector with `Start.cmd config --mode anatomy`.
+
+Use `Start.cmd attach-motion CLIP\motion.json --sha256 DIGEST` to attach a
+local licensed MotionScene. Install its verified run in the project results
+directory under the recorded UUID. To enable the existing muscle inspector,
+also pass `--crosswalk CLIP\crosswalk-v3.json --crosswalk-sha256 DIGEST`.
+Restart the Explorer, then select **Open saved motion replay**. The authoring
+and landmark review recipes below retain their source and license prerequisites.
+
 ## Install the atlas
 
 After [Linux setup](GETTING_STARTED.md), activate the project's pinned Python

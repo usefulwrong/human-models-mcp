@@ -37,7 +37,7 @@ def pinned_inventory(upstream):
             ).groups()
             pins.append({"fj_id": fj, "filename": f"{fj}.obj", "upstream_path": item.filename.split("/", 1)[1],
                          "source_primary_fma": primary_fma, "size": int(size), "oid": oid.decode()})
-    manifest = (upstream / "mirror-FMA2Obj.txt").read_text()
+    manifest = (upstream / "mirror-FMA2Obj.txt").read_text(encoding="utf-8")
     assert {p["fj_id"] for p in pins} == set(re.findall(r"FJ\d+M?", manifest))
     assert len(pins) == len({p["fj_id"] for p in pins}) == 3210
     return sorted(pins, key=lambda p: p["fj_id"])
@@ -137,7 +137,7 @@ def install(upstream, meshes, *, offline):
                        "batch_url": BATCH_URL, "ordered_pin_set_sha256": hashlib.sha256(json.dumps(chunk, sort_keys=True).encode()).hexdigest(),
                        "results": [{**p, **r} for p, r in zip(chunk, results, strict=True)]}
             out = upstream / "lfs-chunks" / f"{start:04d}-{os.getpid()}.json"
-            out.write_text(json.dumps(receipt, indent=2) + "\n")
+            out.write_text(json.dumps(receipt, indent=2) + "\n", encoding="utf-8", newline="\n")
             chunk_failures = sum(r["status"] == "failed" for r in results)
             failures += chunk_failures
             print(datetime.datetime.now(datetime.UTC).isoformat(), start + len(chunk), "/", len(missing), "failed:", failures, "receipt:", out, flush=True)

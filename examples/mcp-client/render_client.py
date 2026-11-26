@@ -131,8 +131,8 @@ async def exercise(client, args):
         assert image.n_frames == args.frames
     video = (args.output / "animation.mp4").read_bytes()
     assert b"ftyp" in video[:32]
-    passport = json.loads((args.output / "passport.json").read_text())
-    frames = json.loads((args.output / "frames.json").read_text())
+    passport = json.loads((args.output / "passport.json").read_text(encoding="utf-8"))
+    frames = json.loads((args.output / "frames.json").read_text(encoding="utf-8"))
     assert len(frames["frames"]) == args.frames and frames["source_files"]["trajectory.npz"] == source_before
     assert all(a["time_s"] < b["time_s"] for a, b in zip(frames["frames"], frames["frames"][1:]))
     assert passport["source_run_id"] == run["run_id"] and passport["renderer"]["physics"] == "not_executed"
@@ -142,7 +142,7 @@ async def exercise(client, args):
         == "pass"
     )
     if "evidence.json" in transfers:
-        evidence = json.loads((args.output / "evidence.json").read_text())
+        evidence = json.loads((args.output / "evidence.json").read_text(encoding="utf-8"))
         claims = {claim["claim_id"]: claim["value"] for claim in evidence["claims"]}
         assert claims == {"artifact:" + name: value for name, value in job["artifacts"].items()
                           if name != "evidence.json"}
@@ -150,7 +150,7 @@ async def exercise(client, args):
         assert passport["anatomy"]["external_registration"] == "illustrative"
         assert passport["anatomy"]["atlas_license"] == "CC-BY-SA-2.1-JP"
         assert "FMA34690" in passport["anatomy"]["source"]
-        atlas = json.loads((args.output / "anatomy_registration.json").read_text())
+        atlas = json.loads((args.output / "anatomy_registration.json").read_text(encoding="utf-8"))
         assert atlas["blender"]["status"] == "PASS" and len(atlas["frames"]) == args.frames
         assert set(atlas["phase_source_indices"].values()) <= {f["source_index"] for f in frames["frames"]}
         assert any(c["anatomical_mapping_status"] == "illustrative" for c in evidence["claims"])
@@ -187,8 +187,8 @@ async def exercise(client, args):
         + '<video controls loop src="animation.mp4" style="max-width:100%"></video><p>Computed model motion with Blender presentation. Human and balance validation are unavailable.</p><img src="preview.png" style="max-width:100%"><p><a href="passport.json">Scientific passport</a>'
         + evidence_link
         + ' · <a href="source.zip">Source data</a> · <a href="scene.blend">Editable scene</a> · <a href="frames.json">Frame clock and hashes</a></p>'
-    )
-    (args.output / "client.json").write_text(json.dumps(result, indent=2) + "\n")
+    , encoding="utf-8", newline="\n")
+    (args.output / "client.json").write_text(json.dumps(result, indent=2) + "\n", encoding="utf-8", newline="\n")
     print(
         json.dumps(
             {

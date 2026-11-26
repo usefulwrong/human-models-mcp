@@ -17,7 +17,7 @@ def search_sources(query: str, limit: int = 5) -> dict:
     if not tokens or len(tokens) > 20:
         return error("invalid_input", "query must contain 1–20 words or model identifier components")
     root = home()
-    lock = json.loads((root / "models.lock.json").read_text())
+    lock = json.loads((root / "models.lock.json").read_text(encoding="utf-8"))
     locked = {item["path"]: item for item in lock["files"]}
     records = []
 
@@ -67,7 +67,7 @@ def search_sources(query: str, limit: int = 5) -> dict:
             "MIT", "wrapper_scenario_description")
     reference_folder = root / "benchmarks/nichols2016_wrist"
     if (reference_folder / "reference.json").is_file():
-        reference = json.loads((reference_folder / "reference.json").read_text())
+        reference = json.loads((reference_folder / "reference.json").read_text(encoding="utf-8"))
         for name, expected in reference["files"].items():
             path = reference_folder / name
             if name not in ("article.xml", "reference.csv") or path.is_symlink() or hashlib.sha256(path.read_bytes()).hexdigest() != expected:

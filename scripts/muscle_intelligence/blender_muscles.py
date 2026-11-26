@@ -21,7 +21,7 @@ FRAMES = (0, 27, 55, 83, 110)
 
 
 def dump(path, value):
-    path.write_text(json.dumps(value, allow_nan=False, indent=2) + "\n")
+    path.write_text(json.dumps(value, allow_nan=False, indent=2) + "\n", encoding="utf-8", newline="\n")
 
 
 def objects():

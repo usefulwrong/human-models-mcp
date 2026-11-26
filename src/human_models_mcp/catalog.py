@@ -3,6 +3,7 @@
 import hashlib
 import importlib.metadata
 import json
+import os
 
 from .registry import home
 
@@ -39,7 +40,7 @@ CITATIONS = [
 def model_card(verify: bool = False, model_id: str = "ms_human_700") -> dict:
     if model_id not in MODEL_FILES:
         return {"status": "unsupported", "error": {"code": "unsupported", "message": "no installed model adapter"}}
-    lock = json.loads((home() / "models.lock.json").read_text())
+    lock = json.loads((home() / "models.lock.json").read_text(encoding="utf-8"))
     files = lock["files"]
     missing = [x["path"] for x in files if not (home() / "models" / x["path"]).is_file()]
     corrupt = []
@@ -74,7 +75,7 @@ def model_card(verify: bool = False, model_id: str = "ms_human_700") -> dict:
                             "standing_balance", "externally_actuated_balance", "neuromuscular_balance", "zmp"],
             "units": {"hinge_coordinate": "rad", "slide_coordinate": "m", "musculotendon_length": "m",
                       "hinge_moment_arm": "m", "mass": "kg"},
-            "acceleration": {"physics_backend": "cpu", "render_backend": "osmesa or verified nvidia_egl"},
+            "acceleration": {"physics_backend": "cpu", "render_backend": "glfw when available" if os.name == "nt" else "osmesa or verified nvidia_egl"},
             "limitations": LIMITATIONS, "method_limitations": {
                 "static_pose": ["No integration; read the scenario for fixed-coordinate, local-coupled or physical-wrist-coordinate semantics."],
                 "dynamic_forward": ["Read the scenario for source initialization, fixture, control law and applied forces; no clinical safety inference."],

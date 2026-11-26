@@ -11,7 +11,7 @@ LOCK = Path(__file__).with_name("atlas_pectoralis.json")
 
 
 def atlas_lock():
-    return json.loads(LOCK.read_text())
+    return json.loads(LOCK.read_text(encoding="utf-8"))
 
 
 def atlas_lock_digest(lock):
@@ -68,7 +68,7 @@ def atlas_inputs():
         raise ValueError("invalid atlas cache directory")
     receipt = cache / "license_receipt.json"
     if (receipt.is_symlink() or not receipt.is_file() or receipt.stat().st_size > 1024
-            or json.loads(receipt.read_text()) != {"license": lock["license"], "atlas_lock_sha256": atlas_lock_digest(lock)}):
+            or json.loads(receipt.read_text(encoding="utf-8")) != {"license": lock["license"], "atlas_lock_sha256": atlas_lock_digest(lock)}):
         raise ValueError("atlas license receipt missing or no longer matches the pin; use provision-atlas")
     for name, asset in lock["files"].items():
         verify_asset(cache / name, asset)

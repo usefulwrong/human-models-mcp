@@ -4,7 +4,7 @@ title: UsefulWrong / human-models-mcp
 type: software
 authors:
   - name: UsefulWrong contributors
-version: 0.9.0rc2
+version: 0.9.1rc1
 license: MIT
 abstract: Local research toolkit for bounded musculoskeletal experiments with pinned MS-Human-700 assets, numerical evidence and saved-state Blender visualization. Model results are not human experimental or clinical validation.
 references:

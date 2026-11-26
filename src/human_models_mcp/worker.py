@@ -1,26 +1,15 @@
 """One trusted operation per bounded subprocess. stdout is internal JSON only."""
 
 import json
-import resource
+from pathlib import Path
 import sys
-import os
-import ctypes
-import signal
+
+from .runtime.processes import linux_child_limits, science_cpu_seconds
 
 
 def main():
-    if "HMM_PARENT_PID" in os.environ:
-        if ctypes.CDLL(None).prctl(1, signal.SIGKILL, 0, 0, 0) != 0:
-            raise RuntimeError("cannot enforce worker parent-death signal")
-        if os.getppid() != int(os.environ["HMM_PARENT_PID"]):
-            raise SystemExit("executor exited before worker startup")
-    resource.setrlimit(resource.RLIMIT_FSIZE, (2 * 1024 * 1024, 2 * 1024 * 1024))
-    resource.setrlimit(resource.RLIMIT_NOFILE, (128, 128))
-    # Address space is bounded by Docker's memory limit; Mesa reserves large virtual ranges.
     request = json.load(sys.stdin)
-    articulated = (request["operation"] == "pushup"
-                   and request["parameters"].get("contact_profile") == "articulated_palms_v1")
-    resource.setrlimit(resource.RLIMIT_CPU, (70, 75) if articulated else (45, 50))
+    linux_child_limits(science_cpu_seconds(request))
     try:
         from .catalog import model_card
         card = model_card(verify=True, model_id=request.get("model_id", "ms_human_700"))
@@ -31,6 +20,10 @@ def main():
             from .results import run_dir
             if request["operation"] == "inspect":
                 result = inspect_model(request.get("joint"), request.get("model_id", "ms_human_700"))
+            elif request["operation"] == "graphics_probe":
+                from .adapters.mujoco import load, render
+                mj, model, data = load()
+                result = render(mj, model, data, Path(request["output"]), data.qpos.tolist(), 0)
             elif request["operation"] == "joint_sweep":
                 result = sweep(request["parameters"], run_dir(request["run_id"]), request["validation"], request["defaults"])
             elif request["operation"] == "activation_forward":

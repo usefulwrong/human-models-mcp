@@ -27,7 +27,7 @@ async def export_run(call, run: dict, destination: Path):
             raise ValueError("artifact size/checksum mismatch: " + name)
         with (destination / name).open("xb") as stream:
             stream.write(data)
-    (destination / "manifest.json").write_text(json.dumps(run, indent=2) + "\n")
+    (destination / "manifest.json").write_text(json.dumps(run, indent=2) + "\n", encoding="utf-8", newline="\n")
     metrics = "".join(f"<tr><td>{escape(item['name'])}</td><td>{item['value']:.8g}</td><td>{escape(item['unit'])}</td></tr>" for item in run["outputs"]["metrics"])
     figures = "".join(f'<figure><img src="{quote(name)}" alt="{escape(name)}"><figcaption>{escape(name)}</figcaption></figure>'
                       for name in ("overview.png", "animation.gif", "plots.png", "pose.png") if name in artifacts)
@@ -45,5 +45,5 @@ Engine: {escape(run['engine']['name'])} {escape(run['engine']['version'])} · ph
 <table><tr><th>Metric</th><th>Value</th><th>Unit</th></tr>{metrics}</table>{figures}
 <h2>Interpretation limits</h2><ul>{limitations}</ul><h2>Files and provenance</h2>
 <p>Run {escape(run['run_id'])} · <a href="manifest.json">manifest.json</a>. Artifact bytes were transferred through MCP and verified against this manifest.</p><ul>{links}</ul></html>'''
-    (destination / "index.html").write_text(page)
+    (destination / "index.html").write_text(page, encoding="utf-8", newline="\n")
     return destination.resolve() / "index.html"

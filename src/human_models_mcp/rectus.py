@@ -51,7 +51,7 @@ def rectus_inputs():
     receipt = cache / "rectus_license.json"
     asset = SOURCE["files"][ASSET]
     if (cache.is_symlink() or receipt.is_symlink() or not receipt.is_file() or receipt.stat().st_size > 1024
-            or json.loads(receipt.read_text()) != {"license": SOURCE["license"], "sha256": asset["sha256"]}):
+            or json.loads(receipt.read_text(encoding="utf-8")) != {"license": SOURCE["license"], "sha256": asset["sha256"]}):
         raise ValueError("rectus license receipt missing or invalid; use provision-rectus")
     verify_asset(cache / ASSET, asset)
     return SOURCE

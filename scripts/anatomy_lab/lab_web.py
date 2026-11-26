@@ -15,6 +15,7 @@ from pydantic import ValidationError
 from anatomy_lab import REQUEST, SceneRequest, canonical, digest, read_bounded
 from lab_mcp import registry
 from human_models_mcp.results import error
+from human_models_mcp.runtime.paths import flat_name, is_link
 
 
 class LabHandler(SimpleHTTPRequestHandler):
@@ -40,11 +41,13 @@ class LabHandler(SimpleHTTPRequestHandler):
     def safe_static_path(self):
         path = unquote(urlsplit(self.path).path)
         if (not path.startswith("/") or "\\" in path or "\x00" in path
-                or any(part in {".", ".."} for part in path.split("/"))):
+                or any(not flat_name(part) for part in path.split("/") if part)):
             return False
         base = Path(self.directory).resolve()
         target = base / path.lstrip("/")
         try:
+            if any(is_link(p) for p in (target, *target.parents) if p.is_relative_to(base)):
+                return False
             return target.resolve().is_relative_to(base) and (
                 not target.is_dir() or all((target / name).resolve().is_relative_to(base)
                                            for name in ("index.html", "index.htm")))

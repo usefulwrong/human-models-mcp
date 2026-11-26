@@ -46,7 +46,7 @@ def fit_pair(model, neutral, native, row, install, basis):
     path = install / "meshes" / row["filename"]
     verify_asset(path, row)
     vertices = np.asarray([[float(x) for x in line.split()[1:4]]
-                           for line in path.read_text().splitlines() if line.startswith("v ")])
+                           for line in path.read_text(encoding="utf-8").splitlines() if line.startswith("v ")])
     s = vertices[np.linspace(0, len(vertices)-1, min(1200, len(vertices)), dtype=int)] @ basis.T / 1000
     points = native_bone(model, neutral, native)
     t = points[np.linspace(0, len(points)-1, min(1200, len(points)), dtype=int)]
@@ -144,7 +144,7 @@ def measure(args):
                               "The model tibia body holds distinct tibia and fibula meshes.",
                               "PECM3 is a sided-group control, and EO_R5 is a native-only candidate."],
               "anatomical_registration": "NOT_VERIFIED"}
-    args.output.write_text(json.dumps(result, indent=2, allow_nan=False) + "\n")
+    args.output.write_text(json.dumps(result, indent=2, allow_nan=False) + "\n", encoding="utf-8", newline="\n")
     print(f"{len(routes)} native routes x {len(times)} saved states, {len(result['bone_fits'])} named bone controls")
 
 

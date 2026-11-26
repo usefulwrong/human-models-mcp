@@ -2,6 +2,7 @@ import argparse
 import os
 
 from . import __version__
+from .runtime.graphics import requested_backend
 
 
 def main():
@@ -9,7 +10,7 @@ def main():
     parser.add_argument("--version", action="version", version=f"%(prog)s {__version__}")
     parser.add_argument("--transport", choices=["stdio", "http"], default="stdio")
     args = parser.parse_args()
-    os.environ.setdefault("MUJOCO_GL", "osmesa")
+    os.environ.setdefault("MUJOCO_GL", requested_backend())
     from .server import mcp
     if args.transport == "stdio":
         mcp.run()

@@ -16,7 +16,7 @@ BONES = (
 def surface(path, asset):
     verify_asset(path, asset)
     vertices, faces = [], []
-    for line in path.read_text().splitlines():
+    for line in path.read_text(encoding="utf-8").splitlines():
         parts = line.split()
         if not parts:
             continue

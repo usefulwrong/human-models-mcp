@@ -1,5 +1,11 @@
 # Run, inspect and export the articulated flat-palm replay
 
+On Windows, run `Start.cmd run pushup_flat_palm --output outputs\flat-palm`.
+Install the optional Renderer with `Install.cmd renderer`, start it with
+`Start.cmd start-service renderer`, and submit a saved run with
+`Start.cmd render RUN-UUID --output outputs\preview`. The saved run contains
+the scientific gates and replay clock. [Windows setup](../README-WINDOWS.md)
+
 From the full source tree after the [Linux quick start](GETTING_STARTED.md),
 use a fresh output directory for each calculation.
 

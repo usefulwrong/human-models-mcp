@@ -1,9 +1,7 @@
 """Serialized, bounded execution and persistent scientific provenance."""
 
-import fcntl
 import hashlib
 import json
-import mimetypes
 import os
 import platform
 import shutil
@@ -19,32 +17,33 @@ from . import __version__
 from .catalog import MODEL_FILES, CITATIONS, LIMITATIONS, SWEEP_LIMITATIONS, FORWARD_LIMITATIONS, COUPLED_LIMITATIONS, model_card
 from .evidence import code_sha256
 from .registry import PARAMETER_TYPES, discover, home
+from .runtime.graphics import requested_backend
+from .runtime.processes import managed_process, science_cpu_seconds
+from .runtime.locking import file_lock
+from .runtime.paths import artifact_mime, is_link, replace
 from .results import error, get_run, run_dir, store, interrupt_run
 
 
 @contextmanager
 def executor_lock():
     store().mkdir(parents=True, exist_ok=True)
-    with (store() / ".executor.lock").open("a") as lock:
-        try:
-            fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
-        except BlockingIOError:
-            yield False
-            return
-        try:
-            yield True
-        finally:
-            fcntl.flock(lock, fcntl.LOCK_UN)
+    with file_lock(store() / ".executor.lock", blocking=False) as acquired:
+        yield acquired
 
 
 def worker(request: dict) -> dict:
-    env = {**os.environ, "OMP_NUM_THREADS": "1", "OPENBLAS_NUM_THREADS": "1", "HMM_PARENT_PID": str(os.getpid())}
+    env = {**os.environ, "OMP_NUM_THREADS": "1", "OPENBLAS_NUM_THREADS": "1", "HMM_PARENT_PID": str(os.getpid()), "PYTHONIOENCODING": "utf-8"}
+    env["MUJOCO_GL"] = requested_backend(request["operation"] == "graphics_probe" or request.get("parameters", {}).get("render", False))
     try:
-        p = subprocess.run([sys.executable, "-m", "human_models_mcp.worker"],
-                           input=json.dumps(request), capture_output=True, text=True, timeout=90, env=env)
-        if p.returncode:
-            return error("failed", f"engine worker exited {p.returncode}: {p.stderr[-1000:]}")
-        return json.loads(p.stdout)
+        with managed_process(
+            [sys.executable, "-m", "human_models_mcp.worker"], memory=3 * 1024**3,
+            cpu_seconds=science_cpu_seconds(request), stdin=subprocess.PIPE,
+            stdout=subprocess.PIPE, stderr=subprocess.PIPE, encoding="utf-8", env=env,
+        ) as process:
+            stdout, stderr = process.communicate(json.dumps(request), timeout=90)
+        if process.returncode:
+            return error("failed", f"engine worker exited {process.returncode}: {stderr[-1000:]}")
+        return json.loads(stdout)
     except subprocess.TimeoutExpired:
         return error("failed", "engine worker exceeded 90 s wall-clock limit")
     except (OSError, ValueError) as exc:
@@ -83,9 +82,9 @@ def run_scenario(scenario_id: str, parameters: dict | None = None, idempotency_k
             return error("busy", "one scientific operation at a time; retry later")
         runs = list(store().glob("*/manifest.json"))
         for path in runs:
-            if not path.is_symlink() and not path.parent.is_symlink():
+            if not is_link(path) and not is_link(path.parent):
                 try:
-                    interrupt_run(path, json.loads(path.read_text()))
+                    interrupt_run(path, json.loads(path.read_text(encoding="utf-8")))
                 except (OSError, ValueError):
                     continue
         if key_hash:
@@ -119,8 +118,8 @@ def run_scenario(scenario_id: str, parameters: dict | None = None, idempotency_k
                           "environment": {"python": platform.python_version(), "platform": platform.platform(),
                                           "package_version": __version__, "machine": platform.machine(),
                                           "code_sha256": code_sha256(),
-                                          "requirements_lock_sha256": hashlib.sha256((home() / "requirements.lock").read_bytes()).hexdigest(),
-                                          "render_requested": os.environ.get("MUJOCO_GL", "osmesa")},
+                                          "requirements_lock_sha256": hashlib.sha256((home() / ("requirements-windows-x64.lock" if os.name == "nt" and (home() / "requirements-windows-x64.lock").is_file() else "requirements.lock")).read_bytes()).hexdigest(),
+                                          "render_requested": requested_backend(params.get("render", False))},
                           "result_status": "running"},
             "outputs": {"metrics": [], "time_series": [], "images": []},
             "scientific": {"scope": scenario["scope"], "validation_level": "unvalidated",
@@ -140,12 +139,12 @@ def run_scenario(scenario_id: str, parameters: dict | None = None, idempotency_k
 
         def save():
             temp = output / "manifest.tmp"
-            temp.write_text(json.dumps(manifest, indent=2, allow_nan=False) + "\n")
-            temp.replace(manifest_path)
+            temp.write_text(json.dumps(manifest, indent=2, allow_nan=False) + "\n", encoding="utf-8", newline="\n")
+            replace(temp, manifest_path)
 
         save()
         try:
-            (output / "validation.json").write_text(json.dumps(scenario["validation"], indent=2))
+            (output / "validation.json").write_text(json.dumps(scenario["validation"], indent=2), encoding="utf-8", newline="\n")
             manifest["scientific"]["validation_contract_sha256"] = hashlib.sha256((output / "validation.json").read_bytes()).hexdigest()
             result = worker({"operation": scenario["backend"], "parameters": params, "run_id": run_id,
                              "validation": scenario["validation"], "defaults": scenario["defaults"], "model_id": scenario["model"]})
@@ -208,16 +207,16 @@ def run_scenario(scenario_id: str, parameters: dict | None = None, idempotency_k
             else:
                 manifest["error"] = result.get("error", {"code": result["status"], "message": "engine unavailable"})
                 manifest["scientific"]["validation_level"] = "unvalidated"
-            (output / "bibliography.json").write_text(json.dumps(manifest["scientific"]["citations"], indent=2))
+            (output / "bibliography.json").write_text(json.dumps(manifest["scientific"]["citations"], indent=2), encoding="utf-8", newline="\n")
             for path in sorted(output.iterdir()):
                 name = path.name
                 if name in ("manifest.json", "manifest.tmp"):
                     continue
-                if path.is_file() and not path.is_symlink():
+                if path.is_file() and not is_link(path):
                     if path.stat().st_size > 2 * 1024 * 1024:
                         raise ValueError("artifact exceeds 2 MiB: " + name)
                     manifest["artifacts"][name] = {"sha256": hashlib.sha256(path.read_bytes()).hexdigest(),
-                        "bytes": path.stat().st_size, "mime_type": "application/gzip" if path.suffix == ".gz" else (mimetypes.guess_type(name)[0] or "application/octet-stream")}
+                        "bytes": path.stat().st_size, "mime_type": artifact_mime(path)}
         except Exception as exc:
             manifest["status"] = manifest["execution"]["result_status"] = "failed"
             manifest["scientific"]["validation_level"] = "unvalidated"

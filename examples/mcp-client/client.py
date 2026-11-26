@@ -20,6 +20,7 @@ async def main():
     parser.add_argument("--docker", action="store_true", help="launch the documented Docker Compose stdio connector")
     parser.add_argument("--compose", type=Path, help="trusted operator's offline bundle Compose file")
     parser.add_argument("--scenario", default="elbow_sweep")
+    parser.add_argument("--physics-only", action="store_true", help="skip the scenario's optional MuJoCo images")
     parser.add_argument("--output", default="reports/fresh-client.json")
     parser.add_argument("--save-dir", type=Path, help="new directory for all verified result files and an offline index.html")
     args = parser.parse_args()
@@ -56,7 +57,8 @@ async def main():
         terminology = await call("search_sources", {"query": term})
         assert terminology["status"] == "ok" and terminology["model_revision"] == card["revision"]
         assert any(m["id"] == term for m in terminology["matches"])
-        run = await call("run_scenario", {"scenario_id": scenario["id"], "parameters": {}})
+        params = {"render": False} if args.physics_only and scenario["defaults"].get("render") else {}
+        run = await call("run_scenario", {"scenario_id": scenario["id"], "parameters": params})
         assert run["status"] == "computed", run
         if scenario["backend"] == "pushup":
             assert (await call("get_result", {"run_id": run["run_id"]})) == run
@@ -71,7 +73,7 @@ async def main():
                 print("Open result: " + evidence["export"])
             destination = Path(args.output)
             destination.parent.mkdir(parents=True, exist_ok=True)
-            destination.write_text(json.dumps(evidence, indent=2) + "\n")
+            destination.write_text(json.dumps(evidence, indent=2) + "\n", encoding="utf-8", newline="\n")
             print(json.dumps({"status": "computed", "run_id": run["run_id"], "acceptance": run["scientific"]["acceptance"]}))
             return
         assert run["scientific"]["validation_level"] == "numerical_sanity"
@@ -168,7 +170,7 @@ async def main():
             evidence["export_directory"] = str(args.save_dir.resolve())
             evidence["viewer"] = str(viewer)
             print("Open result: " + str(viewer))
-        Path(args.output).write_text(json.dumps(evidence, indent=2) + "\n")
+        Path(args.output).write_text(json.dumps(evidence, indent=2) + "\n", encoding="utf-8", newline="\n")
         print(json.dumps({"status": "pass", "run_id": run["run_id"], "metrics": run["outputs"]["metrics"],
                           "transport": evidence["transport"], "png": image_evidence}))
 

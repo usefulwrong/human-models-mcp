@@ -30,14 +30,14 @@ def export(job, destination):
         if hashlib.sha256(data).hexdigest() != meta["sha256"]:
             raise ValueError("whole-file hash differs")
         (destination / name).write_bytes(data)
-    (destination / "job.json").write_text(json.dumps(job, indent=2) + "\n")
+    (destination / "job.json").write_text(json.dumps(job, indent=2) + "\n", encoding="utf-8", newline="\n")
     evidence_link = (' · <a href="evidence.json">Evidence Contract</a>'
                      if "evidence.json" in job["artifacts"] else "")
     (destination / "index.html").write_text(
         '<!doctype html><meta charset="utf-8"><title>UsefulWrong computed motion</title><h1>UsefulWrong / saved-state visualization</h1><video controls loop src="animation.mp4" style="max-width:100%"></video><p>Computed model motion, Blender presentation. No clinical or balance validation.</p><img src="preview.png" style="max-width:100%"><p><a href="passport.json">Scientific passport</a>'
         + evidence_link
         + ' · <a href="source.zip">Original numeric data</a> · <a href="scene.blend">Editable Blender scene</a> · <a href="frames.json">Frame clock and hashes</a></p>'
-    )
+    , encoding="utf-8", newline="\n")
     print("Open render: " + str(destination / "index.html"))
 
 
@@ -115,7 +115,7 @@ def main():
             parser.error("a dataset requires --metadata and --private-output")
         try:
             result = write_comparison(args.run_id, args.dataset_json,
-                                      json.loads(args.metadata.read_text()) if args.metadata else None,
+                                      json.loads(args.metadata.read_text(encoding="utf-8")) if args.metadata else None,
                                       args.private_output, args.accept_fit3d_terms)
         except (OSError, ValueError) as exc:
             parser.error(str(exc))

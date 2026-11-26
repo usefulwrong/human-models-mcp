@@ -5,8 +5,10 @@ import hashlib
 import json
 import os
 from pathlib import Path
+from uuid import UUID
 
 from anatomy_lab import canonical, digest, read_bounded
+from human_models_mcp.runtime.paths import is_link
 
 SCHEMA = "hmm.anatomy.motion/1"
 ARTIFACTS = {"motion.glb": 32 << 20, "coverage.json": 4 << 20, "scene.blend": 256 << 20,
@@ -26,8 +28,11 @@ class WholeMotion:
         if digest(raw) != self.sha:
             raise ValueError("installed MotionScene SHA-256 differs")
         scene = json.loads(raw)
-        run = self.run_root / scene["run_id"]
-        if (run.is_symlink() or run.resolve().parent != self.run_root.resolve() or scene["schema_version"] != SCHEMA
+        run_id = scene["run_id"]
+        if str(UUID(run_id)) != run_id:
+            raise ValueError("invalid stored run identity")
+        run = self.run_root / run_id
+        if (is_link(run) or run.resolve().parent != self.run_root.resolve() or scene["schema_version"] != SCHEMA
                 or scene["catalog_sha256"] != self.atlas_sha):
             raise ValueError("MotionScene schema, catalog SHA-256 or run location differs")
         manifest = read_bounded(run / "manifest.json", 1 << 20)
@@ -50,13 +55,13 @@ class WholeMotion:
             if digest(raw) != self.render_sha or receipt["motion_sha256"] != self.sha:
                 raise ValueError("renderer receipt SHA-256 or motion identity differs")
             path = path / "render"
-            if path.is_symlink():
+            if is_link(path):
                 raise ValueError("invalid render directory")
             metadata = receipt["artifacts"][name]
         else:
             raise LookupError("artifact is not installed")
         target = path / name
-        if target.is_symlink() or not target.is_file() or not 0 < metadata["bytes"] <= limit:
+        if is_link(target) or not target.is_file() or not 0 < metadata["bytes"] <= limit:
             raise ValueError("invalid motion artifact path or size")
         with target.open("rb") as stream:
             if (os.fstat(stream.fileno()).st_size != metadata["bytes"]

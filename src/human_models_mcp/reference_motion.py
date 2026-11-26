@@ -101,7 +101,7 @@ def simulate_landmarks(run_id):
         source = Path(temp) / "snapshot"
         files = snapshot(run, source)
         _, model, data, _, _, states, times, qpos, spec, _ = load_saved_run(source)
-        phases = json.loads((source / "summary.json").read_text())["key_indices"]
+        phases = json.loads((source / "summary.json").read_text(encoding="utf-8"))["key_indices"]
         xyz = []
         ids = [model.joint(name).id for name in MODEL_JOINTS[1:]]
         pelvis = model.body("pelvis").id
