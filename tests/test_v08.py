@@ -162,6 +162,7 @@ def test_workflow_reports_partial_and_preserves_science(monkeypatch):
     request = research.ResearchRequest(recipes=["pushup_scientific", "pushup_rectus"], options={"frames": 3})
     result = research.run_research(request)
     assert len(calls) == 1
+    assert calls[0][0] == "pushup_flat_palm"
     assert result["status"] == "partial"
     assert result["render_jobs"]["pushup_scientific"]["job_id"] == "two"
     assert result["acceptance"] == evidence["acceptance"]

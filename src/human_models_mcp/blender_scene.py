@@ -491,7 +491,10 @@ def setup_scene(expected, atlas_bounds=None):
         lens = 44
         view = options.get("camera_view", "full_body")
         if view == "hands":
-            positions = [h["position_m"] for h in expected["frames"][0]["hand_pads"]]
+            first = expected["frames"][0]
+            positions = [h["position_m"] for h in first["hand_pads"]] or [
+                h["wrist_origin_m"] for h in first["hands"]
+            ]
             if not positions:
                 raise ValueError("hand camera requires a palms/knuckles run with wrist measurements")
             # Keep both hand contacts above the lower-third numeric plots.

@@ -1,73 +1,1873 @@
 {
-  "source_run_id": "9ed1e5d7-40b9-4d4c-96f8-8fcc98e6ac1b",
-  "render_job_id": "b8f93269-91a2-46e3-8e9f-c51bac859da2",
-  "scenario": "pushup_palms",
-  "scenario_version": "1.5.0",
-  "control": "assisted_muscle",
-  "external_assistance": "USED",
-  "renderer": "Cycles CPU",
-  "original_source_zip_sha256": "f793e08da58d267de29256e17e9f954c9aaeb786689aef4001372825cdec2fe7",
-  "source_trajectory_sha256": "49e311faa3e64e2829de718db7a86234341507db90dab2eb3df1ed19cdfdd317",
+  "scene_version": "research-preview/1",
+  "device": "CUDA",
+  "blender": "4.5.15 LTS",
+  "run_id": "23945f13-419c-4ce4-b12d-c08458cd9ad2",
+  "source_motion_sha256": "688e0ce9a175ade3c3275f269fc069e3c5c9f7cb4c766d368ce50abc2c23ecbc",
+  "trajectory_sha256": "2dd080c91e00293b76ab5ca2c0501b4839c88bf1848b4c4dc8655fa639092bd1",
+  "camera": {
+    "name": "Research side",
+    "matrix_world": [
+      [
+        1.0,
+        0.0,
+        0.0,
+        0.8399999737739563
+      ],
+      [
+        0.0,
+        0.03777375444769859,
+        -0.9992862939834595,
+        -2.9100000858306885
+      ],
+      [
+        0.0,
+        0.9992862939834595,
+        0.03777375444769859,
+        0.41999998688697815
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    "vertical_fov_rad": 0.6457718014717102,
+    "size_px": [
+      960,
+      600
+    ]
+  },
+  "frames": [
+    {
+      "state_index": 0,
+      "frame_time": 0.0,
+      "state_sha256": "3094e65eb4d006e2a319132262c8aa0fb513d12d8bf6186bf77cfc0f236be9ac",
+      "phase": "start",
+      "floor_contact_count": 0,
+      "min_surface_distance_m": {
+        "right hand": 0.005724602970482321,
+        "left hand": 0.005724602970481722,
+        "right foot": 0.0033281847496773667,
+        "left foot": 0.003258744786124916
+      },
+      "native_transform_sha256": "6bc8f02d03f3af33b1d5d79d22a8304933a5138e05bcbc8c56f97f7f8aa432c0"
+    },
+    {
+      "state_index": 1,
+      "frame_time": 0.04000000000000003,
+      "state_sha256": "2f6e959b0b6db60a1b8781d9f5c43c0dddbd3a48210c1896b21f4f58623bb7e4",
+      "phase": "motion",
+      "floor_contact_count": 30,
+      "min_surface_distance_m": {
+        "right hand": 0.0025093439374022936,
+        "left hand": 0.002497682836539036,
+        "right foot": -0.0003627236627047059,
+        "left foot": -0.0003771387294938186
+      },
+      "native_transform_sha256": "4f90fb02799fe4f626175f038c5bd962e0953fdd22ba4406eb211a9406e6e4d0"
+    },
+    {
+      "state_index": 2,
+      "frame_time": 0.08000000000000006,
+      "state_sha256": "fbfee05b5dd7f5ed71b187d601c887a697fce17680cbeebd4cfa72831ec79f44",
+      "phase": "motion",
+      "floor_contact_count": 28,
+      "min_surface_distance_m": {
+        "right hand": 0.0029358111745201075,
+        "left hand": 0.0029278021875363686,
+        "right foot": -7.959897585055331e-05,
+        "left foot": -7.811513563781708e-05
+      },
+      "native_transform_sha256": "41aed14b18e399b55b118cfe114ab15da97775779fab663d7d5e3c2386e0f244"
+    },
+    {
+      "state_index": 3,
+      "frame_time": 0.12000000000000009,
+      "state_sha256": "f826bf106cca5d36e7350087134a9d0505f04367f92df0a9375ea203c8f682c3",
+      "phase": "motion",
+      "floor_contact_count": 28,
+      "min_surface_distance_m": {
+        "right hand": 0.003055584485524435,
+        "left hand": 0.003045525220127788,
+        "right foot": -6.135681109635527e-05,
+        "left foot": -4.077784855057581e-05
+      },
+      "native_transform_sha256": "5d04c3aee206fbb5424a02a40468abc48c2eea087139563af387506d470f9094"
+    },
+    {
+      "state_index": 4,
+      "frame_time": 0.16000000000000011,
+      "state_sha256": "5018e2df4dc3c6dadf36cd57bb9b4978b6e09b124c2137a876b4d99ba3837266",
+      "phase": "motion",
+      "floor_contact_count": 27,
+      "min_surface_distance_m": {
+        "right hand": 0.0031312430642691236,
+        "left hand": 0.003130348221320481,
+        "right foot": -6.991174816621537e-05,
+        "left foot": -6.479900538618882e-05
+      },
+      "native_transform_sha256": "fe89fd3683c774598dfd4b42f994c171a828a210eef421729196d9c96be50dc0"
+    },
+    {
+      "state_index": 5,
+      "frame_time": 0.20000000000000015,
+      "state_sha256": "e394e2870015de5b3ded6cc383712a3179f2a6082d0af8cb609c8534a24e5a5b",
+      "phase": "motion",
+      "floor_contact_count": 28,
+      "min_surface_distance_m": {
+        "right hand": 0.0031546544176338067,
+        "left hand": 0.003149060466446284,
+        "right foot": -7.569786889290164e-05,
+        "left foot": -6.549176238936777e-05
+      },
+      "native_transform_sha256": "573a7a1894351e58526d880ca5c30d4b01741264318c172f8b12d6cc2a9d5277"
+    },
+    {
+      "state_index": 6,
+      "frame_time": 0.24000000000000019,
+      "state_sha256": "8626ff9b69a21ef93c937d1ebc982021238c6dcdfbaf09566176484b3f1e8871",
+      "phase": "motion",
+      "floor_contact_count": 28,
+      "min_surface_distance_m": {
+        "right hand": 0.003105126033418331,
+        "left hand": 0.0031016980525510746,
+        "right foot": -6.918744598090332e-05,
+        "left foot": -6.633254485970824e-05
+      },
+      "native_transform_sha256": "f04f12050cefcceddf32f9dc5b1d19eb0afbb85aafe6477e5cf229750fef8264"
+    },
+    {
+      "state_index": 7,
+      "frame_time": 0.2800000000000002,
+      "state_sha256": "f4a8667e6d45dec92fb490c2cf3ec8a24300750f397524b3aab0e1bef5f5db2c",
+      "phase": "motion",
+      "floor_contact_count": 28,
+      "min_surface_distance_m": {
+        "right hand": 0.0031875032706499854,
+        "left hand": 0.0031874865078402497,
+        "right foot": -7.39017569178213e-05,
+        "left foot": -6.79760885834435e-05
+      },
+      "native_transform_sha256": "d401840eaec86460def7288fe8019050f1760cc0f14fba23249c9f24d4e6b1e5"
+    },
+    {
+      "state_index": 8,
+      "frame_time": 0.32000000000000023,
+      "state_sha256": "f01ea017470151f4721556c183eeaf82e05ce0d5b591159c6fb21c46f2917c31",
+      "phase": "motion",
+      "floor_contact_count": 28,
+      "min_surface_distance_m": {
+        "right hand": 0.0032575241895250644,
+        "left hand": 0.003257019264362249,
+        "right foot": -6.038892021619641e-05,
+        "left foot": -5.525657371602266e-05
+      },
+      "native_transform_sha256": "8c4b19be191434980c6f5a63efeb5efd5e81577ef73a0f8309eab4b0686f768d"
+    },
+    {
+      "state_index": 9,
+      "frame_time": 0.36000000000000026,
+      "state_sha256": "678332dad78ea9f36854047e1fae0591350b31933f75593ebd952e0ba24e6096",
+      "phase": "motion",
+      "floor_contact_count": 28,
+      "min_surface_distance_m": {
+        "right hand": 0.003240338873432099,
+        "left hand": 0.003240685163730852,
+        "right foot": -6.471119408024695e-05,
+        "left foot": -6.389835461483029e-05
+      },
+      "native_transform_sha256": "db973b231d4c92f8c29d759499604d7d83f62962e45ef9d06cc772850d99ae71"
+    },
+    {
+      "state_index": 10,
+      "frame_time": 0.4000000000000003,
+      "state_sha256": "3880539bb7b04bc5917fb6f0c811b01e870060831aa4c45929eec617e37cbc92",
+      "phase": "motion",
+      "floor_contact_count": 28,
+      "min_surface_distance_m": {
+        "right hand": 0.0032388212250169506,
+        "left hand": 0.003237828370936501,
+        "right foot": -6.186629939823607e-05,
+        "left foot": -6.447819598049548e-05
+      },
+      "native_transform_sha256": "d70664582d3f51d79543da54ad05900140219e97fba2e5b417d3f276a227fd40"
+    },
+    {
+      "state_index": 11,
+      "frame_time": 0.44000000000000034,
+      "state_sha256": "b56a402aba293ca4a4efd9c8fddd1ba3668f86a074c76d41b8074a25ad951676",
+      "phase": "motion",
+      "floor_contact_count": 27,
+      "min_surface_distance_m": {
+        "right hand": 0.0032691810569537095,
+        "left hand": 0.0032681241801871246,
+        "right foot": -0.00010822112184938337,
+        "left foot": -3.0730396525534276e-05
+      },
+      "native_transform_sha256": "36f053627511c34ecaca05092d44bbd84348b7369fd3b832400f6b8d86480c49"
+    },
+    {
+      "state_index": 12,
+      "frame_time": 0.48000000000000037,
+      "state_sha256": "f48a43b1ebbf1a0bdb37f6070f31356f978cb3e3a9e1756276b8f77449735700",
+      "phase": "motion",
+      "floor_contact_count": 28,
+      "min_surface_distance_m": {
+        "right hand": 0.0032771297485066466,
+        "left hand": 0.003276798976924138,
+        "right foot": -5.599012231949363e-05,
+        "left foot": -6.225380034857037e-05
+      },
+      "native_transform_sha256": "c2056a10ed0f539c1c8a555d857685729b9bde4a39556bd20c22f618f21ed03d"
+    },
+    {
+      "state_index": 13,
+      "frame_time": 0.5199999999999981,
+      "state_sha256": "8131be8425f76d2a5bd161d76822f46f88f93aafeb379bc8aeb7757d6be0ecf2",
+      "phase": "motion",
+      "floor_contact_count": 28,
+      "min_surface_distance_m": {
+        "right hand": 0.0032793148053718675,
+        "left hand": 0.0032788723877768622,
+        "right foot": -5.307919823643176e-05,
+        "left foot": -5.748467642457261e-05
+      },
+      "native_transform_sha256": "38ba7a9b2d1895604f5cc36fc242736ed14dbc04c261ea303fcff5de11b719cc"
+    },
+    {
+      "state_index": 14,
+      "frame_time": 0.5599999999999937,
+      "state_sha256": "e35b1be062d66a343364237ea3d8420c38a28cfe346f7fef47fac092f64ed942",
+      "phase": "motion",
+      "floor_contact_count": 28,
+      "min_surface_distance_m": {
+        "right hand": 0.003286078928112124,
+        "left hand": 0.0032845682155532383,
+        "right foot": -5.990132964429212e-05,
+        "left foot": -5.744067988867896e-05
+      },
+      "native_transform_sha256": "130ea880e63daae55e89a7903c51813f344ab8331621fc767253d137d03adb74"
+    },
+    {
+      "state_index": 15,
+      "frame_time": 0.5999999999999893,
+      "state_sha256": "02cb4c369f62cdbcd5a2c6d17a3984b9b60ac227babf010b32d744d30555fe15",
+      "phase": "motion",
+      "floor_contact_count": 28,
+      "min_surface_distance_m": {
+        "right hand": 0.003306089519412474,
+        "left hand": 0.003306752504787184,
+        "right foot": -7.561480646950391e-05,
+        "left foot": -4.303895235231725e-05
+      },
+      "native_transform_sha256": "b51c034802467cd19e1fec98d24e5fb36bc013d400f0094c9dd93d8c35a74040"
+    },
+    {
+      "state_index": 16,
+      "frame_time": 0.6399999999999849,
+      "state_sha256": "d28acf82a98a326e56fc0668a34b97939875f2fd173a2de43b6e1c183ba11276",
+      "phase": "motion",
+      "floor_contact_count": 27,
+      "min_surface_distance_m": {
+        "right hand": 0.0033247604901842347,
+        "left hand": 0.0033257475437101173,
+        "right foot": -6.953047282742125e-05,
+        "left foot": -5.488721673181651e-05
+      },
+      "native_transform_sha256": "1ff42e6f05efdbb95b55176d67433c1887a50788f751ec290a33583543b9ff4c"
+    },
+    {
+      "state_index": 17,
+      "frame_time": 0.6799999999999805,
+      "state_sha256": "10fa5a236391c89c7ace882d2330d46f78e9e7eaa21105572a88af59d114ad5c",
+      "phase": "motion",
+      "floor_contact_count": 28,
+      "min_surface_distance_m": {
+        "right hand": 0.00333542172247517,
+        "left hand": 0.0033328993462854737,
+        "right foot": -0.00020374168899775502,
+        "left foot": -0.00018818061642548317
+      },
+      "native_transform_sha256": "44337b7b6ef9a70ef07653b86101081ff689f26dc6da8805aeeda306112797ca"
+    },
+    {
+      "state_index": 18,
+      "frame_time": 0.7199999999999761,
+      "state_sha256": "055a9fdad5b4ce370272ee49ea7d1a3d11b1873088cd2e7699457b0f9897d8cd",
+      "phase": "motion",
+      "floor_contact_count": 27,
+      "min_surface_distance_m": {
+        "right hand": 0.0033345383361800644,
+        "left hand": 0.0033321722601132057,
+        "right foot": -0.0001077414516818323,
+        "left foot": -9.08994952194403e-06
+      },
+      "native_transform_sha256": "61383553f049a7f4632520a549bf5384a15eba8507cd3cc7c59c6bf6d48ac3aa"
+    },
+    {
+      "state_index": 19,
+      "frame_time": 0.7599999999999717,
+      "state_sha256": "08dfc99d676d9595ab449659363ac86a2daa20c227d0adfd8cdb7916ed11b52c",
+      "phase": "motion",
+      "floor_contact_count": 28,
+      "min_surface_distance_m": {
+        "right hand": 0.003348894275253895,
+        "left hand": 0.0033590657125842005,
+        "right foot": -8.471417367724582e-05,
+        "left foot": -6.175170232060323e-05
+      },
+      "native_transform_sha256": "1f43c6bf10ff10aee4eb526137c5b5666c81369a89f8045b1238f7fb965f2628"
+    },
+    {
+      "state_index": 20,
+      "frame_time": 0.7999999999999673,
+      "state_sha256": "d961d2d0823de4dd8495ec6c22c104537f81fab9d1d0a4fa906d60c11a18f61a",
+      "phase": "motion",
+      "floor_contact_count": 27,
+      "min_surface_distance_m": {
+        "right hand": 0.003356724352591811,
+        "left hand": 0.00337186871607851,
+        "right foot": -2.661124331759801e-05,
+        "left foot": -1.061350252282156e-06
+      },
+      "native_transform_sha256": "f65b4e21643603f93ead346729b6f95ce586ceebe98cacc734f5bd33523ec105"
+    },
+    {
+      "state_index": 21,
+      "frame_time": 0.8399999999999629,
+      "state_sha256": "3dfd26461b64a6b96d858b27ea83fa80648104760e7ea5788a70186803243aea",
+      "phase": "motion",
+      "floor_contact_count": 26,
+      "min_surface_distance_m": {
+        "right hand": 0.0033435228208260085,
+        "left hand": 0.0033581663130570795,
+        "right foot": -0.00029819988760942245,
+        "left foot": -0.00027833890528797256
+      },
+      "native_transform_sha256": "d6e3f3a4af8a5da629218bce5ee1adee0119dd4084f004cb24f20b7c33f86ab8"
+    },
+    {
+      "state_index": 22,
+      "frame_time": 0.8799999999999585,
+      "state_sha256": "6946187c0aa39070bba56a2bcc648c23bed2f966661de3c5005d242abb8e71af",
+      "phase": "motion",
+      "floor_contact_count": 24,
+      "min_surface_distance_m": {
+        "right hand": 0.003316304301590225,
+        "left hand": 0.003312568076891791,
+        "right foot": 2.851289225852538e-05,
+        "left foot": 0.0012864423652023046
+      },
+      "native_transform_sha256": "493511c76899889bf1db7cef5a7371644085a208f60bb62b3f3d9fbc69dbdad6"
+    },
+    {
+      "state_index": 23,
+      "frame_time": 0.9199999999999541,
+      "state_sha256": "fe711e95c41ce04b146daaa4d97a446e507e0f08760e6e212af6e5f611954394",
+      "phase": "motion",
+      "floor_contact_count": 24,
+      "min_surface_distance_m": {
+        "right hand": 0.0032055296437782602,
+        "left hand": 0.003169264870965166,
+        "right foot": 4.597890048481379e-06,
+        "left foot": 2.1396726518983777e-05
+      },
+      "native_transform_sha256": "14d88454793a394c306d96adb986f174005c14541899f6813d7313fdb3baf0b3"
+    },
+    {
+      "state_index": 24,
+      "frame_time": 0.9599999999999497,
+      "state_sha256": "2920553db3dc4acb06047d92f768277f89b179db95959a992d70331e84fa4afe",
+      "phase": "motion",
+      "floor_contact_count": 25,
+      "min_surface_distance_m": {
+        "right hand": 0.003146078224307779,
+        "left hand": 0.00311840443140191,
+        "right foot": -5.536785134630656e-05,
+        "left foot": 7.549360439604302e-06
+      },
+      "native_transform_sha256": "8792889f14424a0405714dc5eac3716b89eecc52b99749d6b09c6202973e7161"
+    },
+    {
+      "state_index": 25,
+      "frame_time": 0.9999999999999453,
+      "state_sha256": "efa63ffd17f4da1078c09732de66d6f4811cef65843c1746e24d8ce4896c4311",
+      "phase": "motion",
+      "floor_contact_count": 26,
+      "min_surface_distance_m": {
+        "right hand": 0.003163534473233579,
+        "left hand": 0.0031547602568247346,
+        "right foot": -1.2789358072223811e-05,
+        "left foot": -0.00039684075636967076
+      },
+      "native_transform_sha256": "7de78b4b4fe93aaec0750f96da14eb9c3c895081373c053b41a26c45da96adee"
+    },
+    {
+      "state_index": 26,
+      "frame_time": 1.039999999999941,
+      "state_sha256": "9aeaf70263e71e3ad547e58b8314e9c3f8d0c8ed876e54ecece4be37e410e3fd",
+      "phase": "motion",
+      "floor_contact_count": 25,
+      "min_surface_distance_m": {
+        "right hand": 0.0032266133722701623,
+        "left hand": 0.0032513331898646036,
+        "right foot": -0.000315492812185722,
+        "left foot": 2.4974017359957745e-06
+      },
+      "native_transform_sha256": "fb9c6f17a523a37e1a48873abba22ccbc71e0aa6943d603dec871abf3c5776e8"
+    },
+    {
+      "state_index": 27,
+      "frame_time": 1.0799999999999366,
+      "state_sha256": "f8910e60a9cb60980c808b74f6822814600c79eed95298c68fd971ca86d99ecb",
+      "phase": "motion",
+      "floor_contact_count": 26,
+      "min_surface_distance_m": {
+        "right hand": 0.0032245650130859364,
+        "left hand": 0.003273126827926953,
+        "right foot": -1.478083650013895e-05,
+        "left foot": -2.104084703408865e-05
+      },
+      "native_transform_sha256": "4a0c0fcf6230f2ffa1365709524d11f21d3b7e14d070e5a93352c8e5bb34c45a"
+    },
+    {
+      "state_index": 28,
+      "frame_time": 1.1199999999999322,
+      "state_sha256": "f042245843a117fcbe3f110b41cc005c62629c1e34532796d728acbd898c00eb",
+      "phase": "motion",
+      "floor_contact_count": 26,
+      "min_surface_distance_m": {
+        "right hand": 0.0032071366641193543,
+        "left hand": 0.003242362570940861,
+        "right foot": -7.9500780625609e-05,
+        "left foot": -7.67365434968803e-05
+      },
+      "native_transform_sha256": "ebbd71fb18906cb82023eb1d600138f8f16038a85f93bcaa2d1777a41e9927d8"
+    },
+    {
+      "state_index": 29,
+      "frame_time": 1.1599999999999278,
+      "state_sha256": "2c03a4f36294056879f1a9b26a108ddab22c34f05d3be95d7a447398b5a1abfb",
+      "phase": "motion",
+      "floor_contact_count": 26,
+      "min_surface_distance_m": {
+        "right hand": 0.0032002071089548513,
+        "left hand": 0.0032113664122122463,
+        "right foot": -7.811897651254646e-05,
+        "left foot": -7.194474437138138e-05
+      },
+      "native_transform_sha256": "16b7348073f64ac5c9ba5e06ccde716bb2aa3edce0016efcc4f50e686a9cb213"
+    },
+    {
+      "state_index": 30,
+      "frame_time": 1.1999999999999234,
+      "state_sha256": "b58b0e775d73c2d0b21c21df49b2ce12165abd0eaf9d3bcf7a7a830747d62998",
+      "phase": "motion",
+      "floor_contact_count": 26,
+      "min_surface_distance_m": {
+        "right hand": 0.0032259311566069163,
+        "left hand": 0.0032208824911300147,
+        "right foot": -8.581342705730327e-05,
+        "left foot": -7.467767733791708e-05
+      },
+      "native_transform_sha256": "28f1c385c6319035c36174962c498aad8abd2f801ecdd193d391f15d35bd3953"
+    },
+    {
+      "state_index": 31,
+      "frame_time": 1.239999999999919,
+      "state_sha256": "d685d828d6d763fe810f22943b3ebbd80603059b0618152bde57d8a686ac377d",
+      "phase": "motion",
+      "floor_contact_count": 26,
+      "min_surface_distance_m": {
+        "right hand": 0.003262035111073097,
+        "left hand": 0.0032401492370491202,
+        "right foot": -2.3600577868612693e-05,
+        "left foot": -0.00022264782425879953
+      },
+      "native_transform_sha256": "99d177dda98a2f05659135129e778a7ad4d4dd0e67d6b19869606beb4969221b"
+    },
+    {
+      "state_index": 32,
+      "frame_time": 1.2799999999999145,
+      "state_sha256": "5610becb60ee2859ba475f6638c72b0c2633b4d534a178764f621241ea6c2443",
+      "phase": "motion",
+      "floor_contact_count": 26,
+      "min_surface_distance_m": {
+        "right hand": 0.003267502994202404,
+        "left hand": 0.0032574299034679993,
+        "right foot": -9.12257352442547e-05,
+        "left foot": -6.898674937648452e-05
+      },
+      "native_transform_sha256": "6c80608ef1b0c756531f14c650cac909ac2f9c8cef008a9965c3fa2fbba1a464"
+    },
+    {
+      "state_index": 33,
+      "frame_time": 1.3199999999999101,
+      "state_sha256": "4975aefabf66a850b89f7303bb20cae5e1038dfef3b3414659ea30c99c4f11f0",
+      "phase": "motion",
+      "floor_contact_count": 26,
+      "min_surface_distance_m": {
+        "right hand": 0.003203945516658137,
+        "left hand": 0.0032111401509329965,
+        "right foot": -8.8916284166074e-05,
+        "left foot": -7.375631089239637e-05
+      },
+      "native_transform_sha256": "6d9e2077549bd98e5c243a4a30541e8922ae703e23806893f304c546f8fe670b"
+    },
+    {
+      "state_index": 34,
+      "frame_time": 1.3599999999999057,
+      "state_sha256": "4ff12331f08c2030778123a9024c668c7b9c45a9fa4ada362e3ceebe7f05e240",
+      "phase": "motion",
+      "floor_contact_count": 26,
+      "min_surface_distance_m": {
+        "right hand": 0.0031920209597955636,
+        "left hand": 0.003210784234462768,
+        "right foot": -8.045596871132654e-05,
+        "left foot": -7.351359832029336e-05
+      },
+      "native_transform_sha256": "3c2276069f3566ca8b5d0df5d55bf2f5e70a68853bb807ef0ba372aa095ae9d9"
+    },
+    {
+      "state_index": 35,
+      "frame_time": 1.3999999999999013,
+      "state_sha256": "e93d6fc41f96160fc12edeedc11baf0aac0b2c7e900a531bb19cd5929f2a22f9",
+      "phase": "motion",
+      "floor_contact_count": 26,
+      "min_surface_distance_m": {
+        "right hand": 0.00319925140030306,
+        "left hand": 0.0032185945025943064,
+        "right foot": -7.891674655345626e-05,
+        "left foot": -7.298408959478808e-05
+      },
+      "native_transform_sha256": "365423b6f82b91acbd92bdb9381188dab814cc22e81d9ebf05ab9d033e3b43dd"
+    },
+    {
+      "state_index": 36,
+      "frame_time": 1.439999999999897,
+      "state_sha256": "bc9f3b836f2967ab2e7eb759bd83eaa33835187777dcdff851b6cdb190ebbfa2",
+      "phase": "motion",
+      "floor_contact_count": 26,
+      "min_surface_distance_m": {
+        "right hand": 0.003198919218318456,
+        "left hand": 0.003206410454399197,
+        "right foot": -8.284560851827549e-05,
+        "left foot": -7.045586831826156e-05
+      },
+      "native_transform_sha256": "580815270f68c2ab8acf7dc9bd0b23a0bd319cbffeb1af65747d325340b03c4c"
+    },
+    {
+      "state_index": 37,
+      "frame_time": 1.4799999999998925,
+      "state_sha256": "d6f6e395230b58c67cabb1137b3ae90c2787c89ff73a7056d4030b2af57721f7",
+      "phase": "motion",
+      "floor_contact_count": 26,
+      "min_surface_distance_m": {
+        "right hand": 0.0032187766567947093,
+        "left hand": 0.00320942927985052,
+        "right foot": -8.33136159036213e-05,
+        "left foot": -5.854618634679176e-05
+      },
+      "native_transform_sha256": "faff0362a5b78bd99b7d933c982936d1c481e5c451db62c4c416b71fdf58f0a7"
+    },
+    {
+      "state_index": 38,
+      "frame_time": 1.519999999999888,
+      "state_sha256": "37cbe2b6f817414eb547020260d42864ef6df107be0304d3791c6c782785ea82",
+      "phase": "motion",
+      "floor_contact_count": 26,
+      "min_surface_distance_m": {
+        "right hand": 0.003238391300531972,
+        "left hand": 0.0032163229858132893,
+        "right foot": -8.435734686828428e-05,
+        "left foot": -4.544621257712711e-05
+      },
+      "native_transform_sha256": "79d009ac64c3e2f169354d30bd91a249670fd4fa8c71329bf01c8396269db7f1"
+    },
+    {
+      "state_index": 39,
+      "frame_time": 1.5599999999998837,
+      "state_sha256": "7d82836aa276fd663f974cf7fdea89be2153d9ef6fef79cf0e9deb905865eaf5",
+      "phase": "motion",
+      "floor_contact_count": 25,
+      "min_surface_distance_m": {
+        "right hand": 0.003268747022757294,
+        "left hand": 0.003300433369598092,
+        "right foot": 6.113576025165712e-05,
+        "left foot": -0.00023253382153289037
+      },
+      "native_transform_sha256": "e375a5e7a061837b3cdcf8b8f27e5155418b7b50fc42ac16751fb069c21708b4"
+    },
+    {
+      "state_index": 40,
+      "frame_time": 1.5999999999998793,
+      "state_sha256": "8b42d33ade57c8f9e4afe2f3e5769d0fcaa71ba5e1fec84dd2cdc27bb1223ca2",
+      "phase": "motion",
+      "floor_contact_count": 26,
+      "min_surface_distance_m": {
+        "right hand": 0.003380020395207118,
+        "left hand": 0.003468982021475283,
+        "right foot": -8.171773243483699e-05,
+        "left foot": -9.435184618854925e-05
+      },
+      "native_transform_sha256": "9432c01f7d261c500d886a7514e53077ca3f370bf7891fdd64d59751402e6f0c"
+    },
+    {
+      "state_index": 41,
+      "frame_time": 1.639999999999875,
+      "state_sha256": "4d6a08e489ea9dc492fb4ff56f8087643f328ae76a3e25dc2f67ab575681fd8f",
+      "phase": "motion",
+      "floor_contact_count": 26,
+      "min_surface_distance_m": {
+        "right hand": 0.003261377057348627,
+        "left hand": 0.003291356875441043,
+        "right foot": -9.521252622085585e-05,
+        "left foot": -8.144806206353272e-06
+      },
+      "native_transform_sha256": "341adaa9f00b7f502c6d840f9bcbf306dad5ec2b48e713442a09f15a5c91d22f"
+    },
+    {
+      "state_index": 42,
+      "frame_time": 1.6799999999998705,
+      "state_sha256": "869be4ded0f482b26981cbd15b9c13cb94dd54db450dee6a66b3b68a76d1eb99",
+      "phase": "motion",
+      "floor_contact_count": 26,
+      "min_surface_distance_m": {
+        "right hand": 0.003147162281088518,
+        "left hand": 0.0031159474876037412,
+        "right foot": -5.279892626188637e-05,
+        "left foot": -1.2771645719118763e-05
+      },
+      "native_transform_sha256": "f98ccef2e638afb5567636c42afa7154d8046c0c4c31eb8c826e727b54e98425"
+    },
+    {
+      "state_index": 43,
+      "frame_time": 1.719999999999866,
+      "state_sha256": "75678c436b3e9a209a0697b97c3a52ee39dbb7ebd7227ddd02d2ebf7a41442c5",
+      "phase": "motion",
+      "floor_contact_count": 26,
+      "min_surface_distance_m": {
+        "right hand": 0.0031287296604028307,
+        "left hand": 0.0030520686000602704,
+        "right foot": -4.5716107912666115e-05,
+        "left foot": -4.545228403695506e-05
+      },
+      "native_transform_sha256": "7f53841325b2b661565f0d59b615cb9f15276bddecbfaafa1bbabc6238de2874"
+    },
+    {
+      "state_index": 44,
+      "frame_time": 1.7599999999998617,
+      "state_sha256": "0b6a0a01c5999bd80f734bba4642fab078e6d1a22c3d42817bba48e9cb47274f",
+      "phase": "motion",
+      "floor_contact_count": 26,
+      "min_surface_distance_m": {
+        "right hand": 0.00314787241044127,
+        "left hand": 0.0031223592082667805,
+        "right foot": -4.880576092176209e-05,
+        "left foot": -0.00015305811622427085
+      },
+      "native_transform_sha256": "7171cf5befa3ec29196ce59897541b2212012defcfac66e853e19a253f7aa23f"
+    },
+    {
+      "state_index": 45,
+      "frame_time": 1.7999999999998573,
+      "state_sha256": "f1c6d5d0e84636b7ac3fe582f49ace681c36d67e3f9de39471d387e2948ef4c2",
+      "phase": "motion",
+      "floor_contact_count": 26,
+      "min_surface_distance_m": {
+        "right hand": 0.003169663392992285,
+        "left hand": 0.003224401595081699,
+        "right foot": -6.849072473179979e-05,
+        "left foot": -6.128471043866796e-05
+      },
+      "native_transform_sha256": "b07fe57ffaab0c6f5a2284e2c9f066206e6f6466934e0bd0e7f589d1107a6b47"
+    },
+    {
+      "state_index": 46,
+      "frame_time": 1.8399999999998529,
+      "state_sha256": "e6db51bf6384ca5111775c97b5671be6e3925302120b850a21af587e74a9fc8a",
+      "phase": "motion",
+      "floor_contact_count": 26,
+      "min_surface_distance_m": {
+        "right hand": 0.0031843576713594477,
+        "left hand": 0.003213883364648086,
+        "right foot": -4.7782592566394944e-05,
+        "left foot": -4.056897779300406e-05
+      },
+      "native_transform_sha256": "a3e51627d1bb61558140f7c3aec4334fdf175acce1ce44a47af9639738b6a6cd"
+    },
+    {
+      "state_index": 47,
+      "frame_time": 1.8799999999998485,
+      "state_sha256": "74052a9cc31870a4fc735f6a137e627b369fc2f2f45502a3467d55b83b4b023e",
+      "phase": "motion",
+      "floor_contact_count": 25,
+      "min_surface_distance_m": {
+        "right hand": 0.003202838893670526,
+        "left hand": 0.003186335105851498,
+        "right foot": -6.546381044908456e-05,
+        "left foot": 6.820234193443547e-05
+      },
+      "native_transform_sha256": "285c356ef6e88cd71737db6fc6c52a63f1c6b47ec8760e8fddc88deb63bdcc80"
+    },
+    {
+      "state_index": 48,
+      "frame_time": 1.919999999999844,
+      "state_sha256": "08a8e1c84a4045cdb9a23a928689251e9fde6b066989872e0ad159c16b0f163a",
+      "phase": "motion",
+      "floor_contact_count": 26,
+      "min_surface_distance_m": {
+        "right hand": 0.003221453318887425,
+        "left hand": 0.003195015204119434,
+        "right foot": -7.660747669310797e-05,
+        "left foot": -9.752608523520834e-05
+      },
+      "native_transform_sha256": "f9d83d3ebed6f03aa012ec4591f6ac3e3dbc3a17e407a3af7c3e5a898dbe0baa"
+    },
+    {
+      "state_index": 49,
+      "frame_time": 1.9599999999998396,
+      "state_sha256": "c017db539f0122747838a0a178fa335d06174e181431c9b9355e6e10f74859dc",
+      "phase": "motion",
+      "floor_contact_count": 26,
+      "min_surface_distance_m": {
+        "right hand": 0.00322564642787953,
+        "left hand": 0.0032213131966137565,
+        "right foot": -7.415871649435468e-05,
+        "left foot": -9.910033708138838e-05
+      },
+      "native_transform_sha256": "af47e45a5cea9aa0b34955d9411cd60eaca1da71e9aa73d65ffc3ada20a34cec"
+    },
+    {
+      "state_index": 50,
+      "frame_time": 1.9999999999998352,
+      "state_sha256": "8bc693f8052bb6435870757e1bbb97aa3f4e5cd83a4053146b8624ea2edc5838",
+      "phase": "motion",
+      "floor_contact_count": 26,
+      "min_surface_distance_m": {
+        "right hand": 0.0032242837668705537,
+        "left hand": 0.003240031711056227,
+        "right foot": -6.510275647447772e-05,
+        "left foot": -8.409768117006305e-05
+      },
+      "native_transform_sha256": "16e28f44b4e1487cd6a385cfe8a2c3ebe4ad4cea360fc1bf95bfaddc5408fc27"
+    },
+    {
+      "state_index": 51,
+      "frame_time": 2.0399999999998486,
+      "state_sha256": "5dba278393c980f18b8bebff97b891db1d5e2690b68503a8bb37540affa3afa0",
+      "phase": "motion",
+      "floor_contact_count": 26,
+      "min_surface_distance_m": {
+        "right hand": 0.003221334532773952,
+        "left hand": 0.003244919790034476,
+        "right foot": -5.701412315149007e-05,
+        "left foot": -5.2296597660456134e-05
+      },
+      "native_transform_sha256": "31a91831c4647d64c21bbcc3152ad50f3274a7941a2c55116ff0e9d8df8eb078"
+    },
+    {
+      "state_index": 52,
+      "frame_time": 2.079999999999862,
+      "state_sha256": "eefbf1ab107228151eb669546565e4cae1988e796e3cb2188b6a0445e4902daa",
+      "phase": "motion",
+      "floor_contact_count": 26,
+      "min_surface_distance_m": {
+        "right hand": 0.003217555525093913,
+        "left hand": 0.0032298299490984526,
+        "right foot": -6.50070576995107e-05,
+        "left foot": -5.646255122550292e-05
+      },
+      "native_transform_sha256": "b73b6865a16c5ba92dfb33e77ad2fa61bb0157b5cfc6a892f665d4bbdfdc72a6"
+    },
+    {
+      "state_index": 53,
+      "frame_time": 2.1199999999998753,
+      "state_sha256": "a023f3761a5059c9b2e906194092d3505def573a90d36992bfbbd29ef1a14d90",
+      "phase": "motion",
+      "floor_contact_count": 26,
+      "min_surface_distance_m": {
+        "right hand": 0.0032216881707235086,
+        "left hand": 0.0032178614577348524,
+        "right foot": -6.151382966767399e-05,
+        "left foot": -4.927625730111185e-05
+      },
+      "native_transform_sha256": "94902600ea5dba9c69e304775c80133b00d992f93251d5fc82898b681364fe10"
+    },
+    {
+      "state_index": 54,
+      "frame_time": 2.1599999999998887,
+      "state_sha256": "faddd2e70dca4fd5f20ce4578b31e26b746b739c4f9fcd020ea8363ea9c2cb2f",
+      "phase": "motion",
+      "floor_contact_count": 26,
+      "min_surface_distance_m": {
+        "right hand": 0.0032308232746082388,
+        "left hand": 0.003217831651988517,
+        "right foot": -6.40324059876865e-05,
+        "left foot": -4.9144469423265114e-05
+      },
+      "native_transform_sha256": "742c1f71c0a22b6409c22587dc84351b7a4a8eea9867a636d198df6bf478c662"
+    },
+    {
+      "state_index": 55,
+      "frame_time": 2.199999999999902,
+      "state_sha256": "bda60dee28b94e1c6de242f351abefbde84dd296dc36184c871411b239d16d1f",
+      "phase": "bottom",
+      "floor_contact_count": 26,
+      "min_surface_distance_m": {
+        "right hand": 0.0032309623452886948,
+        "left hand": 0.003222873399401886,
+        "right foot": -6.354702507158083e-05,
+        "left foot": -4.8251385665540325e-05
+      },
+      "native_transform_sha256": "16c387f6649a67fa430e79d94d40b0b53e8f3cba6cbcc19ad17f31a011e5eae4"
+    },
+    {
+      "state_index": 56,
+      "frame_time": 2.2399999999999154,
+      "state_sha256": "f52cad07eb2855ba055cb4412dcc0179fdbd9638973def8ba2db2badbeef2477",
+      "phase": "motion",
+      "floor_contact_count": 26,
+      "min_surface_distance_m": {
+        "right hand": 0.00323215199277368,
+        "left hand": 0.0032358560745509137,
+        "right foot": -6.32715727982569e-05,
+        "left foot": -4.85107185308406e-05
+      },
+      "native_transform_sha256": "bc3bc91368881eca831c9451c3f0734807cf40fe59d309520270e983025ec9c7"
+    },
+    {
+      "state_index": 57,
+      "frame_time": 2.2799999999999288,
+      "state_sha256": "54283b41101c6291933e4319610ae44af9d2acaa49e86cff386a6d5522d7f8f6",
+      "phase": "motion",
+      "floor_contact_count": 26,
+      "min_surface_distance_m": {
+        "right hand": 0.0032360391683032234,
+        "left hand": 0.0032489802314252247,
+        "right foot": -6.359867167832906e-05,
+        "left foot": -4.927566984766485e-05
+      },
+      "native_transform_sha256": "04e5a927375082da33f64184552a75e3d581e18ba020ff77024a10914bfd8af3"
+    },
+    {
+      "state_index": 58,
+      "frame_time": 2.319999999999942,
+      "state_sha256": "5d36f956013728b09094ffa1edafb5f812c32faa7eb39c3be8feb29b6c913bca",
+      "phase": "motion",
+      "floor_contact_count": 26,
+      "min_surface_distance_m": {
+        "right hand": 0.0032416531224518626,
+        "left hand": 0.0032560358812139577,
+        "right foot": -6.459567287170342e-05,
+        "left foot": -5.025895349602266e-05
+      },
+      "native_transform_sha256": "e4bf3dd4628dc4f89ad408b1ad585b872df07b5a4a686df44559a7251254ad80"
+    },
+    {
+      "state_index": 59,
+      "frame_time": 2.3599999999999555,
+      "state_sha256": "f849c4a00b9bcd56521c8cfab3e674b892be392ba697661568efc6089e8b0d0e",
+      "phase": "motion",
+      "floor_contact_count": 26,
+      "min_surface_distance_m": {
+        "right hand": 0.003245425142887835,
+        "left hand": 0.0032538743951824583,
+        "right foot": -6.581593607436764e-05,
+        "left foot": -4.404712956107559e-05
+      },
+      "native_transform_sha256": "1b6d987beb71075cd557d6653afdfc9b56c286cd9f18f59cd60079d3f3e1fdf6"
+    },
+    {
+      "state_index": 60,
+      "frame_time": 2.399999999999969,
+      "state_sha256": "8a86a962982ea8d362083912ba964446c726a5540867115dc095677d13e80f3f",
+      "phase": "motion",
+      "floor_contact_count": 26,
+      "min_surface_distance_m": {
+        "right hand": 0.003242264878366519,
+        "left hand": 0.003243202133710343,
+        "right foot": -6.614928703095602e-05,
+        "left foot": -3.9471673944448116e-05
+      },
+      "native_transform_sha256": "e46d088f9ad6dfeea0a9b9836289db9ca1b9eeee5983c00184600747511cc464"
+    },
+    {
+      "state_index": 61,
+      "frame_time": 2.439999999999982,
+      "state_sha256": "18f025c24a8dbc7d3e5752fd855dff79a1388abe343a9e73d44bd89744cafec8",
+      "phase": "motion",
+      "floor_contact_count": 26,
+      "min_surface_distance_m": {
+        "right hand": 0.003235842046947863,
+        "left hand": 0.0032329650468652165,
+        "right foot": -0.00010196133879075003,
+        "left foot": -9.404457950663164e-05
+      },
+      "native_transform_sha256": "be233097085ae96480d78e0d93a7724c9b8a5f69bbb586c96234780ea86ab552"
+    },
+    {
+      "state_index": 62,
+      "frame_time": 2.4799999999999955,
+      "state_sha256": "1d66ddea3eb9b14140dc4941f0d58592af95e04ca2c1e7f61e9d6d3deed9e27b",
+      "phase": "motion",
+      "floor_contact_count": 26,
+      "min_surface_distance_m": {
+        "right hand": 0.0032249943601105916,
+        "left hand": 0.0032202821251996264,
+        "right foot": -2.285655564114586e-05,
+        "left foot": -0.00011057771635246405
+      },
+      "native_transform_sha256": "16d4f9f5691bd8625ffb0296327b4de300fd222e14864dca818369ceebacd440"
+    },
+    {
+      "state_index": 63,
+      "frame_time": 2.520000000000009,
+      "state_sha256": "25c4f92968b070f80dacb548ec3e363dad53b2f0159823a3dbc2d2c1c94fd222",
+      "phase": "motion",
+      "floor_contact_count": 26,
+      "min_surface_distance_m": {
+        "right hand": 0.0031863865876812867,
+        "left hand": 0.0031741894966220508,
+        "right foot": -9.916982806078278e-06,
+        "left foot": -0.0001119570893091254
+      },
+      "native_transform_sha256": "8b114893451b4ea2c01bd69ea2bd266cb820cc0959f70cb17f00b49d5cf687f7"
+    },
+    {
+      "state_index": 64,
+      "frame_time": 2.5600000000000223,
+      "state_sha256": "a8836433167e2fe4fcd6d7f0f582fe07b2d36e917bb315956d6188a1a6f5c95d",
+      "phase": "motion",
+      "floor_contact_count": 26,
+      "min_surface_distance_m": {
+        "right hand": 0.003188972022648723,
+        "left hand": 0.0031803099635952913,
+        "right foot": -4.4976070372154675e-05,
+        "left foot": -4.2305160381922446e-05
+      },
+      "native_transform_sha256": "eb09305dc5449cac4c1875d90e7378b314eef39fa6f281b340cc52708d893b17"
+    },
+    {
+      "state_index": 65,
+      "frame_time": 2.6000000000000356,
+      "state_sha256": "f85602410350a5619e64a8139edc835925cdb0e0b2e59e6a3b85f562a954203a",
+      "phase": "motion",
+      "floor_contact_count": 26,
+      "min_surface_distance_m": {
+        "right hand": 0.0032003330834132655,
+        "left hand": 0.0032022035179850392,
+        "right foot": -8.499670855131175e-05,
+        "left foot": -0.00010253182679426792
+      },
+      "native_transform_sha256": "d872d655ed3d7124a4d8c654bcc5bc414588a4e69d3655869967b568d14106d6"
+    },
+    {
+      "state_index": 66,
+      "frame_time": 2.640000000000049,
+      "state_sha256": "080ca6cb706482560639f87c43b68005af7a32427f6e2b27ab3507b8555e399c",
+      "phase": "motion",
+      "floor_contact_count": 26,
+      "min_surface_distance_m": {
+        "right hand": 0.00321608457762079,
+        "left hand": 0.0032152761588994418,
+        "right foot": -6.302597503914792e-05,
+        "left foot": -5.726667916157446e-05
+      },
+      "native_transform_sha256": "25b6f92a3e31a24715305136a91b96f49bef578c99d4d26b4375634b85cbcf79"
+    },
+    {
+      "state_index": 67,
+      "frame_time": 2.6800000000000623,
+      "state_sha256": "ba816f7103cd1331888a3f9fc038723dcdaf35c0a93e1cb845df5ab9384106dc",
+      "phase": "motion",
+      "floor_contact_count": 26,
+      "min_surface_distance_m": {
+        "right hand": 0.0032322559218783565,
+        "left hand": 0.0032282603971869,
+        "right foot": -0.00011231984532057704,
+        "left foot": -0.00017201412140512712
+      },
+      "native_transform_sha256": "32a01963e388c4ccac0266509e3b898159f671f3fd0f1640b75e930b8553c480"
+    },
+    {
+      "state_index": 68,
+      "frame_time": 2.7200000000000757,
+      "state_sha256": "cadd148caf4f77736dd046a3ea2fb7f5345dbacffa028b9c783427b1c392f050",
+      "phase": "motion",
+      "floor_contact_count": 24,
+      "min_surface_distance_m": {
+        "right hand": 0.003215400165882407,
+        "left hand": 0.0032083431900705624,
+        "right foot": 6.827376673387842e-06,
+        "left foot": 0.00011342852308682261
+      },
+      "native_transform_sha256": "797c36dc936dbcd859b38a18ff591b603f5d8df21ba6ea0c00247982c4bbc960"
+    },
+    {
+      "state_index": 69,
+      "frame_time": 2.760000000000089,
+      "state_sha256": "954d68202e16a181327bb28f2f8e845f5f78945a504d3a474ce464b1424a9627",
+      "phase": "motion",
+      "floor_contact_count": 26,
+      "min_surface_distance_m": {
+        "right hand": 0.0032409926365884797,
+        "left hand": 0.0032251034817052425,
+        "right foot": -3.47124386401651e-05,
+        "left foot": -1.0729663679549806e-05
+      },
+      "native_transform_sha256": "7698db105d666a6abb43db57cb891b70de84ff17857a1fc205ffa6a0694146f8"
+    },
+    {
+      "state_index": 70,
+      "frame_time": 2.8000000000001024,
+      "state_sha256": "7e8c38f2f7ee141855cb7de86d907294c84c855286b08b63b875730af25a453e",
+      "phase": "motion",
+      "floor_contact_count": 26,
+      "min_surface_distance_m": {
+        "right hand": 0.0032619917648020625,
+        "left hand": 0.003241054679403348,
+        "right foot": -4.501881987334366e-05,
+        "left foot": -3.93012714659316e-05
+      },
+      "native_transform_sha256": "2db13919df91520102c1e77d8416fc98c4be01a350a8d02c6b8e99ebf47900d7"
+    },
+    {
+      "state_index": 71,
+      "frame_time": 2.8400000000001158,
+      "state_sha256": "9c5d859d4942583da9d0b709f79198bc0fc30fde6ce701783b507b0284cce9e9",
+      "phase": "motion",
+      "floor_contact_count": 26,
+      "min_surface_distance_m": {
+        "right hand": 0.0032746393629149786,
+        "left hand": 0.0032387309826438365,
+        "right foot": -3.7129615038489217e-05,
+        "left foot": -1.811569320712969e-05
+      },
+      "native_transform_sha256": "901401485f3023497ec934897bc0e7c1c5e33f2e0be687b7acbb5f48b0c7d381"
+    },
+    {
+      "state_index": 72,
+      "frame_time": 2.880000000000129,
+      "state_sha256": "9949c15330de5e92bb57e39de3524568b1cc05077f281a0a00433e648dc45f45",
+      "phase": "motion",
+      "floor_contact_count": 25,
+      "min_surface_distance_m": {
+        "right hand": 0.0032538935019652687,
+        "left hand": 0.0032124182748322827,
+        "right foot": -4.537626807812195e-05,
+        "left foot": 6.655283246364413e-05
+      },
+      "native_transform_sha256": "b3c63fde3578c7493bf0cc24e9038996657acd3ee71fa721354bf4de6d83813f"
+    },
+    {
+      "state_index": 73,
+      "frame_time": 2.9200000000001425,
+      "state_sha256": "28327f06e2b3cc5ed79da20eeaf81c369445ca7a45652b033b88c32a66a2f188",
+      "phase": "motion",
+      "floor_contact_count": 26,
+      "min_surface_distance_m": {
+        "right hand": 0.0033588078414608985,
+        "left hand": 0.0034396698764222536,
+        "right foot": -4.422066236529215e-05,
+        "left foot": -0.00020541962087846505
+      },
+      "native_transform_sha256": "61699ebb8dca44f491dcd8d8a176909dc2d5246af9736abde63534b65ea26f09"
+    },
+    {
+      "state_index": 74,
+      "frame_time": 2.960000000000156,
+      "state_sha256": "e243f5352933751f13b928ba1cf72705c2309da3a8de5052dad84fd95d7b8e6a",
+      "phase": "motion",
+      "floor_contact_count": 26,
+      "min_surface_distance_m": {
+        "right hand": 0.0033488276256540767,
+        "left hand": 0.0034232980745955285,
+        "right foot": -9.733033528448731e-05,
+        "left foot": -9.861559460474373e-05
+      },
+      "native_transform_sha256": "26f3f0fdbca476a0a17b8983a0ddad0184e180f07bc320e59a36b2886bec2d6f"
+    },
+    {
+      "state_index": 75,
+      "frame_time": 3.000000000000169,
+      "state_sha256": "dfc4b333e420e0576abfbc9ff575edce12ef30e7d603f6266a7593bc5b75b5d1",
+      "phase": "motion",
+      "floor_contact_count": 26,
+      "min_surface_distance_m": {
+        "right hand": 0.003260620675336335,
+        "left hand": 0.0033298134650406024,
+        "right foot": -1.4124740482825138e-05,
+        "left foot": -2.121073542386137e-05
+      },
+      "native_transform_sha256": "5faab42bd1f51a4a53229df3f94ad722727e1012751cb5912c1e2f5e9d312bf6"
+    },
+    {
+      "state_index": 76,
+      "frame_time": 3.0400000000001826,
+      "state_sha256": "7b3e140ae053bddbdf4fb45f1d44d1d407c8594ad5c5e878ccbba8edbee51aa8",
+      "phase": "motion",
+      "floor_contact_count": 26,
+      "min_surface_distance_m": {
+        "right hand": 0.003251868086446068,
+        "left hand": 0.003255481926721677,
+        "right foot": -3.8352360348735404e-05,
+        "left foot": -5.4534163233269095e-05
+      },
+      "native_transform_sha256": "14680be94528079b5b17173d0934810a6eb74cd0510783df003d624f6317f565"
+    },
+    {
+      "state_index": 77,
+      "frame_time": 3.080000000000196,
+      "state_sha256": "2545a016fb9304e39aa80c9dd54f4c33358069b3070ae38f2c713d042e593031",
+      "phase": "motion",
+      "floor_contact_count": 26,
+      "min_surface_distance_m": {
+        "right hand": 0.0032689952570517317,
+        "left hand": 0.0032091773130079075,
+        "right foot": -7.015929057226783e-05,
+        "left foot": -8.03390889708086e-05
+      },
+      "native_transform_sha256": "490d819393cd683f25a03500157d3b21eb919ff1c9f2bea9fec796c829ee92f2"
+    },
+    {
+      "state_index": 78,
+      "frame_time": 3.1200000000002093,
+      "state_sha256": "4d3d8c8cf1736c61b32ac5031b8d0c2d08491921b071743b0f4be31efaec19f0",
+      "phase": "motion",
+      "floor_contact_count": 26,
+      "min_surface_distance_m": {
+        "right hand": 0.0033038358659938736,
+        "left hand": 0.003242599701980586,
+        "right foot": -8.329594909146226e-05,
+        "left foot": -7.404643864938887e-05
+      },
+      "native_transform_sha256": "c4353e8ee69b58f0313b76ec6e7181692b8a61237e5aaa81ddcebb0ff3373c6e"
+    },
+    {
+      "state_index": 79,
+      "frame_time": 3.1600000000002226,
+      "state_sha256": "57cb97f1aa57308ddfdf295e10b90b27c699aa1cf4af2d67b14d6f7600af8075",
+      "phase": "motion",
+      "floor_contact_count": 26,
+      "min_surface_distance_m": {
+        "right hand": 0.0033277037592450345,
+        "left hand": 0.0032861114070878196,
+        "right foot": -8.617548659452245e-05,
+        "left foot": -7.232879005175663e-05
+      },
+      "native_transform_sha256": "94617b8ccda5ca033510921da5cb6fa3259521dd3763acc9a3159eba7d30e8d4"
+    },
+    {
+      "state_index": 80,
+      "frame_time": 3.200000000000236,
+      "state_sha256": "89513fc822ec72517b35d32e1bff94eea6569a8b09abbf9363df6a1fead9cd7b",
+      "phase": "motion",
+      "floor_contact_count": 26,
+      "min_surface_distance_m": {
+        "right hand": 0.0033268232899855647,
+        "left hand": 0.0033282932977589507,
+        "right foot": -8.453901781711737e-05,
+        "left foot": -6.861669506149498e-05
+      },
+      "native_transform_sha256": "31649ad38863d26126fb69718e72b1d6893f5f739e8105efde2cd28355fb5af0"
+    },
+    {
+      "state_index": 81,
+      "frame_time": 3.2400000000002493,
+      "state_sha256": "2347b0ab114a88c2bd991f18ca73bbb1a887878bedcc2c33e4b86defd5af76c9",
+      "phase": "motion",
+      "floor_contact_count": 26,
+      "min_surface_distance_m": {
+        "right hand": 0.0033258465944446926,
+        "left hand": 0.0033695243362358235,
+        "right foot": -7.559997107631916e-05,
+        "left foot": -6.194343601921559e-05
+      },
+      "native_transform_sha256": "f31502137ef31e3e97aed694d8744d2b3475a3592b6f616cee7f3c8d1f083d60"
+    },
+    {
+      "state_index": 82,
+      "frame_time": 3.2800000000002627,
+      "state_sha256": "d625db10d10402304f96c0e291b0d9c42632325cdf8f647d81179e9cefd7ecb7",
+      "phase": "motion",
+      "floor_contact_count": 26,
+      "min_surface_distance_m": {
+        "right hand": 0.0033008126211423834,
+        "left hand": 0.00334564822625896,
+        "right foot": -3.96836952171048e-05,
+        "left foot": -6.779707123187595e-05
+      },
+      "native_transform_sha256": "22b3c5c0a0f07cfc1ef0f6f4536b7d99a1694dd7cc1058452936af7f8c54eee3"
+    },
+    {
+      "state_index": 83,
+      "frame_time": 3.320000000000276,
+      "state_sha256": "44e7c748426c1dd79328d81de143410cc68888ad0065d7cba6a7226af31808c3",
+      "phase": "motion",
+      "floor_contact_count": 26,
+      "min_surface_distance_m": {
+        "right hand": 0.0032612302109219816,
+        "left hand": 0.003283374918040681,
+        "right foot": -5.635216942613541e-05,
+        "left foot": -4.5538526468560936e-05
+      },
+      "native_transform_sha256": "1c79eb21f44d1ffee593e6d46129631c08cd9b105b89bc3f269fbb53b1574180"
+    },
+    {
+      "state_index": 84,
+      "frame_time": 3.3600000000002894,
+      "state_sha256": "227b32418edcbd787ee10cdff11bf3e66ddb824184c6c3e847d1c5f96fa8c3a8",
+      "phase": "motion",
+      "floor_contact_count": 26,
+      "min_surface_distance_m": {
+        "right hand": 0.0032898629666491272,
+        "left hand": 0.0032810779696744313,
+        "right foot": -6.488372464421438e-05,
+        "left foot": -4.316718141182674e-05
+      },
+      "native_transform_sha256": "7e693748b71e01a867d50a96779c3a2d2c03adf87af047deeb59ecf426e1027a"
+    },
+    {
+      "state_index": 85,
+      "frame_time": 3.400000000000303,
+      "state_sha256": "b57d6d659e3cc6059be1be4559462e4c9184de6827c16dc292964261c999b599",
+      "phase": "motion",
+      "floor_contact_count": 26,
+      "min_surface_distance_m": {
+        "right hand": 0.00330831692926225,
+        "left hand": 0.003289388449787675,
+        "right foot": -7.636854968999518e-05,
+        "left foot": -8.217811561016253e-05
+      },
+      "native_transform_sha256": "cc9fd0c132d73e07ce6bd798a92c1be3c7ba6d6c7ced980729f1e8d3442c34d4"
+    },
+    {
+      "state_index": 86,
+      "frame_time": 3.440000000000316,
+      "state_sha256": "aaa1c16e0ff776a16f99d6d6ce338c35da4870f7bfff83abdccf943cdaa8b556",
+      "phase": "motion",
+      "floor_contact_count": 26,
+      "min_surface_distance_m": {
+        "right hand": 0.0033180135168127626,
+        "left hand": 0.0033047696697556996,
+        "right foot": -7.515817500997057e-05,
+        "left foot": -8.204337198786799e-05
+      },
+      "native_transform_sha256": "1e119b614e9870f7895aaf134fdaec3e9568ff6d89f0519d12a3721ce0a18f86"
+    },
+    {
+      "state_index": 87,
+      "frame_time": 3.4800000000003295,
+      "state_sha256": "8b99343eae944332fe0ae11ebb8a7903a3344e82d93b084f881334f57e57ecd5",
+      "phase": "motion",
+      "floor_contact_count": 26,
+      "min_surface_distance_m": {
+        "right hand": 0.003313993007711135,
+        "left hand": 0.0033189506840490286,
+        "right foot": -8.795771399786739e-05,
+        "left foot": -9.794372810417035e-05
+      },
+      "native_transform_sha256": "b9eb3368292db25389c7426c13eefa559336fb1ea9752cfec6332be5321f56d0"
+    },
+    {
+      "state_index": 88,
+      "frame_time": 3.520000000000343,
+      "state_sha256": "0d75a910c95d8001899011951caa77e0b80faa644d07979f4a5ea205cf3dc6d7",
+      "phase": "motion",
+      "floor_contact_count": 26,
+      "min_surface_distance_m": {
+        "right hand": 0.003289763950462087,
+        "left hand": 0.0033130565558255236,
+        "right foot": -9.412258089926823e-05,
+        "left foot": -0.00011247377132173747
+      },
+      "native_transform_sha256": "186165a58d3393fb0609005e11387de74b22b53d62c43866255fb902c21808f4"
+    },
+    {
+      "state_index": 89,
+      "frame_time": 3.560000000000356,
+      "state_sha256": "3d2e19a5734b90d790826eeb18aab34cc442ba4334ee5d7747e6fee414624296",
+      "phase": "motion",
+      "floor_contact_count": 24,
+      "min_surface_distance_m": {
+        "right hand": 0.0032439384959593205,
+        "left hand": 0.0032559099945507443,
+        "right foot": 1.996895609363003e-05,
+        "left foot": 6.476610511678416e-05
+      },
+      "native_transform_sha256": "e2b91cd26a12bfaa09e8bf37a1cae857c5719fa5eab53c04bb6cf7afd8f15575"
+    },
+    {
+      "state_index": 90,
+      "frame_time": 3.6000000000003696,
+      "state_sha256": "2e2abbd3711545aa13fe8a2bd96bd5196bb96e81225c336d92f2e1152f9d7299",
+      "phase": "motion",
+      "floor_contact_count": 25,
+      "min_surface_distance_m": {
+        "right hand": 0.003095804288667405,
+        "left hand": 0.0030821833477036346,
+        "right foot": 1.0312769923290221e-05,
+        "left foot": -1.9678794492647422e-05
+      },
+      "native_transform_sha256": "f4c983e0c78bb8a08a9e2b3a5f3c8bddf3379b37ab21c50b2f27c63cdf77cdcc"
+    },
+    {
+      "state_index": 91,
+      "frame_time": 3.640000000000383,
+      "state_sha256": "e6f23c009ccbcbfaafe9b6078323e2c7d0cf39f547bd919733034c11531c7bcf",
+      "phase": "motion",
+      "floor_contact_count": 28,
+      "min_surface_distance_m": {
+        "right hand": 0.0030771650767131608,
+        "left hand": 0.003070553102879313,
+        "right foot": -0.00027737101500803496,
+        "left foot": -9.855200666576691e-05
+      },
+      "native_transform_sha256": "2df414684edf92e36c348e1f937732f57a75ac6436fb13c2eaf59d91de079225"
+    },
+    {
+      "state_index": 92,
+      "frame_time": 3.6800000000003963,
+      "state_sha256": "7871882d66903265eef5532dfe2a5224e486096a6eefecefa9ed5fe0ad09e333",
+      "phase": "motion",
+      "floor_contact_count": 26,
+      "min_surface_distance_m": {
+        "right hand": 0.0031365316199807166,
+        "left hand": 0.0031452588031676606,
+        "right foot": -0.00036395722721664636,
+        "left foot": -0.0004457174572675693
+      },
+      "native_transform_sha256": "19b222c1ed8cc4a1f9e679f65857a008d10279d14d33aad678cddd4098113301"
+    },
+    {
+      "state_index": 93,
+      "frame_time": 3.7200000000004096,
+      "state_sha256": "54b7b76a99eef33d4869b66d4d0900a868ffd351d54ad8da964b00e7e49f0b14",
+      "phase": "motion",
+      "floor_contact_count": 28,
+      "min_surface_distance_m": {
+        "right hand": 0.003212528484236787,
+        "left hand": 0.003236256734451478,
+        "right foot": -0.0002502085355568784,
+        "left foot": -7.053938490896028e-05
+      },
+      "native_transform_sha256": "7cae5a7a8428e772c7cf323f3fe54b7948861eb787b0e64caf87fb7aa9054d45"
+    },
+    {
+      "state_index": 94,
+      "frame_time": 3.760000000000423,
+      "state_sha256": "86eac819719619c259406998ee57c1d3bef810ee5da42b2a3f3113c15d114fb5",
+      "phase": "motion",
+      "floor_contact_count": 28,
+      "min_surface_distance_m": {
+        "right hand": 0.003229571011348584,
+        "left hand": 0.003249549656474022,
+        "right foot": -0.00037364460693511264,
+        "left foot": -0.00015326603952307144
+      },
+      "native_transform_sha256": "e777ac36ab3e063a9c6538bd410a6a3e521ae6078d859b20d74afea216f2a1b8"
+    },
+    {
+      "state_index": 95,
+      "frame_time": 3.8000000000004364,
+      "state_sha256": "d6d0aa367f246758a014984be4013dd859423abdfee764c4c3cdefc4b2335e13",
+      "phase": "motion",
+      "floor_contact_count": 28,
+      "min_surface_distance_m": {
+        "right hand": 0.0032187338295800024,
+        "left hand": 0.0032141260415133634,
+        "right foot": -8.01479918912662e-05,
+        "left foot": -5.370016778101505e-05
+      },
+      "native_transform_sha256": "a23b66bd6bab66c3c1f0a27505953f93d8cab6e1f8276f20a455f057d2d8291c"
+    },
+    {
+      "state_index": 96,
+      "frame_time": 3.8400000000004497,
+      "state_sha256": "423670ef3096c1b30a87757de4c35e77e2793325f9e57eee7b9999d0948f8df8",
+      "phase": "motion",
+      "floor_contact_count": 28,
+      "min_surface_distance_m": {
+        "right hand": 0.003221594500305864,
+        "left hand": 0.0032191969998785572,
+        "right foot": -7.371621622996594e-05,
+        "left foot": -5.144166282163021e-05
+      },
+      "native_transform_sha256": "ad64a38589a0e1a72daeb726d46c86c5e893861850afb19e52257e47ef437fac"
+    },
+    {
+      "state_index": 97,
+      "frame_time": 3.880000000000463,
+      "state_sha256": "6b7c1541834b457eac5071a5587d1bd50216bb1d7adaa4ee653a1e74a0178ee8",
+      "phase": "motion",
+      "floor_contact_count": 28,
+      "min_surface_distance_m": {
+        "right hand": 0.003234357047333156,
+        "left hand": 0.0032240487276400847,
+        "right foot": -6.167154375162631e-05,
+        "left foot": -4.963860949162846e-05
+      },
+      "native_transform_sha256": "4c4b735b839ab940dcbf8dcaa856a94804e89aeac05fb4442ef80a35f30cbcaf"
+    },
+    {
+      "state_index": 98,
+      "frame_time": 3.9200000000004764,
+      "state_sha256": "ed705a7ea3e251271e1b6d9fc44f39fe92273e245269b8fc0eb16ca451892d0a",
+      "phase": "motion",
+      "floor_contact_count": 28,
+      "min_surface_distance_m": {
+        "right hand": 0.003208986417142186,
+        "left hand": 0.003209486460624092,
+        "right foot": -4.647870950432592e-05,
+        "left foot": -5.107463574716142e-05
+      },
+      "native_transform_sha256": "b05dea64ec702b69ddd7e34205608eeae40c1569fc8cdbf696d4664505c65ad1"
+    },
+    {
+      "state_index": 99,
+      "frame_time": 3.96000000000049,
+      "state_sha256": "8311b92d706b71942961a11498d3da1228f6ca87a258eb6a28736caed52bd290",
+      "phase": "motion",
+      "floor_contact_count": 28,
+      "min_surface_distance_m": {
+        "right hand": 0.0031989205177248934,
+        "left hand": 0.0032076945981849092,
+        "right foot": -5.331735997153586e-05,
+        "left foot": -5.76847210603873e-05
+      },
+      "native_transform_sha256": "f64422f36de0d77b7c5b35e0f34c87f0fc4716c2ae4f08c71829606bcf4ffafd"
+    },
+    {
+      "state_index": 100,
+      "frame_time": 4.000000000000503,
+      "state_sha256": "2e9b7d0fc256fa6bb7d423f44d5f579a71dd1ea3e47f44a28a192a447a4d99e0",
+      "phase": "motion",
+      "floor_contact_count": 28,
+      "min_surface_distance_m": {
+        "right hand": 0.0032138416611291994,
+        "left hand": 0.003219964679761142,
+        "right foot": -5.717595900416733e-05,
+        "left foot": -6.669520549042879e-05
+      },
+      "native_transform_sha256": "b1522c8247b60fd36e6582a54bffc2b83714c6d8dfaff0c54b8cdc99340da968"
+    },
+    {
+      "state_index": 101,
+      "frame_time": 4.0400000000004805,
+      "state_sha256": "e90bdb335f0ce430d991090717e9b759e0354af96312439adf1622270d9e2b43",
+      "phase": "motion",
+      "floor_contact_count": 28,
+      "min_surface_distance_m": {
+        "right hand": 0.0032103431435864553,
+        "left hand": 0.003221434174665626,
+        "right foot": -5.792800615478377e-05,
+        "left foot": -6.255013943006621e-05
+      },
+      "native_transform_sha256": "a314a428d369f5c19d96f4afd1a7c00e4fe71509745e2e4cddc6dab8cf646d93"
+    },
+    {
+      "state_index": 102,
+      "frame_time": 4.080000000000458,
+      "state_sha256": "6101a9dd873a7821af89718877e630441398d68e28095d9f6a50d47839d1092f",
+      "phase": "motion",
+      "floor_contact_count": 28,
+      "min_surface_distance_m": {
+        "right hand": 0.0032060340759441953,
+        "left hand": 0.0032093328352576786,
+        "right foot": -6.257392499933734e-05,
+        "left foot": -6.168401966558101e-05
+      },
+      "native_transform_sha256": "1a983a2914bb732fc48730ebf58f9cef5e1d46b2f452b6e0c85514978628a4a9"
+    },
+    {
+      "state_index": 103,
+      "frame_time": 4.120000000000436,
+      "state_sha256": "568ee07b874f71bef5285636c8353e24af265afecd2f2cb3d36cddeb50519202",
+      "phase": "motion",
+      "floor_contact_count": 28,
+      "min_surface_distance_m": {
+        "right hand": 0.0032104215883337096,
+        "left hand": 0.0032122822473267653,
+        "right foot": -6.492694337745242e-05,
+        "left foot": -6.226521521757872e-05
+      },
+      "native_transform_sha256": "c00689b3515f96ee06bce91a8c4151305d0a84ea778cc179ec85f7ccc7627a29"
+    },
+    {
+      "state_index": 104,
+      "frame_time": 4.160000000000414,
+      "state_sha256": "8da88f3a8fbb7470ca809c73f0fa34013b21e650adc3aa76d12d129a8aced5ae",
+      "phase": "motion",
+      "floor_contact_count": 28,
+      "min_surface_distance_m": {
+        "right hand": 0.0032138385655513324,
+        "left hand": 0.0032074868768139746,
+        "right foot": -6.606179883692637e-05,
+        "left foot": -6.14756929065291e-05
+      },
+      "native_transform_sha256": "e35ad8fa556bd5838b641a758feda66cf6a2796d81ac8fe8664716de7202cbd8"
+    },
+    {
+      "state_index": 105,
+      "frame_time": 4.200000000000392,
+      "state_sha256": "af5c20fd3be0225b987538bb0eb984020b5d34a258408d155bf21d52e3649dc0",
+      "phase": "motion",
+      "floor_contact_count": 28,
+      "min_surface_distance_m": {
+        "right hand": 0.003176292435084156,
+        "left hand": 0.0031698277349074206,
+        "right foot": -6.684582156316066e-05,
+        "left foot": -6.475318669676988e-05
+      },
+      "native_transform_sha256": "d4e19c0f79d0f64cd76f6842e65b501a4aedb9fcaa09af84b9cc5aee618a22d2"
+    },
+    {
+      "state_index": 106,
+      "frame_time": 4.24000000000037,
+      "state_sha256": "ccaff675e09b82db3a49d20cd1630044a6616a5142d93b52f6324e55937bb5d1",
+      "phase": "motion",
+      "floor_contact_count": 28,
+      "min_surface_distance_m": {
+        "right hand": 0.0031600577234600436,
+        "left hand": 0.0031580668517774907,
+        "right foot": -7.386927279299377e-05,
+        "left foot": -6.170892967632263e-05
+      },
+      "native_transform_sha256": "f916ad9710b493f75d2876c41e0418f083459649720b5cebdb3f28a20648f250"
+    },
+    {
+      "state_index": 107,
+      "frame_time": 4.2800000000003475,
+      "state_sha256": "c9dd2643844fd21d163d285d8f6b5599d092510c4c2fbec7e8df9d27e0eb772e",
+      "phase": "motion",
+      "floor_contact_count": 28,
+      "min_surface_distance_m": {
+        "right hand": 0.0031605370545404396,
+        "left hand": 0.003155816255328959,
+        "right foot": -7.486332800942658e-05,
+        "left foot": -6.231646140250624e-05
+      },
+      "native_transform_sha256": "b764cab32005789b386f91f0552c819ee066dc6ea578e7527f3d4777fb683837"
+    },
+    {
+      "state_index": 108,
+      "frame_time": 4.320000000000325,
+      "state_sha256": "efc66517abc3d6b5a4d43ebbde26a832c6f1795d55a3c6f84948691ec8fb756f",
+      "phase": "motion",
+      "floor_contact_count": 28,
+      "min_surface_distance_m": {
+        "right hand": 0.003160441018669348,
+        "left hand": 0.0031612425398432975,
+        "right foot": -7.511878750900841e-05,
+        "left foot": -6.158067540578543e-05
+      },
+      "native_transform_sha256": "2d8fab937e1758e7629c2263c8d52e4ad0399a2a830c9a40ad9b37f28c05702d"
+    },
+    {
+      "state_index": 109,
+      "frame_time": 4.360000000000303,
+      "state_sha256": "7af7eabdd190d0cddef16bd62846dd810e637e22cb6cc7e833fa9aab1c0f598a",
+      "phase": "motion",
+      "floor_contact_count": 28,
+      "min_surface_distance_m": {
+        "right hand": 0.0031621512344164066,
+        "left hand": 0.0031584137284936644,
+        "right foot": -7.528446714319403e-05,
+        "left foot": -6.150159628500601e-05
+      },
+      "native_transform_sha256": "3467eaa4465038b254e583c36e22abbc8a70d617c74d8746fcb258ea15f84925"
+    },
+    {
+      "state_index": 110,
+      "frame_time": 4.400000000000281,
+      "state_sha256": "4ba9f8a370e87fa19f634e4db542427e69e7c174c63557083d57a4b06dc6237a",
+      "phase": "return",
+      "floor_contact_count": 28,
+      "min_surface_distance_m": {
+        "right hand": 0.003162015820038241,
+        "left hand": 0.0031575557642290674,
+        "right foot": -7.477242647137977e-05,
+        "left foot": -6.250344429294119e-05
+      },
+      "native_transform_sha256": "40a5d9e9d886467cb0253f33060826fd3cb32377ea09375399e5343e93588bd2"
+    }
+  ],
+  "scenario_id": "pushup_flat_palm",
+  "acceptance": {
+    "full_cycle_kinematics": "PASS",
+    "four_supports": "FAIL",
+    "numerical_bounds": "FAIL",
+    "stationary_supports": "FAIL",
+    "no_world_support_equalities": "PASS",
+    "no_unintended_floor_contacts": "PASS",
+    "unilateral_friction_cones": "PASS",
+    "reference_hand_placement": "PASS",
+    "forward_fingers": "PASS",
+    "bottom_depth": "PASS",
+    "hand_support_geometry": "PASS",
+    "elbow_extension": "PASS",
+    "wrist_extension_envelope": "PASS",
+    "distributed_palms_and_digits": "PASS",
+    "full_pushup": "FAIL",
+    "muscle_driven": "NOT_ACHIEVED",
+    "external_control": "USED",
+    "human_experimental_validation": "NOT_VALIDATED",
+    "volumetric_anatomy_registration": "UNAVAILABLE",
+    "finger_dynamics": "SOURCE_DIGIT_JOINTS",
+    "wrist_ligaments": "NOT_MODELED",
+    "wrist_range_derivation": "LITERATURE_INFORMED_NOT_CALIBRATED",
+    "skin_contact_pressure": "NOT_MODELED",
+    "frictional_support": "NOT_ACHIEVED"
+  },
+  "package_version": "0.9.0rc2",
+  "model_revision": "98a70c569c4c1b6da467a20012f766ee1f8dc521",
+  "source_manifest_sha256": "85d24de44df1299c75120c2282e865b28a988a6649497acdb670ef3b19c565b3",
+  "source_model_asset_sha256": "a32fc82227aebf5156d9efd067d3799513044a24ca12dd117d8b9b4be436d689",
+  "runtime_clock_hz": 25,
+  "crosswalk_counts": {
+    "accepted_anatomical_mappings": 74,
+    "accepted_part_display_assets": 72,
+    "accepted_sided_group_row_mappings": 76,
+    "coarse_groups": {
+      "abdominal_transverse_paths": 10,
+      "biceps_brachii": 4,
+      "deltoid": 6,
+      "external_oblique": 16,
+      "forearm_extensors": 22,
+      "forearm_flexors": 24,
+      "internal_oblique": 12,
+      "pectoralis_major": 6,
+      "rectus_abdominis": 2,
+      "serratus_anterior": 20,
+      "spinal_stabilizer_paths": 186,
+      "trapezius": 28,
+      "triceps_brachii": 6,
+      "unmapped_source_identifier": 358
+    },
+    "family_evidence": {
+      "NATIVE_FAMILY_CANDIDATE": 258,
+      "PINNED_NOMENCLATURE": 270,
+      "REVIEWED_GROUP": 76,
+      "UNRESOLVED": 96
+    },
+    "family_label_supported": 604,
+    "illustrative_motion_surfaces": 288,
+    "independent_human_validations": 0,
+    "independently_registered_attachments": 0,
+    "linked_display_assets": 74,
+    "linked_pilot_display_assets": 12,
+    "rows_accounted_for": 700,
+    "statuses": {
+      "CANDIDATE": 354,
+      "REVIEWED_ANATOMICAL": 76,
+      "UNMAPPED": 270
+    },
+    "unique_accepted_fma_parts": 74,
+    "verified_anatomical_deformations": 0
+  },
+  "excluded_display_surfaces": [
+    {
+      "name": "Left extensor indicis [FJ1493M]",
+      "source_node": 165,
+      "source_mesh_sha256": "555897575abeafc51de9eb2ba0b06067e55cc70ee28de30ddb367dd1292df72f",
+      "mode": "excluded_floor_crossing",
+      "max_depth_below_floor_m": 0.01611864663118617
+    },
+    {
+      "name": "Right extensor indicis [FJ1493]",
+      "source_node": 331,
+      "source_mesh_sha256": "1bc4c76d910b61b6b1336e56a74c226769f605ff1d3237f62489945019973eb9",
+      "mode": "excluded_floor_crossing",
+      "max_depth_below_floor_m": 0.016085756753170838
+    }
+  ],
+  "visible_floor_audit": {
+    "sample_count": 441,
+    "mesh_count": 420,
+    "maximum_visible_hand_bone_depth_m": 0.0,
+    "worst_visible_mesh": "l_bofoot",
+    "maximum_visible_depth_below_floor_m": 0.00044572277469139
+  },
+  "atlas_and_model_sources": {
+    "myosuite": {
+      "sha256": "1d74b59bf052f568b558eb05a4508b06e9482f342e1fe01fae543471c53ca9a4",
+      "revision": "afa8427188c8bd054925200c70db6757908dee45",
+      "license": "CC-BY-4.0"
+    },
+    "myosim": {
+      "tree_sha256": "8e504f094e91e8b453982f41c25d6c1013055ddd9a84078e34bd7ca974926175",
+      "license": "Apache-2.0"
+    },
+    "bp3d": {
+      "catalog_sha256": "953a632513863a62fb65c8468ec16cee6cb195f4899516fbb254d10a6b5fe32c",
+      "version": "4.3",
+      "membership": "4.3/4.3i operator-local",
+      "license": "CC-BY-SA-2.1-JP",
+      "license_sha256": "f4fe9670e99172cd529403fbfb83d6172b2b677daa2ff54bab908888217ab611",
+      "receipt_sha256": "727089d6f017e82f32130b833fb9f546c00569507f350ba6ccaa54994e9a6261"
+    },
+    "z_anatomy": {
+      "name": "Z-Anatomy, adapted from BodyParts3D \u00a9 DBCLS",
+      "author": "Gauthier Kervyn; BodyParts3D by Kousaku Okubo and DBCLS",
+      "url": "https://github.com/Z-Anatomy/Models-of-human-anatomy/tree/0a849e8acf7080f8da3251a926fbc160d2bc3f7a",
+      "revision": "0a849e8acf7080f8da3251a926fbc160d2bc3f7a",
+      "source_blend_sha256": "9f08a17ea0115fed80b2a73ecdf0a1bc2ab2f6956f37c593ce23d513ea35afcd",
+      "license": "CC-BY-SA-4.0",
+      "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+      "objects": [
+        "Rectus abdominis muscle.r",
+        "Rectus abdominis muscle.l"
+      ],
+      "source_coordinates": "baked Z-Anatomy world transforms, metres, right-handed; +X left, +Z superior",
+      "files": {
+        "rectus.npz": {
+          "sha256": "01fc5dab901433422c766d8fbbb5beef16824f055a4eca6d1db27f33b13e61c4",
+          "bytes": 375769
+        }
+      }
+    }
+  },
   "files": {
-    "README.md": {
-      "bytes": 4458,
-      "sha256": "0e7496d1cb4478d4badf05924353ffe3a0706419dbf0bad9ddae373476082121"
+    "whole-body.mp4": {
+      "sha256": "0509c57d686863cec4f62f14214b7eec9c7e22128a8d8698e951293d3975513b",
+      "bytes": 296306,
+      "license": "CC-BY-SA-4.0",
+      "content_type": "MOVING_ILLUSTRATIVE",
+      "caption": "111 exact saved-state renders at 25 fps with the full-cycle FAIL label."
     },
-    "animation.gif": {
-      "bytes": 4361656,
-      "sha256": "dc0f19c930fd027357d948d233bd3c31ed19b502cd5620b88ff37e0f4990f6f5"
+    "whole-body.gif": {
+      "sha256": "882455caa93515e3cd017adccca23cb2d888709bc496ea00b093dcbf96b5823c",
+      "bytes": 1012816,
+      "license": "CC-BY-SA-4.0",
+      "content_type": "MOVING_ILLUSTRATIVE",
+      "caption": "Every second saved frame from the same Blender video."
     },
-    "animation.mp4": {
-      "bytes": 319659,
-      "sha256": "59ec761211518e2fedf0d43fb185b8988f7d45200dec229fee2be849d8e6e6b9"
+    "hero-poster.png": {
+      "sha256": "cf6136531ab2a8ad1dee646b9a2736ce20c42201eb308e0c3c9ad2f4022ce40d",
+      "bytes": 259423,
+      "license": "CC-BY-SA-4.0",
+      "content_type": "MOVING_ILLUSTRATIVE",
+      "caption": "Blender detail of saved state 55 (2.2 s)."
     },
-    "bottom.png": {
-      "bytes": 320978,
-      "sha256": "ead42df394c1efd0e360cf3598ddd5388e26e3fb0eb670e8bbf36ffc42530142"
+    "matched-phases.png": {
+      "sha256": "1fe0ead364ad0bb0c25634bd369a813bd05dbc33d5bc80195daa36102181515a",
+      "bytes": 281338,
+      "license": "CC-BY-SA-4.0",
+      "content_type": "MOVING_ILLUSTRATIVE",
+      "caption": "Three.js and Blender at states 0, 55 and 110."
     },
-    "data.zip": {
-      "bytes": 9239919,
-      "sha256": "cc0e6e2138b646c74dd2c2656047e2679e3cd064f705d8f4ea852cc474ac299d"
+    "static-atlas.png": {
+      "sha256": "92fcb6278d03e4652fcae5f9dfedd4388bac4e08d0d3c60f1c980970dd8d0a24",
+      "bytes": 86783,
+      "license": "CC-BY-SA-2.1-JP",
+      "content_type": "STATIC_ATLAS",
+      "caption": "Static skin, bone, muscle and visceral layers from the pinned BodyParts3D 4.3 installation."
     },
-    "frames.json": {
-      "bytes": 17782,
-      "sha256": "e8833309295d9752b06df7598024ad1b3befbffedb2cf012f3fa292359a97e86"
+    "explorer-heart.png": {
+      "sha256": "b3aa7a28970702adaacbb692911d3f5729ef4c0a979f99a8046ccb0e5fc05a1d",
+      "bytes": 344198,
+      "license": "CC-BY-SA-2.1-JP",
+      "content_type": "STATIC_ATLAS",
+      "caption": "Anatomy Explorer with the static heart (FMA7088), rib cage context and mesh coverage.",
+      "capture": {
+        "viewer_version": "0.9.0rc2",
+        "viewport_px": [1280, 800],
+        "locale": "en-US",
+        "browser": "Chromium via Playwright 1.64.1",
+        "webgl_backend": "ANGLE Vulkan on NVIDIA GeForce RTX 3070 Ti",
+        "selection": "FMA7088",
+        "renderable_meshes": 132,
+        "source_identity_differences": true,
+        "catalog_sha256": "953a632513863a62fb65c8468ec16cee6cb195f4899516fbb254d10a6b5fe32c",
+        "source_receipt_sha256": "727089d6f017e82f32130b833fb9f546c00569507f350ba6ccaa54994e9a6261"
+      }
     },
-    "geometry_validation.json": {
-      "bytes": 22095,
-      "sha256": "2a03ae8c3212907229c7bb041d69f37a094e36b4e046b3570e0c52dd2ef406d4"
+    "desktop-contact.png": {
+      "sha256": "a302b5cc72b460b9434cffa5fca2fd96cc7f98fef804859346413bdc77687508",
+      "bytes": 171739,
+      "license": "CC-BY-SA-4.0",
+      "content_type": "MOVING_ILLUSTRATIVE",
+      "caption": "Desktop contact inspector with native wrench and full-cycle failure at state 55."
     },
-    "index.html": {
-      "bytes": 3063,
-      "sha256": "a75c003a19364055cedecb085aa17728e97654d34587cf181f4bd6c11fd5955a"
+    "mobile-contact.png": {
+      "sha256": "40b721271e1395165a1fc7bce972b6114b1538314d17899e9e92c96f3254a02e",
+      "bytes": 105615,
+      "license": "CC-BY-SA-4.0",
+      "content_type": "MOVING_ILLUSTRATIVE",
+      "caption": "Mobile contact inspector with native wrench and full-cycle failure at state 55."
     },
-    "passport.json": {
-      "bytes": 89482,
-      "sha256": "02dcc0e3d9b42545a0e2446ac582c9fd4dad3c926a2e6f657c07a83a153be1f8"
+    "desktop-pectoralis.png": {
+      "sha256": "8a6503e68c0b5da9bf4bb769799b246c37664aa7e40b9710f8e663be2e59ba7a",
+      "bytes": 152572,
+      "license": "CC-BY-SA-4.0",
+      "content_type": "MOVING_ILLUSTRATIVE",
+      "caption": "Right pectoralis instrument readout at exact state 55."
     },
-    "plot.png": {
-      "bytes": 58155,
-      "sha256": "8bad04f4242ac0dbe1c5c8a3ba08a9cc9ba7c02f134f02d79a9846d176cb9a1a"
+    "desktop-triceps.png": {
+      "sha256": "ea6f74eac5d93bbe976438df6eb526be8f99def91c32001e00c68fd5f9b56214",
+      "bytes": 154083,
+      "license": "CC-BY-SA-4.0",
+      "content_type": "MOVING_ILLUSTRATIVE",
+      "caption": "Right triceps instrument readout at exact state 55."
     },
-    "preview.png": {
-      "bytes": 327300,
-      "sha256": "5c03a351c5f338aee3e24b8891e140280880b2548b40127824b7894ad8fa58c6"
+    "mobile-pectoralis-detail.png": {
+      "sha256": "8c8ba0be76fe7401eb4f732b49ee7419724e852804db3760a90a6db606da769c",
+      "bytes": 65668,
+      "license": "CC-BY-SA-4.0",
+      "content_type": "MOVING_ILLUSTRATIVE",
+      "caption": "Right pectoralis inspector at 390 px."
     },
-    "return.png": {
-      "bytes": 327300,
-      "sha256": "5c03a351c5f338aee3e24b8891e140280880b2548b40127824b7894ad8fa58c6"
+    "mobile-triceps-detail.png": {
+      "sha256": "5998f51fa6a780dc6370791f632478de46d4e22cf13f1f5b340b8aa66586ddbd",
+      "bytes": 65541,
+      "license": "CC-BY-SA-4.0",
+      "content_type": "MOVING_ILLUSTRATIVE",
+      "caption": "Right triceps inspector at 390 px."
+    },
+    "hand-right.png": {
+      "sha256": "a95ee11793b4b915d1c62a668e0b9da8d366f46f0ccbdeb5547236e23f7c095d",
+      "bytes": 420525,
+      "license": "CC-BY-SA-4.0",
+      "content_type": "MOVING_ILLUSTRATIVE",
+      "caption": "Right hand, saved state 55 with contact proxies and force directions visible, Cycles OptiX."
+    },
+    "hand-left.png": {
+      "sha256": "dcf2f19ec35b7bcd6b5433254a90866bec1ff32f227fe28bcb5e578dba8082b9",
+      "bytes": 371086,
+      "license": "CC-BY-SA-4.0",
+      "content_type": "MOVING_ILLUSTRATIVE",
+      "caption": "Left hand, saved state 55 with contact proxies and force directions visible, Cycles OptiX."
+    },
+    "muscle-signals.png": {
+      "sha256": "9ab9a1497d2ddea91d50cb02dd2768c12b595552b1b69904fe5d1efc80c5136f",
+      "bytes": 193016,
+      "license": "MIT",
+      "content_type": "MODEL_OUTPUT",
+      "caption": "Bilateral mean activation and summed absolute path force from 111 saved states."
+    },
+    "muscle-signals.csv": {
+      "sha256": "4b0c02780f34e8867aec18ced78a3dbb635a6a3b99e8fa17bd92fa9b65c43865",
+      "bytes": 19152,
+      "license": "MIT",
+      "content_type": "MODEL_OUTPUT",
+      "caption": "Data for the synchronized bilateral force and activation plots."
+    },
+    "contact-frame-055.json": {
+      "sha256": "12ccb061d8bb86f3a339cc751bebf9c15668dc2a6d9c5309a0e3f0e0a757949f",
+      "bytes": 37952,
+      "license": "MIT",
+      "content_type": "MODEL_OUTPUT",
+      "caption": "Official MCP right-hand contact evidence at state 55."
     },
     "scientific_manifest.json": {
-      "bytes": 36448,
-      "sha256": "7177f673cb3f0f2c54c6c8a3c54e00f8a5102e04aadb431990375959e1b6f384"
-    },
-    "start.png": {
-      "bytes": 327060,
-      "sha256": "cce82d9c8e3e747d6d5e8c3acf8de5349b7a1c62b28d6304bd89cb0c47e86e3f"
-    },
-    "summary.json": {
-      "bytes": 7576,
-      "sha256": "2f05f2e5854ca3e85e09c33b7324c473eca6757d1794b38bfd8d30ac4d48903b"
+      "sha256": "85d24de44df1299c75120c2282e865b28a988a6649497acdb670ef3b19c565b3",
+      "bytes": 47432,
+      "license": "MIT",
+      "content_type": "MODEL_OUTPUT",
+      "caption": "Original computation manifest including acceptance and hashes."
     }
   }
 }

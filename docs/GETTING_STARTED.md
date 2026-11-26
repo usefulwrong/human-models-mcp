@@ -25,20 +25,18 @@ world-writable. The generated MCP connector includes the selected user IDs.
 ```sh
 export HMM_UID="$(id -u)" HMM_GID="$(id -g)"
 make build
-python3 scripts/experiment.py --scenario pushup --output outputs/my-pushup
+python3 scripts/experiment.py --scenario pushup_flat_palm --output outputs/my-flat-palm
 ```
 
 `make build` verifies every model file against `models.lock.json`, creates
 `.client-venv` with hash-locked packages and builds the CPU runtime. The launcher
 runs an independent MCP SDK client and exports checked CSV/JSON/NPZ files plus
 `client.json`, `manifest.json` and `index.html` to the new directory. No API key,
-language model or Blender is needed.
-
-The separate assisted palm calculation is:
-
-```sh
-python3 scripts/experiment.py --scenario pushup_palms --output outputs/my-palms
-```
+language model or Blender is needed. Open the generated `index.html` and
+inspect the acceptance map in `manifest.json`. In the preview run,
+distributed palm-and-digit support passed. The full push-up, four-support,
+stationary-support and numerical-bound criteria failed.
+[Preview receipt](demo/scientific_manifest.json)
 
 A scenario's `render` flag requests native diagnostic images. Blender renders
 are separate operations on saved states.
@@ -51,7 +49,7 @@ make render-build
 make render-preview
 ```
 
-This downloads and checks official Blender, computes a fresh `pushup_palms`
+This downloads and checks official Blender, computes a fresh experimental `pushup_flat_palm`
 result, starts a project renderer and renders five states on CPU. Open the
 printed local HTML path. A first image build can take several minutes.
 No GUI or NVIDIA hardware is required. See [Rendering](RENDERING.md) to render
@@ -88,10 +86,10 @@ runtime/client and renderer. `render_jobs/` is a separate queue.
 
 ## Offline use and packaging
 
-After building, normal calculations and renders need no network. A new machine
-needs the downloads again. This is a source-checkout preview, not a self-contained
-PyPI install: the wheel contains code and the frozen palm reference; scenarios,
-locks and provisioned models are project data. Run from the project root.
+After building, normal calculations and renders can use the provisioned images
+and assets offline. For another machine, provision or transfer those inputs
+before disconnecting it. The wheel contains code and the frozen palm reference.
+Run from the full source tree to access the scenarios, locks and model data.
 Docker explicitly sets `HUMAN_MODELS_HOME=/app`.
 
 Stop this project's renderer with `docker compose stop renderer`. No cleanup is
@@ -100,6 +98,6 @@ outputs. Do not prune shared Docker images or volumes for troubleshooting.
 
 [Reproducibility](REPRODUCIBILITY.md) · [Security](SECURITY.md)
 
-For the four-view experiment and the optional Z-Anatomy recipe, follow the
-[v0.8 workflow](V08_WORKFLOW.md). The BodyParts3D cache and Fit3D comparison
-have their own setup. [Atlas and reference setup](V08_ANATOMICAL_EVIDENCE.md)
+Follow the [preview workflow](PREVIEW_WORKFLOW.md) for exact-state MCP queries,
+the browser and Blender. Install the optional Explorer to browse the atlas and
+run the `anatomy_lab` MCP tool. [Anatomy Explorer setup and commands](V09_ANATOMY_LAB.md)

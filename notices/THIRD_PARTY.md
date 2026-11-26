@@ -27,15 +27,14 @@ The wrapper's MIT license does not relicense models, native libraries or meshes.
 The model card's license statement was reviewed; the historical provenance of
 every original mesh was not independently reconstructed. No motion capture,
 patient anatomy scans, generated anatomy artwork or restricted external assets
-are added to scientific outputs. OpenSim and MyoSuite are research comparisons,
-not redistributed dependencies. The reference art in `.agent-input` is excluded
-from Docker and scientific demo artifacts.
+are added to scientific outputs. The public moving media include MyoSuite
+and Z-Anatomy derivatives under the terms below. The external reference media
+and source asset downloads are provisioned independently of the source tree.
 
 The v0.3 loaded-elbow experiment derives the source model in memory by adding
 one explicitly recorded compliant pelvis fixture and time-step setting. It does
 not modify the downloaded source files. Engine-rendered demo images retain this
-model attribution. No HRA, Z-Anatomy, OpenSim, MyoSuite or OpenCOR assets are
-redistributed. Matplotlib 3.11.2 and its exact transitive packages are hash-pinned;
+model attribution. Matplotlib 3.11.2 and its exact transitive packages are hash-pinned;
 their upstream distribution license files remain in the image.
 
 - **Nichols, Bednar and Murray (2016)**, PLOS ONE 11(6):e0157346,
@@ -66,9 +65,8 @@ Blender 4.5.15 LTS (GPL-3.0-or-later), usd-core/OpenUSD 26.11
 (LicenseRef-TOST-1.0) and their bundled dependencies are separate from the
 MIT wrapper. Exact sources, hashes, licenses and redistribution considerations
 are in [BLENDER_RENDERER.md](BLENDER_RENDERER.md) and renderer.lock.json.
-The historical demo uses native model geometry. The four-view workflow demo
-includes renders of two Z-Anatomy muscles with separate CC BY-SA 4.0 terms.
-The downloaded atlas meshes and editable atlas scene stay local.
+The core Blender renderer supports optional renders of two Z-Anatomy muscles
+with separate CC BY-SA 4.0 terms. The source tree carries media and source pins.
 [Rectus attribution](BODYPARTS3D.md#rectus-abdominis-supplement)
 HRA reference
 metadata/optional cache has CC-BY-4.0 attribution; Z-Anatomy source review found
@@ -76,18 +74,16 @@ mixed asset licenses. No general CC permission is inferred for every asset.
 
 ## Public Research Preview demo
 
-`docs/demo/` contains new calculation/render outputs from the pinned source
-model, not generated anatomy artwork or human-subject recordings. Original
-wrapper data, graphs and scene assembly use the wrapper MIT terms; retained
-MS-Human-700 geometry/model derivatives remain subject to Apache-2.0. The full
-model license, change/provenance records and wrapper license accompany the
-standalone scientific-data and scene archives. The source model files were not
-edited on disk; in-memory derivatives are identified in `model_recipe.json`.
+The [current demo](../docs/demo/README.md) records the selected articulated
+run, saved-state hashes and separate terms for each derivative. Moving
+bones are MS-Human-700 under Apache-2.0. MyoSuite light surfaces derive
+from BodyParts3D © DBCLS under CC BY 4.0. Moving images and scenes include
+fitted Z-Anatomy rectus surfaces under CC BY-SA 4.0. The separately captured
+Explorer screenshot and static atlas sheet use the 4.3 mirror under
+CC BY-SA 2.1 Japan. Model signal
+plots identify their MS-Human-700 source.
 
-Rendered images and editable `.blend` files do not contain the Blender program.
-No Blender binary is distributed in the public tree or prepared Release assets.
-Using Blender to make a picture does not license the picture as GPL. The local
-renderer uses the unmodified official Blender binary under its own terms;
-redistributing that binary/image would require a separate obligations review.
-No external human reference photographs or third-party exercise videos are
-redistributed. References link to their original publishers.
+The source packages preserve code, notices and source pins. Third-party
+model and renderer binaries, the full-resolution atlas and external human
+reference media are provisioned separately. Blender's GPL applies to the
+program. The current scene and media retain their underlying component terms.

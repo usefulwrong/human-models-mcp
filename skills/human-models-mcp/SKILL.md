@@ -141,6 +141,11 @@ verify hashes, inspect start/bottom/end frames and report scientific limits.
 The model does not provide flat-palm pressure, independent scapula control,
 registered muscle volumes, calibrated human activation or safety predictions.
 
+The current preview uses `pushup_flat_palm`. Query its exact sample with
+`get_contact`, inspect `distributed_palms_and_digits` independently from
+`full_pushup`, and retain the actual science statuses in every replay.
+[Contact model and limits](../../docs/CONTACT_MODEL_AND_LIMITATIONS.md)
+
 `pushup_palms` and `pushup_knuckles` add fixed source-derived hand postures,
 48 rerouted extrinsic hand/wrist transmissions and multi-point support. Their
 default `assisted_muscle` mode records real muscle activation/forces plus explicit
@@ -152,7 +157,7 @@ tension. Discrete wrist ligaments and independent finger dynamics are absent.
 Use regional visual layers and `camera_view: hands` as described in the
 [hand-detail notes](../../docs/HAND_DETAIL.md).
 
-Current `pushup_palms` 1.5 defaults to `palm_technique: chest_full`: 33 frozen
+The historical `pushup_palms` 1.5 defaults to `palm_technique: chest_full`: 33 frozen
 synthetic targets, roughly shoulder-width supports and a separately declared
 wrist envelope. Require `elbow_extension` and `wrist_extension_envelope` PASS;
 read `wrist_range_derivation` and `palm_reference_input.json`. Only two extension
@@ -161,7 +166,7 @@ engineering, not subject calibration or an unmodified-native-range result.
 `chest_level` retains the former native-range wide partial trajectory, and
 `legacy_reach` retains the rejected reach. Do not merge their scientific statuses.
 
-For detailed-hand runs require `stationary_supports=PASS` and retrieve
+For legacy fixed-point runs inspect `stationary_supports` and retrieve
 `support_stationarity.json`: all native hand/toe pads and four prescribed points
 must stay within 0.5 mm horizontally at every integration step. Defaults are
 `support_boundary: fixed_points`, 0.5 ms integration and 4.4 s total. Horizontal
@@ -178,7 +183,7 @@ widened to force a reference. Muscle forces require recomputation after changing
 technique; neither expected EMG nor rendering colors may manufacture them.
 
 Before implementing or accepting human exercise motion, follow the repository
-[reference-first rule](../../AGENTS.md#human-movement-references-before-implementation).
+[reference-first rule](../../docs/MOVEMENT_METHODS.md).
 Search for real people performing the named variant, open the actual images or
 video frames, and record viewed phases/angles and source URLs before choosing
 the trajectory. Compare model limits with those references; preserve an honest
@@ -186,7 +191,7 @@ negative result if they are incompatible. A numeric PASS is not a technique PASS
 For push-ups explicitly inspect bilateral pectoral forces/activation; rendering
 colors must remain computed values and cannot be supplied from expected EMG.
 
-## Evidence and recipes in v0.8
+## Evidence and recipes
 
 Discover capabilities and scenario scope before execution. Inspect named gates,
 then use a listed render recipe and request Evidence Contract entries with
@@ -194,7 +199,7 @@ then use a listed render recipe and request Evidence Contract entries with
 workflow for licensed data. Use the report's named quantities and evidence
 class when drawing conclusions.
 
-[Anatomical evidence guide](../../docs/V08_ANATOMICAL_EVIDENCE.md)
+[Anatomical evidence guide](../../docs/ANATOMICAL_EVIDENCE.md)
 
 ## One calculation with several views
 

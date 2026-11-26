@@ -1,0 +1,26 @@
+id: pushup_flat_palm
+version: 1.0.0
+title: Experimental broad palm support and bilateral articulated source digits
+engine: mujoco
+engine_version: 3.17.0
+model: ms_human_700
+model_revision: 98a70c569c4c1b6da467a20012f766ee1f8dc521
+backend: pushup
+method: dynamic_forward
+required_capabilities: [dynamic_forward, muscle_activation, actuator_force, muscle_actuated_dynamics, motion_visualization]
+scope: >-
+  Experimental derivative of the synthetic chest-level palm reference. Native
+  unilateral collision and friction supply ground reactions. Measure the heel,
+  thenar and hypothenar regions, distal palm and five digits on each side.
+  Source digit hinges are integrated under contact with bounded joint assistance.
+  Compliant pads are an engineering contact representation.
+defaults:
+  control: assisted_muscle
+  muscle_strength_scale: 1.0
+  friction: 0.8
+  timestep_s: 0.0005
+  render: false
+  hand_support: palms
+  support_boundary: frictional_contact
+  contact_profile: articulated_palms_v1
+  palm_technique: chest_full

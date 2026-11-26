@@ -8,37 +8,26 @@ import sys
 import shutil
 from uuid import uuid4
 
-from release_check import source_fingerprint, git_read
+from public_check import check, public_files
+from visual_release_check import source_fingerprint
 
 ROOT = Path(__file__).resolve().parents[1]
-PAYLOAD = ["src", "scenarios", "scripts", "tests", "skills", "examples", "notices", "benchmarks", "pyproject.toml", "requirements.in",
-           "requirements.lock", "models.lock.json", "Dockerfile", "compose.yaml", "Makefile", "MANIFEST.in", ".dockerignore", "LICENSE", "CITATION.cff"]
 
 
 def main():
-    head = git_read("rev-parse", "HEAD")
-    versioned = head.returncode == 0
-    changed = []
-    if versioned:
-        for command in (["git", "diff", "HEAD", "--name-only", "-z"], ["git", "ls-files", "--others", "--exclude-standard", "-z"]):
-            changed.extend(subprocess.check_output(command, cwd=ROOT).decode().split("\0"))
-    dirty = any(p and not p.startswith(("reports/", "docs/demo")) for p in changed)
     tag = str(uuid4())
-    destination = ROOT / ".cache" / ("clean-v05-" + tag)
-    if versioned:
-        subprocess.run(["git", "clone", "--no-hardlinks", str(ROOT), str(destination)], check=True)
-    else:
-        destination.mkdir(parents=True)
-    assert not (destination / "results").exists()
-    if dirty or not versioned:
-        # An isolated test fixture, not a substitute source archive or invented Git history.
-        for name in ("src", "scenarios", "scripts", "tests", "skills", "examples", "notices", "docs", "benchmarks"):
-            shutil.copytree(ROOT / name, destination / name, dirs_exist_ok=True,
-                            ignore=shutil.ignore_patterns("__pycache__", "*.egg-info"))
-        for name in ("pyproject.toml", "requirements.in", "requirements.lock", "models.lock.json", "Dockerfile", "compose.yaml",
-                     "Makefile", "MANIFEST.in", ".dockerignore", "LICENSE", "CITATION.cff", "README.md"):
-            shutil.copy2(ROOT / name, destination / name)
-    assert source_fingerprint(destination) == source_fingerprint(ROOT)
+    destination = ROOT / ".cache" / ("clean-source-" + tag)
+    destination.mkdir(parents=True)
+    for source in public_files(ROOT):
+        if source.is_symlink():
+            raise ValueError(f"symlink in public source: {source.relative_to(ROOT)}")
+        target = destination / source.relative_to(ROOT)
+        target.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(source, target)
+    acceptance = check(destination, strict_tree=True)
+    if acceptance["status"] != "pass":
+        raise ValueError(str(acceptance["failures"]))
+    fingerprint = source_fingerprint(destination)
     subprocess.run([sys.executable, "scripts/provision.py"], cwd=destination, check=True, timeout=300)
     for name in ("results", "reports/logs"):
         (destination / name).mkdir(parents=True, exist_ok=True)
@@ -63,13 +52,13 @@ def main():
         clients[scenario] = str(client_output.relative_to(ROOT))
     e2e = json.loads((destination / "reports/e2e.json").read_text())
     assert e2e["status"] == "pass" and e2e["stdio"]["v03"]["loaded_elbow"]["run"]["status"] == "computed"
-    evidence = {"status": "pass", "head": head.stdout.strip() if versioned else "no_git_repository",
-                "source_sha256": source_fingerprint(ROOT), "clone": str(destination.relative_to(ROOT)),
+    evidence = {"status": "pass",
+                "source_sha256": fingerprint, "clone": str(destination.relative_to(ROOT)),
                 "image_id": subprocess.check_output(["docker", "image", "inspect", image, "--format", "{{.Id}}"], text=True).strip(),
                 "build_cache": False, "runtime_network": "none", "initial_results": "absent",
-                "source_state": "unversioned_fixture" if not versioned else "working_tree_overlay" if dirty else "committed",
+                "source_state": "exact_public_source_fixture",
                 "original_git_mutated": False,
-                "checks": ["fresh_git_clone" if versioned else "unversioned_source_fixture", "fresh_model_provision", "no_cache_image_build", "unit_package_lint", "stdio_http_real_engine", "fresh_host_motion_client"],
+                "checks": ["strict_public_source_fixture", "fresh_model_provision", "no_cache_image_build", "unit_package_lint", "stdio_http_real_engine", "fresh_host_motion_client"],
                 "e2e_evidence": str((destination / "reports/e2e.json").relative_to(ROOT)),
                 "fresh_clients": clients}
     (ROOT / "reports/clean-copy.json").write_text(json.dumps(evidence, indent=2) + "\n")

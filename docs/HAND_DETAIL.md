@@ -1,13 +1,14 @@
-# Push-up: regional muscles and palm/knuckle comparison
+# Historical fixed-point hand methods and regional measurements
 
-**Full-amplitude update:** `pushup_palms` 1.5 uses `palm_technique: chest_full`,
+For the current articulated palms and their measured limits, see [contact evidence](CONTACT_MODEL_AND_LIMITATIONS.md).
+
+**Historical fixed-point derivation:** `pushup_palms` 1.5 uses `palm_technique: chest_full`,
 chest-level palms at approximately shoulder width (31 cm) and 0.1–1.9 rad elbow
 targets. A multi-phase bounded IK plans the entire cycle with common fixed
 supports, then freezes 33 checked poses. Only initialization sets a physical
 pose; later states still result from `mj_step`. Two wrist-extension coordinate
 bounds are explicitly derived, with a separate shaft-angle envelope checked
-at every integration step. [Current evidence](demo/README.md).
-The [public demonstration](demo/README.md) is a separately checked RC run.
+at every integration step.
 
 `chest_level` preserves the former 70 cm native-range partial trajectory;
 `legacy_reach` preserves the rejected forward reach. Neither archive is rewritten.
@@ -31,8 +32,8 @@ The new `pectoral_muscles` layer and `chest` camera show six native bilateral
 PECM1/2/3 paths. New runs save `pectorals.csv` and `pectorals.json`; the client
 downloads a separate `plot.png` with right/left force and activation traces.
 These measurements describe their source experiment, including rejected poses.
-[AGENTS.md](../AGENTS.md) requires real human visual references before exercise
-geometry changes and phase-by-phase review before handoff.
+The [movement methods](MOVEMENT_METHODS.md) require real human visual references
+before exercise geometry changes and phase-by-phase review.
 
 The extension provides two explicit experiments, `pushup_palms` and
 `pushup_knuckles`, using the full primary MS-Human-700 model. The original
@@ -41,7 +42,7 @@ The new variants integrate real muscle excitation, activation and forces with
 **bounded external residual joint assistance**. Their `muscle_driven` status is
 `NOT_ACHIEVED`, even when the full-cycle/contact/numerical gates pass.
 
-The [public RC demo](demo/README.md) includes its own complete scientific data.
+The [current demo](demo/README.md) uses the articulated frictional route.
 The commands below create new individual exports under ignored `outputs/`.
 Historical comparison viewers and the original 26-path demo are retained in the
 private research archive; they are not pre-existing public downloads.
@@ -103,7 +104,7 @@ checks remain separate. These are engineering acceptance conditions.
 
 ## Fixed supports and moving wrists
 
-Defaults now use `support_boundary: fixed_points`. One prescribed horizontal
+The historical fixed-point scenarios use `support_boundary: fixed_points`. One prescribed horizontal
 material point per hand and per foot closes the kinematic chain. The reference
 is solved with bounded closed-chain IK, keeping full hand orientation and both
 toe sphere centres fixed. During integration the controller never overwrites
@@ -280,8 +281,7 @@ layers. For exact E2E media settings with public MCP SDK transfers, use:
 ```
 
 The client verifies idempotency, immutable source states and transfer hashes.
-Historical fixed-support comparisons used Cycles OptiX. The public RC demo is
-rendered on CPU; consult the new RC report for the current GPU availability. Add `-f compose.yaml -f compose.render-gpu.yaml` when starting
+Historical fixed-support comparisons used Cycles OptiX. Add `-f compose.yaml -f compose.render-gpu.yaml` when starting
 the renderer and `--device gpu` to request that backend; CPU rendering remains
 available. No system/driver changes or control of other GPU processes is needed.
 
@@ -298,5 +298,4 @@ Blender scene, overlay positions/colors/visibility, video timing and full MP4
 decode. Detailed native reconstruction shares the source-hand derivation helper;
 it independently checks the resulting state/geometry against Blender rather than
 claiming an independent anatomical derivation. Historical hand/fist reports and all source runs are retained in the local
-research archive. Current public acceptance is in [the RC audit](../reports/PUBLIC_RELEASE_AUDIT.md);
-the rejected-pose fixture remains executable in the unit suite.
+research archive. The rejected-pose fixture remains executable in the unit suite.

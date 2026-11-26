@@ -130,8 +130,8 @@ def main():
     if len(rendered["frames"]) != 3 or list(phase_indices) != ["start", "bottom", "return"]:
         raise ValueError("expected start, bottom and return in a three-frame render")
     run, model, data, _, _, states, times, qpos, spec, rows = load_saved_run(job / "input")
-    if run["scenario_id"] != "pushup_palms":
-        raise ValueError("only the pinned pushup_palms region is supported")
+    if run["scenario_id"] not in {"pushup_flat_palm", "pushup_palms"}:
+        raise ValueError("regional replay requires a supported palm push-up run")
     mj.mj_forward(model, data)
     lock = atlas_lock()
     atlas_hash = atlas_lock_digest(lock)

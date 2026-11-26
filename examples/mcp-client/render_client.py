@@ -30,7 +30,7 @@ async def exercise(client, args):
         return value
 
     tools = {t.name for t in (await client.list_tools()).tools}
-    assert len(tools) == 14 and {"render_result", "get_render_artifact", "run_scenario"} <= tools
+    assert {"render_result", "get_render_artifact", "run_scenario"} <= tools
     profiles = await call("list_render_profiles")
     assert set(profiles["profiles"]) == {"preview", "scientific", "cinematic"}
     scenarios = await call("list_scenarios")
@@ -44,10 +44,11 @@ async def exercise(client, args):
         else await call("run_scenario", {"scenario_id": args.scenario, "parameters": {"render": False}})
     )
     assert run["status"] == "computed" and run["scenario_id"] == args.scenario
+    pushup = run["scenario_id"].startswith("pushup")
     source_before = run["artifacts"]["trajectory.npz"]["sha256"]
     layers = (
         ["bones", "muscle_paths", "joint_axes", "contact_forces", "center_of_mass"]
-        if args.scenario in ("pushup", "pushup_palms", "pushup_knuckles") else
+        if pushup else
         ["bones", "muscle_paths", "joint_axes", "applied_moments"]
         if args.scenario in ("elbow_tracking", "loaded_elbow")
         else ["bones", "contact_forces", "center_of_mass", "joint_axes", "applied_moments"]
@@ -159,7 +160,7 @@ async def exercise(client, args):
         assert rejected["status"] == "unsupported"
     else:
         assert passport["anatomy"]["external_registration"] == "registration_unverified"
-    if args.scenario in ("pushup", "pushup_palms", "pushup_knuckles"):
+    if pushup:
         assert passport["source_scientific"]["acceptance"] == run["scientific"]["acceptance"]
     after = await call("get_result", {"run_id": run["run_id"]})
     assert after == run
@@ -178,8 +179,12 @@ async def exercise(client, args):
     }
     evidence_link = (' · <a href="evidence.json">Evidence Contract</a>'
                      if "evidence.json" in transfers else "")
+    gate = run["scientific"].get("acceptance", {}).get("full_pushup")
+    acceptance = f"<p>Full push-up: {gate}</p>" if gate in {"PASS", "FAIL", "NOT_RUN"} else ""
     (args.output / "index.html").write_text(
-        '<!doctype html><meta charset="utf-8"><title>UsefulWrong computed motion</title><h1>UsefulWrong / saved-state visualization</h1><video controls loop src="animation.mp4" style="max-width:100%"></video><p>Computed model motion; Blender presentation. No clinical or balance validation.</p><img src="preview.png" style="max-width:100%"><p><a href="passport.json">Scientific passport</a>'
+        '<!doctype html><meta charset="utf-8"><title>UsefulWrong computed motion</title><h1>UsefulWrong / saved-state visualization</h1>'
+        + acceptance
+        + '<video controls loop src="animation.mp4" style="max-width:100%"></video><p>Computed model motion with Blender presentation. Human and balance validation are unavailable.</p><img src="preview.png" style="max-width:100%"><p><a href="passport.json">Scientific passport</a>'
         + evidence_link
         + ' · <a href="source.zip">Source data</a> · <a href="scene.blend">Editable scene</a> · <a href="frames.json">Frame clock and hashes</a></p>'
     )

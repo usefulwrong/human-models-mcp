@@ -32,7 +32,20 @@ def camera(scene, collection, name, view, basis):
     return obj
 
 
-def build(folder, motion, basis, *, save=True):
+def contact_receipt(motion, record):
+    evidence = record["scientific_quantity"]
+    sample = record["sample"]
+    frame = motion["frames"][sample]
+    if (record["status"] != "ok" or record["run_id"] != motion["run_id"]
+            or frame["state_index"] != sample or frame["state_sha256"] != record["state_sha256"]
+            or frame["frame_time"] != record["time_s"] or evidence["acceptance"] != motion["acceptance"]
+            or evidence["sources_sha256"]["contact_manifest.json"] != motion["contact"]["manifest_sha256"]
+            or evidence["sources_sha256"]["trajectory.npz"] != motion["trajectory_sha256"]):
+        raise ValueError("contact receipt differs from the motion or exact saved state")
+    return sample
+
+
+def build(folder, motion, basis, *, save=True, contact=None):
     bpy.ops.wm.read_factory_settings(use_empty=True)
     scene = bpy.context.scene
     scene.render.fps = 25
@@ -93,13 +106,20 @@ def build(folder, motion, basis, *, save=True):
             scene.timeline_markers.new(frame["phase"], frame=frame["state_index"])
     scene.frame_set(0)
     notes = bpy.data.texts.new("MotionScene evidence and attribution")
-    notes.write("Assisted MuJoCo push-up. The baked animation is editable. Anatomy registration is illustrative.\n"
+    notes.write(f"{motion['scenario_id']} · full_pushup={motion['acceptance']['full_pushup']}. "
+                "Editable saved-state replay with illustrative anatomy.\n"
                 "MyoSuite / BodyParts3D © DBCLS, CC BY 4.0. Z-Anatomy rectus © Gauthier Kervyn, based on "
                 "BodyParts3D © DBCLS, CC BY-SA 4.0. MS-Human-700 Apache-2.0.\n")
-    notes.write(json.dumps({k: motion[k] for k in ("run_id", "control", "frames", "acceptance", "assets")},
+    notes.write(json.dumps({k: motion[k] for k in ("run_id", "scenario_id", "control", "frames", "acceptance",
+                                                "assets", "excluded_display_surfaces") if k in motion},
                            indent=2))
     scene["motion_sha256"] = digest(folder / "motion.json")
     scene["trajectory_sha256"] = motion["trajectory_sha256"]
+    if contact is not None:
+        sample = contact_receipt(motion, contact)
+        bpy.data.texts.new("Saved contact scientific quantities").write(json.dumps(contact, indent=2))
+        scene.timeline_markers.new(f"Contact evidence · {contact['measurement_status']}", frame=sample)
+        scene.frame_set(sample)
     bpy.context.preferences.filepaths.save_version = 0
     if save:
         bpy.ops.wm.save_as_mainfile(filepath=str(folder / "render/scene.blend"), compress=True)
@@ -109,6 +129,10 @@ def verify(folder, motion, basis):
     scene = bpy.context.scene
     assert scene["motion_sha256"] == digest(folder / "motion.json")
     assert scene["trajectory_sha256"] == motion["trajectory_sha256"]
+    contact = bpy.data.texts.get("Saved contact scientific quantities")
+    if contact:
+        contact = json.loads(contact.as_string())
+        assert scene.frame_current == contact_receipt(motion, contact)
     samples = json.loads((folder / "samples.json").read_text())
     coverage = json.loads((folder / "coverage.json").read_text())
     assert all(bpy.data.collections.get(name) is not None for name in motion["layers"])
@@ -116,6 +140,11 @@ def verify(folder, motion, basis):
     native = {row["name"]: row for row in coverage["native_bones"]}
     sample_objs = [scene.objects[s["name"]] for s in samples["points"]]
     doc, blob = unpack((folder / "motion.glb").read_bytes())
+    proxies = {n["name"]: n["extras"]["geom"] for n in doc["nodes"]
+               if n.get("extras", {}).get("layer") == "OVERLAYS" and "geom" in n["extras"]}
+    if proxies:
+        assert bpy.data.collections["OVERLAYS"].hide_render
+        bpy.context.view_layer.layer_collection.children["OVERLAYS"].hide_viewport = False
     mapped_samples = []
     for row, obj in zip(samples["points"], sample_objs, strict=True):
         mesh_id = doc["nodes"][row["node"]]["mesh"]
@@ -134,10 +163,14 @@ def verify(folder, motion, basis):
         mapped_samples.append((remap, np.asarray(row["world_glb_m"])[:, keep, :] @ basis))
     poses = {int(g): np.asarray(p) for g, p in samples["geom_pose_world_m"].items()}
     errors, skin_errors, frame_rows = [], [], []
+    proxy_error = 0.
     for i, frame in enumerate(motion["frames"]):
         scene.frame_set(i)
         depsgraph = bpy.context.evaluated_depsgraph_get()
         error = 0.
+        for name, geom_id in proxies.items():
+            transform = np.asarray(scene.objects[name].evaluated_get(depsgraph).matrix_world)
+            proxy_error = max(proxy_error, float(np.max(np.abs(transform - poses[geom_id][i]))))
         for obj, (remap, exp) in zip(sample_objs, mapped_samples, strict=True):
             evaluated = obj.evaluated_get(depsgraph)
             transform = np.asarray(evaluated.matrix_world)
@@ -159,6 +192,12 @@ def verify(folder, motion, basis):
               "maximum_native_matrix_component_error": max(row["max_native_matrix_component_error"] for row in frame_rows),
               "action_count": len(bpy.data.actions), "armatures": [o.name for o in scene.objects if o.type == "ARMATURE"],
               "collections": {c: len(bpy.data.collections[c].objects) for c in motion["layers"]}}
+    if proxies:
+        result.update(contact_proxy_count=len(proxies), contact_proxy_matrix_max_error=proxy_error)
+        if proxy_error > .0001:
+            raise ValueError("reopened proxy transform differs from the native state")
+    if contact:
+        result["contact_receipt"] = contact
     result["blender_vertex_samples"] = {row["name"]: list(remap) for row, (remap, _) in
                                          zip(samples["points"], mapped_samples, strict=True)}
     (folder / "render/reopen.json").write_text(json.dumps(result, indent=2) + "\n")
@@ -195,14 +234,15 @@ def render(folder, motion):
 
 
 def main():
-    folder, operation = sys.argv[sys.argv.index("--") + 1:]
+    folder, operation, *extra = sys.argv[sys.argv.index("--") + 1:]
     folder = Path(folder)
     motion = json.loads((folder / "motion.json").read_text())
     basis = np.asarray(motion["coordinates"]["world_to_glb"])[:3, :3]
     if digest(folder / "motion.glb") != motion["artifacts"]["motion.glb"]["sha256"]:
         raise ValueError("motion GLB digest differs")
     if operation == "build":
-        build(folder, motion, basis)
+        contact = json.loads(Path(extra[0]).read_bytes()) if extra else None
+        build(folder, motion, basis, contact=contact)
     elif operation == "verify":
         verify(folder, motion, basis)
     elif operation == "render":

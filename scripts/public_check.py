@@ -16,16 +16,11 @@ from urllib.parse import unquote, urlsplit
 
 ROOT = Path(__file__).resolve().parents[1]
 DIRECTORIES = ("src", "scenarios", "scripts", "tests", "skills", "examples", "notices", "benchmarks", "docs", ".github")
-ROOT_FILES = ("README.md", "AGENTS.md", "LICENSE", "CITATION.cff", "CONTRIBUTING.md", "CHANGELOG.md", "SECURITY.md",
+ROOT_FILES = ("README.md", "LICENSE", "CITATION.cff", "CONTRIBUTING.md", "CHANGELOG.md", "SECURITY.md",
               "pyproject.toml", "MANIFEST.in", "Makefile", "Dockerfile", "Dockerfile.render", "compose.yaml",
               "compose.render-gpu.yaml", ".gitignore", ".dockerignore", "Dockerfile.render.dockerignore",
               "requirements.in", "requirements.lock", "requirements-render.lock", "models.lock.json",
               "renderer.lock.json", "visual_sources.json")
-REPORTS = ("PUBLIC_RELEASE_CHECK.json", "PUBLIC_RELEASE_AUDIT.md", "PUBLIC_RELEASE_ASSETS.json",
-           "PUBLIC_LINK_CHECK.json", "PUBLIC_EXTERNAL_LINKS.json", "PUBLIC_CRITICAL_AUDIT.md",
-           "V08_SCIENCE.md", "V08_ANATOMY_REGISTRATION.md", "V08_REFERENCE_BENCHMARK.md",
-           "V08_RENDER_E2E.md", "V08_RELEASE_CHECK.json", "V08_CODE_REVIEW.md", "V08_PUBLICATION_CHECK.json",
-           "V08_FINAL_RELEASE_AUDIT.md", "V08_FINAL_RELEASE_CHECK.json")
 OPERATOR_ONLY = tuple(Path(name) for name in (
     "scripts/anatomy_lab/build_report.py", "scripts/anatomy_lab/report_site",
     "scripts/muscle_intelligence/package_review.py", "scripts/muscle_intelligence/review_media.py",
@@ -46,7 +41,6 @@ def public_files(root):
     for name in DIRECTORIES:
         paths.extend(p for p in (root / name).rglob("*") if p.is_file()
                      and "__pycache__" not in p.parts and not any(x.endswith('.egg-info') for x in p.parts))
-    paths.extend(root / "reports" / name for name in REPORTS if (root / "reports" / name).exists())
     return sorted(p for p in paths if not any(p.relative_to(root).is_relative_to(local) for local in OPERATOR_ONLY)
                   and "node_modules" not in p.relative_to(root).parts)
 
@@ -229,7 +223,8 @@ def check(root, *, strict_tree=False):
     checked_assets = 0
     if not demo.exists():
         failures.append({'path': 'docs/demo/assets.json', 'reason': 'public demo manifest missing'})
-    for manifest in (demo, demo.parent / 'workflow/assets.json', demo.parent / 'v09/assets.json'):
+    subdirectories = sorted(p for p in demo.parent.glob("*") if p.is_dir())
+    for manifest in (demo, *(p / "assets.json" for p in subdirectories)):
         if not manifest.exists() and not manifest.is_symlink() and (manifest == demo or not manifest.parent.exists()):
             continue
         if not manifest.is_file() or manifest.is_symlink():

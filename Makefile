@@ -25,8 +25,7 @@ e2e:
 	$(RUN) --entrypoint python runtime scripts/e2e.py
 	python3 scripts/fresh_clients.py
 
-demo:
-	python3 scripts/fresh_clients.py --demo
+demo: render-preview
 
 client:
 	$(RUN) --entrypoint python runtime examples/mcp-client/client.py

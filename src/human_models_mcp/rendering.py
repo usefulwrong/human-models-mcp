@@ -40,7 +40,7 @@ LAYERS = {
     "center_of_mass": "Native mass-weighted whole-model COM, in metres.",
     "applied_moments": "Recorded generalized elbow torque or external pelvis moment pseudovector [N*m]; not biological joint reaction.",
 }
-SUPPORTED = {"elbow_tracking", "loaded_elbow", "standing_contact_probe", "assisted_stance", "pushup", "pushup_palms", "pushup_knuckles"}
+SUPPORTED = {"elbow_tracking", "loaded_elbow", "standing_contact_probe", "assisted_stance", "pushup", "pushup_palms", "pushup_knuckles", "pushup_palms_contact", "pushup_flat_palm"}
 RECIPES = {
     "pushup_scientific": {"profile": "scientific", "layers": ["bones", "joint_axes", "contact_forces", "center_of_mass"]},
     "pushup_muscle_paths": {"profile": "scientific", "layers": ["bones", "muscle_paths"]},
@@ -170,6 +170,8 @@ def snapshot(run, destination):
         "model_recipe.json",
         "initial_conditions.json",
         "contact_map.json",
+        "contact_manifest.json",
+        "palm_regions.json",
         "support.json",
         "contacts.json",
         "validation.json",

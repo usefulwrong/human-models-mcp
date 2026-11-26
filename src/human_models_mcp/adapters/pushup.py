@@ -1,12 +1,16 @@
 """Bounded full-primary-model push-up dynamics with measured muscle recruitment."""
 
 import csv
+import gzip
+import hashlib
+import json
 from pathlib import Path
 
 import numpy as np
 
 from ..registry import ForwardValidation, PushupParameters, home
 from .contact import dump, measure_contacts, momentum_rates
+from .articulated_palms import PROFILE as ARTICULATED_PROFILE
 
 PADS = ("palm_r", "palm_l", "toe_r", "toe_l")
 ARM = ("elv_angle", "shoulder_elv", "shoulder_rot", "elbow_flexion", "pro_sup", "deviation", "flexion")
@@ -28,13 +32,13 @@ LIMITATIONS = [
 
 
 def pushup_model(timestep_s=0.001, friction=1.3, muscle_strength_scale=1.0, hand_support="legacy_point", support_boundary="frictional",
-                 knuckle_technique="legacy_flared", palm_technique="legacy_reach"):
+                 knuckle_technique="legacy_flared", palm_technique="legacy_reach", contact_profile=None, *, contact_floor_margin_m=0.):
     import mujoco as mj
 
     spec = mj.MjSpec.from_file(str(home() / "models/ms_human_700/MS-Human-700.xml"))
     if hand_support != "legacy_point":
         from .hands import configure_hands
-        spec, _ = configure_hands(spec, hand_support)
+        spec, _ = configure_hands(spec, hand_support, articulated=contact_profile == ARTICULATED_PROFILE)
     if palm_technique == "chest_full":
         # The physical shaft-angle gate is separate from this literature-informed coordinate box.
         for side in "rl":
@@ -58,10 +62,21 @@ def pushup_model(timestep_s=0.001, friction=1.3, muscle_strength_scale=1.0, hand
     for i in range(model.ngeom):
         if model.geom(i).name.startswith("palm_"):
             model.geom_friction[i, 0] = friction
-    if (model.nq, model.nv, model.nu, model.neq) != (85, 85, 700, 42):
+    expected_counts = (129, 129, 700, 44) if contact_profile == ARTICULATED_PROFILE else (85, 85, 700, 42)
+    if (model.nq, model.nv, model.nu, model.neq) != expected_counts:
         raise ValueError("pushup requires the pinned full primary model with 700 muscles and 42 equalities")
     if not np.all(model.actuator_dyntype == mj.mjtDyn.mjDYN_MUSCLE):
         raise ValueError("non-muscle actuator in primary model")
+    if contact_profile:
+        from .contact_geometry import add_floor_geometry
+
+        poses, _ = contact_reference(model if contact_profile == ARTICULATED_PROFILE else None)
+        add_floor_geometry(mj, spec, model, poses[0], contact_profile, friction, contact_floor_margin_m)
+        model = spec.compile()
+        model.opt.jacobian = mj.mjtJacobian.mjJAC_DENSE
+        model.eq_solref[:] = [.004, 1]
+        model.eq_solimp[:, :2] = [.9999, .9999]
+        model.key_qpos[0] = poses[0]
     if support_boundary == "fixed_points":
         from .supports import add_fixed_supports
         initial = mj.MjData(model)
@@ -121,13 +136,40 @@ def pushup_model(timestep_s=0.001, friction=1.3, muscle_strength_scale=1.0, hand
         model.opt.jacobian = mj.mjtJacobian.mjJAC_DENSE
         model.eq_solref[model.eq_type == mj.mjtEq.mjEQ_JOINT] = [.004, 1]
         model.eq_solimp[model.eq_type == mj.mjtEq.mjEQ_JOINT, :2] = [.9999, .9999]
-    model.dof_damping[6:85] = np.maximum(model.dof_damping[6:85], 10)
+    primary = primary_joints(model)[6:]
+    model.dof_damping[primary] = np.maximum(model.dof_damping[primary], 10)
     # Scale both active gain and passive muscle force; preserve the source curve shapes.
     model.actuator_gainprm[:, 2] *= muscle_strength_scale
     model.actuator_biasprm[:, 2] *= muscle_strength_scale
     data = mj.MjData(model)
     mj.mj_resetDataKeyframe(model, data, 0)
     return mj, model, data
+
+
+def primary_joints(model):
+    return np.array([j for j in range(model.njnt) if not model.joint(j).name.startswith(("digit_", "support_height_"))])
+
+
+def contact_reference(articulated_model=None):
+    # The archived fixed profile constructs the original targets only.
+    from .supports import full_palm_reference
+
+    mj, model, _ = pushup_model(hand_support="palms", support_boundary="fixed_points", palm_technique="chest_full")
+    poses, info = full_palm_reference(mj, model)
+    if articulated_model is None:
+        return poses[:, :85].copy(), info
+    from .articulated_palms import FINGER_REST, align_reference, name_joint
+
+    result = np.zeros((len(poses), articulated_model.nq))
+    result[:, primary_joints(articulated_model)] = poses[:, :85]
+    for side in "rl":
+        for name, value in FINGER_REST.items():
+            result[:, articulated_model.joint(name_joint(side, name)).id] = value
+    for pose in result:
+        couple(articulated_model, pose)
+    align_reference(mj, articulated_model, result)
+    return result, {**info, "hand_reference": "source digit range fit and bilateral palm/toe height alignment"}
+
 
 
 def couple(model, qpos):
@@ -297,32 +339,63 @@ def anatomical_group(name):
 def simulate_pushup(params: dict, output: Path, validation: dict):
     p = PushupParameters.model_validate(params)
     ForwardValidation.model_validate(validation)
-    mj, model, data = pushup_model(p.timestep_s, p.friction, p.muscle_strength_scale, p.hand_support, p.support_boundary, p.knuckle_technique, p.palm_technique)
-    poses, ik = reference_poses(mj, model, data, p.hand_support, knuckle_technique=p.knuckle_technique, palm_technique=p.palm_technique)
+    p_contact = p.support_boundary == "frictional_contact"
+    articulated = p.contact_profile == ARTICULATED_PROFILE
+    mj, model, data = pushup_model(p.timestep_s, p.friction, p.muscle_strength_scale, p.hand_support,
+                                  p.support_boundary, p.knuckle_technique, p.palm_technique, p.contact_profile)
+    poses, ik = (contact_reference(model if articulated else None) if p_contact else
+                 reference_poses(mj, model, data, p.hand_support, knuckle_technique=p.knuckle_technique,
+                                 palm_technique=p.palm_technique))
     data.qpos[:], data.qvel[:], data.act[:], data.ctrl[:] = poses[0], 0, 0, 0
     mj.mj_forward(model, data)
+    if p_contact:
+        from .contact import shift_root
+        from .contact_geometry import initial_floor_gap
+
+        gap = initial_floor_gap(mj, model, data)
+        shift_root(mj, model, data, np.array([0, 0, .0002 - gap]))
+        mj.mj_forward(model, data)
     initial_qpos = data.qpos.copy()
     hand_orientation = {s: data.xquat[model.body("hand_" + s).id].copy() for s in "rl"}
     pad_ids = [i for n in PADS for i in range(model.ngeom) if model.geom(i).name == n or model.geom(i).name.startswith(n + "_")]
+    if p_contact:
+        pad_ids = [g for g in pad_ids if model.geom_contype[g]]
     pad_names = [model.geom(i).name for i in pad_ids]
     pad_groups = [next(i for i, n in enumerate(PADS) if model.geom(g).name == n or model.geom(g).name.startswith(n + "_")) for g in pad_ids]
     initial_pads = data.geom_xpos[pad_ids].copy()
     dependent = set(map(int, model.eq_obj1id[model.eq_type == mj.mjtEq.mjEQ_JOINT]))
-    active = np.array([j for j in range(6, 85) if j not in dependent])
+    primary = primary_joints(model)
+    anatomical = np.arange(model.nv) if articulated else primary
+    active = np.array([j for j in anatomical if j >= 6 and j not in dependent])
+    elbows = [model.joint("elbow_flexion_" + s).id for s in "rl"]
+    posture = primary[[6, 12, 21, 27, 36, 39]]
     gains = np.full(model.nq, 600.0)
     if p.hand_support != "legacy_point":
-        gains[6:45] = 3500
-        gains[45:85] = 2000
+        gains[primary[6:45]] = 3500
+        gains[primary[45:85]] = 2000
     if p.support_boundary == "fixed_points":
         gains[[15, 16, 17, 30, 31, 32]] = 0
+    if articulated:
+        digits = np.array([i for i in active if i not in primary])
+        gains[digits] = 65.
+        digit_indices = np.searchsorted(active, digits)
+        from .articulated_palms import FINGER_CAPSULES, flat_wrist_targets, regional_forces
+        hand_orientation = flat_wrist_targets(mj, model, data)
+        digit_tips = [model.geom(f"palm_{side}_surface_hand_detail_{side}_{name}").id
+                      for side in "rl" for name in FINGER_CAPSULES.values()
+                      if name == "thumbdist" or "distph" in name]
+        finger_jac = np.zeros((3, model.nv))
+        digit_limit = 8.
+        peak_digit_torque = 0.
+        digit_tangent = coordinate_tangent(model, data, digits)
     pelvis, floor = model.body("pelvis").id, model.geom("floor").id
     scratch = mj.MjData(model)
     mass = float(model.body_subtreemass[pelvis])
     state_spec = mj.mjtState.mjSTATE_INTEGRATION
     state = np.empty(mj.mj_stateSize(model, state_spec))
-    cycle_s = 4.0 if p.support_boundary == "fixed_points" else 2.0
+    cycle_s = 4.0 if p.support_boundary != "frictional" else 2.0
     duration_s = cycle_s + .4
-    sample_interval = .04 if p.support_boundary == "fixed_points" else .02
+    sample_interval = .04 if p.support_boundary != "frictional" else .02
     steps = round(duration_s / p.timestep_s)
     save_every, control_every = round(sample_interval / p.timestep_s), round(.01 / p.timestep_s)
     rows, states, qposes, supports, contacts, muscle_samples = [], [], [], [], [], []
@@ -337,6 +410,18 @@ def simulate_pushup(params: dict, output: Path, validation: dict):
     anchor_displacements = {}
     pad_displacements = {}
     residual = 0.0
+    if p_contact:
+        from .contact_geometry import FloorHistory, contact_manifest, mesh_vertices, surface_samples
+
+        floor_history = FloorHistory(mj, model, floor)
+        contact_map = contact_manifest(mj, model, data, p.contact_profile)
+        surfaces = contact_map["visible_surfaces"]
+        vertices = {name: mesh_vertices(model, row["geom_id"]) for name, row in surfaces.items()}
+        surface_history = []
+        if articulated:
+            floor_regions = {row["geom_id"]: (name[5], row["support_region"])
+                             for name, row in contact_map["collision_geoms"].items() if "support_region" in row}
+            whole_palm_samples = []
     from ..anatomy import path_regions
     regions = path_regions(model)
     region_indices = {region: [i for i in range(model.nu) if region in regions[model.actuator(i).name]]
@@ -347,9 +432,18 @@ def simulate_pushup(params: dict, output: Path, validation: dict):
         mj.mj_forward(model, data)
         reference = target_pose(poses, float(data.time), cycle_s)
         desired = np.clip(gains[active] * (reference[active] - data.qpos[active]), -200, 200)
-        if p.support_boundary == "fixed_points":
+        if p.support_boundary == "fixed_points" or p_contact:
             from .supports import fixed_support_command
-            desired = fixed_support_command(mj, model, data, poses, active, hand_orientation)
+            desired = fixed_support_command(mj, model, data, poses, active, hand_orientation, frictional=p_contact,
+                                            joint_gains=gains if articulated else None)
+            if articulated:
+                for tip in digit_tips:
+                    mj.mj_jacGeom(model, data, finger_jac, None, tip)
+                    gap_m = data.geom_xpos[tip, 2] - model.geom_size[tip, 0] - abs(data.geom_xmat[tip, 8])*model.geom_size[tip, 1]
+                    finger_load = 2. + min(20., max(0., 1800. * gap_m))
+                    desired[digit_indices] -= finger_load * (finger_jac[2] @ digit_tangent)
+                desired[digit_indices] -= .35 * data.qvel[digits]
+                desired[digit_indices] = np.clip(desired[digit_indices], -digit_limit, digit_limit)
         elif p.hand_support == "palms":
             tangent = coordinate_tangent(model, data, active)
             for side in "rl":
@@ -370,6 +464,9 @@ def simulate_pushup(params: dict, output: Path, validation: dict):
             if p.control == "assisted_muscle":
                 muscle_torque = coordinate_tangent(model, data, active).T @ data.qfrc_actuator
                 data.qfrc_applied[active] = np.clip(desired - muscle_torque, -200, 200)
+        if articulated:
+            data.qfrc_applied[digits] = np.clip(data.qfrc_applied[digits], -digit_limit, digit_limit)
+            peak_digit_torque = max(peak_digit_torque, float(np.max(np.abs(data.qfrc_applied[digits]))))
         mj.mj_forward(model, data)
         if data.warning.number.any() or not all(np.isfinite(a).all() for a in
                 (data.qpos, data.qvel, data.qacc, data.act, data.actuator_force)):
@@ -377,15 +474,15 @@ def simulate_pushup(params: dict, output: Path, validation: dict):
         if np.min(data.act) < -1e-10 or np.max(data.act) > 1 + 1e-10:
             raise ValueError("activation outside [0,1]")
         max_external = max(max_external, float(np.max(np.abs(data.qfrc_applied))))
-        max_plank_deviation = max(max_plank_deviation, float(np.max(np.abs(data.qpos[[6, 12, 21, 27, 36, 39]]))))
+        max_plank_deviation = max(max_plank_deviation, float(np.max(np.abs(data.qpos[posture]))))
         if p.palm_technique == "chest_full":
             from .hands import wrist_shaft_extension
             max_wrist_extension = max(max_wrist_extension, *(wrist_shaft_extension(model, data, s) for s in "rl"))
         if np.any(data.qfrc_applied[:6]) or np.any(data.xfrc_applied):
             raise ValueError("external root force or body wrench prohibited")
         violation = np.maximum(model.jnt_range[:, 0] - data.qpos, data.qpos - model.jnt_range[:, 1])
-        max_limit_hinge = max(max_limit_hinge, float(np.max(violation[:85][model.jnt_type[:85] == mj.mjtJoint.mjJNT_HINGE])))
-        max_limit_slide = max(max_limit_slide, float(np.max(violation[:85][model.jnt_type[:85] == mj.mjtJoint.mjJNT_SLIDE])))
+        max_limit_hinge = max(max_limit_hinge, float(np.max(violation[anatomical][model.jnt_type[anatomical] == mj.mjtJoint.mjJNT_HINGE])))
+        max_limit_slide = max(max_limit_slide, float(np.max(violation[anatomical][model.jnt_type[anatomical] == mj.mjtJoint.mjJNT_SLIDE])))
         bearing = np.zeros(4)
         support_forces = np.zeros((4, 3))
         if p.support_boundary == "fixed_points":
@@ -406,6 +503,8 @@ def simulate_pushup(params: dict, output: Path, validation: dict):
             if floor in contact.geom:
                 other = int(contact.geom[1] if contact.geom[0] == floor else contact.geom[0])
                 if other not in pad_ids:
+                    if p_contact and model.geom(other).name.startswith("guard_surface_"):
+                        continue
                     raise ValueError("unexpected non-pad floor contact")
                 local = np.zeros(6)
                 mj.mj_contactForce(model, data, contact_id, local)
@@ -428,6 +527,8 @@ def simulate_pushup(params: dict, output: Path, validation: dict):
             activation_integral += data.act * p.timestep_s
             work += data.actuator_force * data.actuator_velocity * p.timestep_s
             external_work += float(data.qfrc_applied @ data.qvel) * p.timestep_s
+        if p_contact:
+            floor_history.record(data, step)
         if step % save_every:
             continue
         sample = len(rows)
@@ -436,7 +537,7 @@ def simulate_pushup(params: dict, output: Path, validation: dict):
             ground, moment, records, support, friction_error = measure_fixed_supports(mj, model, data, sample, p.friction)
         else:
             ground, moment, records, support, friction_error = measure_contacts(
-                mj, model, data, floor, sample, allowed_prefixes=("palm_", "toe_"))
+                mj, model, data, floor, sample, allowed_prefixes=("palm_", "toe_", "guard_surface_") if p_contact else ("palm_", "toe_"))
         acceleration, hdot, _ = momentum_rates(mj, model, data, scratch, pelvis, 1e-6)
         balance = float(np.linalg.norm(mass * acceleration - ground - mass * model.opt.gravity))
         moment_error = float(np.linalg.norm(hdot - moment))
@@ -444,8 +545,8 @@ def simulate_pushup(params: dict, output: Path, validation: dict):
         transmission_error = float(np.max(np.abs(matrix.T @ data.actuator_force - data.qfrc_actuator)))
         max_balance, max_moment_balance = max(max_balance, balance), max(max_moment_balance, moment_error)
         max_transmission_error, max_friction_error = max(max_transmission_error, transmission_error), max(max_friction_error, friction_error)
-        row = {"sample": sample, "time_s": float(data.time), "angle_rad": float(data.qpos[59]),
-               "left_elbow_rad": float(data.qpos[79]), "target_angle_rad": float(reference[59]),
+        row = {"sample": sample, "time_s": float(data.time), "angle_rad": float(data.qpos[elbows[0]]),
+               "left_elbow_rad": float(data.qpos[elbows[1]]), "target_angle_rad": float(reference[elbows[0]]),
                "pelvis_height_m": float(data.xpos[pelvis, 2]),
                "chest_height_m": float(np.mean(data.xpos[[model.body("humerus_" + s).id for s in "rl"], 2])),
                "trunk_pitch_rad": float(data.qpos[3]), "hip_flexion_r_rad": float(data.qpos[6]),
@@ -454,8 +555,8 @@ def simulate_pushup(params: dict, output: Path, validation: dict):
                "force_balance_error_N": balance, "moment_balance_error_Nm": moment_error,
                "recruitment_scaled_residual": residual, "max_activation": float(max(data.act)),
                "external_torque_max_Nm": float(np.max(np.abs(data.qfrc_applied))),
-               "applied_torque_Nm": float(data.qfrc_applied[59]),
-               "left_elbow_external_torque_Nm": float(data.qfrc_applied[79]),
+               "applied_torque_Nm": float(data.qfrc_applied[elbows[0]]),
+               "left_elbow_external_torque_Nm": float(data.qfrc_applied[elbows[1]]),
                "external_power_W": float(data.qfrc_applied @ data.qvel)}
         for group in ("pectoralis_major", "triceps_brachii", "serratus_anterior", "rectus_abdominis", "deltoid"):
             ids = [i for i in range(model.nu) if anatomical_group(model.actuator(i).name) == group]
@@ -474,10 +575,21 @@ def simulate_pushup(params: dict, output: Path, validation: dict):
         elif p.hand_support == "palms":
             from .hands import measure_palm_technique
             row.update(measure_palm_technique(model, data))
+        if articulated:
+            region_loads = regional_forces(mj, model, data, floor, floor_regions)
+            row.update({f"palm_{side}_{name}_N": load for side, values in region_loads.items()
+                        for name, load in values.items()})
+            whole_palm_samples.append({"sample": sample, "time_s": float(data.time), "normal_force_N": region_loads,
+                                      "digit_qpos_rad": {model.joint(j).name: float(data.qpos[j])
+                                                         for j in anatomical if j not in primary}})
         rows.append(row)
         mj.mj_getState(model, data, state, state_spec)
         states.append(state.copy())
         qposes.append(data.qpos.copy())
+        if p_contact:
+            surface_history.append({"sample": sample, "time_s": float(data.time),
+                "state_sha256": hashlib.sha256(state.astype("<f8").tobytes()).hexdigest(),
+                "surfaces": surface_samples(model, data, surfaces, vertices)})
         supports.append(support)
         contacts.extend(records)
         muscle_samples.append({"excitation": data.ctrl.copy(), "activation": data.act.copy(),
@@ -504,15 +616,49 @@ def simulate_pushup(params: dict, output: Path, validation: dict):
         name = f"contacts_{start // 150:03d}.json"
         dump(output / name, {"contacts": contacts[start:start + 150]})
         contact_files.append(name)
+    if p_contact:
+        if articulated:
+            contact_map["whole_palm_regions"] = "palm_regions.json"
+            dump(output / "palm_regions.json", {"threshold_N": .25,
+                "peak_digit_external_torque_Nm": peak_digit_torque, "samples": whole_palm_samples})
+        contact_map["surface_samples"] = "contact_surfaces.json"
+        contact_map["integration_contacts"] = "contact_steps.json"
+        dump(output / "contact_manifest.json", contact_map)
+        (output / "contact_surfaces.json").write_text(json.dumps(
+            {"fields": ["signed_distance_m", "vertex_world_m"], "frames": surface_history},
+            separators=(",", ":"), allow_nan=False) + "\n")
+        history = floor_history.report()
+        chunk_names = []
+        for start in range(0, len(floor_history.rows), 256):
+            name = f"contact_steps_{start // 256:03d}.json.gz"
+            with gzip.GzipFile(filename=output / name, mode="wb", mtime=0) as stream:
+                stream.write(json.dumps(floor_history.rows[start:start + 256],
+                                        separators=(",", ":"), allow_nan=False).encode())
+            chunk_names.append(name)
+        dump(output / "contact_steps.json", {**history, "chunks": chunk_names})
     dump(output / "contacts.json", {"chunks": contact_files, "force_convention": "frame rows; local wrench on geom1; world=frame.T@local"})
     recipe = {"version": "1.0.0", "builder": "human_models_mcp.adapters.pushup.pushup_model",
               "source_variant": "primary", "timestep_s": p.timestep_s, "friction": p.friction,
               "muscle_strength_scale": p.muscle_strength_scale, "added_floor_and_pads": list(PADS),
               "added_root_support": False, "added_equalities": model.neq - 42, "passive_damping_floor": 10,
-              "pad_floor_solref": [.004, 1] if p.support_boundary == "fixed_points" else [.01, 1], "solver_tolerance": 1e-10, "solver_iterations": 100,
+              "pad_floor_solref": [.004, 1] if p.support_boundary != "frictional" else [.01, 1], "solver_tolerance": 1e-10, "solver_iterations": 100,
               "integrator": "implicitfast", "floor_collision_masks": [4, 2], "pad_collision_masks": [2, 4],
               "parameters": p.model_dump(), "hand_support": p.hand_support, "support_boundary": p.support_boundary,
               "cycle_duration_s": cycle_s, "contact_preload_m": .00002 if p.support_boundary == "fixed_points" else 0, "ik": ik}
+    if p_contact:
+        recipe["contact_profile"] = p.contact_profile
+        recipe["contact_floor_margin_m"] = float(model.geom_margin[floor])
+        recipe["initial_clearance_m"] = .0002
+        recipe["initial_root_translation_z_m"] = float(.0002 - gap)
+    if articulated:
+        recipe["articulated_hand"] = {
+            "digit_external_torque_limit_Nm": digit_limit, "digit_joint_gain_Nm_per_rad": 65.,
+            "digit_joint_damping_Nms_per_rad": .35, "distal_preload_target_N": 2.,
+            "digit_gap_feedback_N_per_m": 1800., "digit_gap_feedback_limit_N": 20.,
+            "wrist_target": "world horizontal palm through bounded external joint feedback",
+            "support": "native digit capsules and six massless compliant palm patches per side",
+            "added_joint_equalities": "native bilateral 4/5 CMC coupling",
+            "mass_distribution": "neutral total hand mass, COM and inertia maintained by partitioning primary inertial"}
     if p.support_boundary == "fixed_points":
         recipe["fixed_supports"] = [{"geom": name, "body": model.body(model.site_bodyid[model.site("material_" + name).id]).name,
             "local_point_m": model.site_pos[model.site("material_" + name).id].tolist(),
@@ -524,7 +670,7 @@ def simulate_pushup(params: dict, output: Path, validation: dict):
             "friction_check": "native contact cones plus aggregate Coulomb bound for each hand/foot; no pressure-map claim"}
     if p.hand_support != "legacy_point":
         from .hands import configure_hands
-        _, recipe["hands"] = configure_hands(mj.MjSpec.from_file(str(home() / "models/ms_human_700/MS-Human-700.xml")), p.hand_support)
+        _, recipe["hands"] = configure_hands(mj.MjSpec.from_file(str(home() / "models/ms_human_700/MS-Human-700.xml")), p.hand_support, articulated=articulated)
     if p.palm_technique == "chest_full":
         raw_reference = Path(__file__).with_name("palms_full_reference_v1.json").read_bytes()
         (output / "palm_reference_input.json").write_bytes(raw_reference)
@@ -555,8 +701,12 @@ def simulate_pushup(params: dict, output: Path, validation: dict):
     dump(output / "initial_conditions.json", {"qpos": initial_qpos.tolist(), "qvel": "zero", "activation": "zero",
                                               "gravity_m_per_s2": model.opt.gravity.tolist(), "settling_s": .2})
     if wrist_samples:
-        dump(output / "wrists.json", {"samples": wrist_samples, "ligament_forces": "not modeled",
-                                       "moments": "ground contact wrench about wrist origin; not joint reaction or ligament tension"})
+        wrists = {"samples": wrist_samples, "ligament_forces": "not modeled",
+                  "moments": "ground contact wrench about wrist origin; not joint reaction or ligament tension"}
+        if articulated:
+            (output / "wrists.json").write_text(json.dumps(wrists, separators=(",", ":"), allow_nan=False) + "\n")
+        else:
+            dump(output / "wrists.json", wrists)
     atlas = [{"id": i, "name": model.actuator(i).name, "group": anatomical_group(model.actuator(i).name),
               "regions": regions[model.actuator(i).name],
               "mapping_evidence": "literal source identifier prefix; unmapped identifiers deliberately retained",
@@ -578,11 +728,11 @@ def simulate_pushup(params: dict, output: Path, validation: dict):
         writer.writerows(rows)
     fraction = contact_counts / (steps - round(.2 / p.timestep_s) + 1)
     middle = min(range(len(rows)), key=lambda i: rows[i]["chest_height_m"])
-    elbows = np.array([[r["angle_rad"], r["left_elbow_rad"]] for r in rows])
+    elbow_series = np.array([[r["angle_rad"], r["left_elbow_rad"]] for r in rows])
     chest_excursion = rows[0]["chest_height_m"] - rows[middle]["chest_height_m"]
     gates = {
-        "full_cycle_kinematics": bool(chest_excursion > .18 and np.min(elbows.max(axis=0)) > 1.4
-            and np.max(elbows[0]) < .35 and np.max(elbows[-1]) < .4
+        "full_cycle_kinematics": bool(chest_excursion > .18 and np.min(elbow_series.max(axis=0)) > 1.4
+            and np.max(elbow_series[0]) < .35 and np.max(elbow_series[-1]) < .4
             and abs(rows[-1]["chest_height_m"] - rows[0]["chest_height_m"]) < .06
             and .25 * len(rows) < middle < .75 * len(rows) and max_plank_deviation < .2),
         "four_supports": bool(min(fraction) > .95 and max_slip < (.0005 if p.hand_support != "legacy_point" else .06)),
@@ -592,6 +742,10 @@ def simulate_pushup(params: dict, output: Path, validation: dict):
     }
     if p.hand_support != "legacy_point":
         gates["stationary_supports"] = bool(max_slip < .0005)
+    if p_contact:
+        gates["no_world_support_equalities"] = bool(np.all(model.eq_type == mj.mjtEq.mjEQ_JOINT))
+        gates["no_unintended_floor_contacts"] = not floor_history.guard_loaded
+        gates["unilateral_friction_cones"] = bool(floor_history.max_cone_error < 1e-6)
     if p.hand_support == "knuckles":
         settled = [r for r in rows if r["time_s"] >= .2 - 1e-10]
         bent = [r for r in settled if min(r["angle_rad"], r["left_elbow_rad"]) > .6]
@@ -612,17 +766,26 @@ def simulate_pushup(params: dict, output: Path, validation: dict):
             max(r[f"hand_{s}_support_tilt_rad"] for r in settled) < .1
             and np.mean([r[f"hand_{s}_bearing_points"] >= 2 for r in settled]) > .95 for s in "rl")
     if p.palm_technique == "chest_full":
-        gates["elbow_extension"] = bool(max(np.max(elbows[0]), np.max(elbows[-1])) < .15)
+        gates["elbow_extension"] = bool(max(np.max(elbow_series[0]), np.max(elbow_series[-1])) < .15)
         gates["wrist_extension_envelope"] = bool(max_wrist_extension <= np.pi / 2 + .01)
+    if articulated:
+        settled_loads = [r["normal_force_N"] for r in whole_palm_samples if r["time_s"] >= .2 - 1e-10]
+        region_fractions = {side: {name: float(np.mean([r[side][name] >= .25 for r in settled_loads]))
+                                  for name in settled_loads[0][side]} for side in "rl"}
+        gates["distributed_palms_and_digits"] = all(f >= .95 for row in region_fractions.values() for f in row.values())
     acceptance = {k: "PASS" if v else "FAIL" for k, v in gates.items()}
     acceptance.update({"full_pushup": "PASS" if all(gates.values()) else "FAIL",
                        "muscle_driven": "PASS" if all(gates.values()) and p.control == "muscle" and max_external == 0 else "NOT_ACHIEVED",
                        "external_control": "USED" if p.control != "muscle" else "ABSENT",
                        "human_experimental_validation": "NOT_VALIDATED", "volumetric_anatomy_registration": "UNAVAILABLE"})
-    acceptance["finger_dynamics"] = "RIGID_SOURCE_POSTURE" if p.hand_support != "legacy_point" else "NOT_MODELED"
+    acceptance["finger_dynamics"] = ("SOURCE_DIGIT_JOINTS" if articulated else
+                                     "RIGID_SOURCE_POSTURE" if p.hand_support != "legacy_point" else "NOT_MODELED")
     acceptance["wrist_ligaments"] = "NOT_MODELED"
     if p.palm_technique == "chest_full":
         acceptance["wrist_range_derivation"] = "LITERATURE_INFORMED_NOT_CALIBRATED"
+    if p_contact:
+        acceptance["skin_contact_pressure"] = "NOT_MODELED"
+        acceptance["frictional_support"] = "PASS" if all(gates.values()) else "NOT_ACHIEVED"
     metrics_values = {"chest_excursion_m": chest_excursion, "chest_return_error_m": abs(rows[-1]["chest_height_m"] - rows[0]["chest_height_m"]),
         "max_support_slip_m": max_slip, "min_support_fraction": float(min(fraction)),
         "max_penetration_m": max_penetration, "max_hinge_limit_violation_rad": max_limit_hinge,
@@ -636,6 +799,10 @@ def simulate_pushup(params: dict, output: Path, validation: dict):
     if p.support_boundary == "fixed_points":
         metrics_values.update(max_support_point_displacement_m=max_slip, max_support_point_speed_m_per_s=max_anchor_speed,
                               support_constraint_work_J=support_work)
+    if p_contact:
+        metrics_values.update({f"{name}_max_material_marker_drift_m": max(
+            value for key, value in pad_displacements.items() if key.startswith(name + "_"))
+            for name in PADS})
     if p.hand_support == "knuckles":
         metrics_values.update(max_bent_elbow_flare_rad=max((r[f"elbow_{s}_flare_rad"] for r in bent for s in "rl"), default=float(np.pi)),
             min_palm_inward_cosine=min(r[f"hand_{s}_palm_inward_cosine"] for r in settled for s in "rl"),
@@ -650,6 +817,7 @@ def simulate_pushup(params: dict, output: Path, validation: dict):
             bottom_shoulder_above_elbow_m=max(rows[middle][f"shoulder_{s}_above_elbow_m"] for s in "rl"))
     dump(output / "summary.json", {"acceptance": acceptance, "metrics": metrics_values, "support_fractions": dict(zip(PADS, fraction.tolist(), strict=True)),
                                    "key_indices": [0, middle, len(rows) - 1], "top_force_impulse": ranking[:20],
+                                   **({"palm_region_support_fractions": region_fractions} if articulated else {}),
                                    "thresholds": {"min_chest_excursion_m": .18, "min_peak_bilateral_elbow_rad": 1.4,
                                       "max_initial_elbow_rad": .35, "max_final_elbow_rad": .4,
                                       "max_chest_return_error_m": .06, "min_four_support_fraction": .95,
@@ -676,7 +844,7 @@ def simulate_pushup(params: dict, output: Path, validation: dict):
                 "units": {"excitation": "1", "activation": "1", "force_N": "N", "length_m": "m", "velocity_m_per_s": "m/s", "power_W": "W",
                           "moment_values": "m/rad for hinge, m/m for slide; transmission derivative dL/dq"}}
     dump(output / "trajectory_metadata.json", metadata)
-    dump(output / "contact_map.json", {"floor": floor, "pads": [{"name": n, "id": model.geom(n).id,
+    dump(output / "contact_map.json", contact_map if p_contact else {"floor": floor, "pads": [{"name": n, "id": model.geom(n).id,
         "body": model.body(model.geom_bodyid[model.geom(n).id]).name, "pos_m": model.geom_pos[model.geom(n).id].tolist(),
         "radius_m": float(model.geom_size[model.geom(n).id, 0])} for n in pad_names], "source_self_collision": "retained",
         "floor_contact_scope": "only declared pad bitmasks, not complete body-floor collision"})
@@ -699,7 +867,8 @@ def simulate_pushup(params: dict, output: Path, validation: dict):
             "Prescribed sticking points restrict horizontal motion; free vertical numerical guides preserve unilateral floor normals. This is an ideal boundary condition, not calibrated deformable skin friction.",
             "Four unactuated 0.1 g vertical guides add small inertia/damping; actual guide reactions are included in force balance and aggregate per-limb Coulomb checks at every integration step."
         ] if p.support_boundary == "fixed_points" else []) + ([
-            "Detailed hands use native manipulation meshes and muscle paths in rigid open/closed finger poses; no independent finger dynamics, ligament forces or tissue pressure.",
+            ("Detailed hands use source digit joints with bounded external assistance, native routes and compliant floor patches; no ligament forces or tissue pressure."
+             if articulated else "Detailed hands use native manipulation meshes and muscle paths in rigid open/closed finger poses; no independent finger dynamics, ligament forces or tissue pressure."),
             "Left posture mirrors the source right hand with native mirrored meshes; primary hand mass/inertia retained. Hand actuator length ranges use the manipulation source where provided.",
             ("Full palms use a separately declared wrist envelope and stance; palms/knuckles are not an isolated causal comparison."
              if p.palm_technique == "chest_full" else "Palms and knuckles use different hand locations to remain within native wrist ranges; this is not an isolated causal comparison of support surface."),
@@ -712,9 +881,9 @@ def simulate_pushup(params: dict, output: Path, validation: dict):
                            "external_torque_limit_Nm": 200 if p.control != "muscle" else 0,
                            "assistance": "bounded external residual after actual muscle force" if p.control == "assisted_muscle" else "none",
                            "palm_orientation_gain_Nm_per_rad": 10000 if p.hand_support == "palms" and p.support_boundary == "frictional" else 0,
-                           "hand_orientation_kp_Nm_per_rad": 3000 if p.support_boundary == "fixed_points" else 0,
-                           "hand_orientation_kd_Nms_per_rad": 30 if p.support_boundary == "fixed_points" else 0,
-                           "gravity_feedforward": "least-squares static load sharing; predicted loads are not measured pressures" if p.support_boundary == "fixed_points" else "none",
+                           "hand_orientation_kp_Nm_per_rad": 3000 if p.support_boundary != "frictional" else 0,
+                           "hand_orientation_kd_Nms_per_rad": 30 if p.support_boundary != "frictional" else 0,
+                           "gravity_feedforward": "least-squares static load sharing; predicted loads are not measured pressures" if p.support_boundary != "frictional" else "none",
                            "joint_feedback_interval_s": p.timestep_s,
                            "muscle_allocation": "300 projected accelerated-gradient iterations, bounds [0,1], ridge 1e-5; 100 Hz",
                            "reference": f"0.2 s settle, {cycle_s:g} s sine-squared flexion cycle, 0.2 s hold"},
@@ -723,4 +892,6 @@ def simulate_pushup(params: dict, output: Path, validation: dict):
             "time_series": {"artifact_id": "series.csv", "axis": "time_s", "units": {k: units.get(k.rsplit("_", 1)[-1], "1") for k in rows[0]},
                             "definition": "State-aligned full-model integrated dynamics; acceptance is separate from computed status."},
             "muscle_outputs": {"metadata": "trajectory_metadata.json", "actuators": "actuators.json", "ranking": "muscle_ranking.json", "chunks": muscle_files},
-            "contact_outputs": {"index": "contacts.json", "support": "support.json"}}
+            "contact_outputs": {"index": "contacts.json", "support": "support.json",
+                **({"manifest": "contact_manifest.json", "surfaces": "contact_surfaces.json",
+                    "integration_events": "contact_steps.json"} if p_contact else {})}}

@@ -95,8 +95,8 @@ def import_fit3d(path, metadata, accepted_license):
 
 def simulate_landmarks(run_id):
     run = get_run(run_id)
-    if run.get("status") != "computed" or run["scenario_id"] not in {"pushup", "pushup_palms"}:
-        raise ValueError("comparison requires a computed pushup or pushup_palms")
+    if run.get("status") != "computed" or run["scenario_id"] not in {"pushup", "pushup_palms", "pushup_flat_palm"}:
+        raise ValueError("comparison requires a supported computed push-up")
     with TemporaryDirectory() as temp:
         source = Path(temp) / "snapshot"
         files = snapshot(run, source)

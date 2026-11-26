@@ -100,7 +100,8 @@ class PushupParameters(BaseModel):
     model_config = ConfigDict(extra="forbid", strict=True, allow_inf_nan=False)
     control: Literal["muscle", "external", "assisted_muscle"] = "muscle"
     hand_support: Literal["legacy_point", "palms", "knuckles"] = "legacy_point"
-    support_boundary: Literal["frictional", "fixed_points"] = "frictional"
+    support_boundary: Literal["frictional", "fixed_points", "frictional_contact"] = "frictional"
+    contact_profile: Literal["surface_spheres_v1", "surface_convex_v1", "articulated_palms_v1"] | None = Field(default=None, exclude_if=lambda value: value is None)
     knuckle_technique: Literal["legacy_flared", "neutral_tucked"] = "legacy_flared"
     palm_technique: Literal["legacy_reach", "chest_level", "chest_full"] = "legacy_reach"
     muscle_strength_scale: float = Field(default=1.0, ge=0, le=1)
@@ -114,7 +115,12 @@ class PushupParameters(BaseModel):
             raise ValueError("fixed support points require the palms or knuckles hand geometry")
         if self.knuckle_technique == "neutral_tucked" and (self.hand_support != "knuckles" or self.support_boundary != "fixed_points"):
             raise ValueError("neutral tucked technique requires fixed-points knuckle support")
-        if self.palm_technique in ("chest_level", "chest_full") and (self.hand_support != "palms" or self.support_boundary != "fixed_points"):
+        if self.support_boundary == "frictional_contact":
+            if self.contact_profile is None or self.hand_support != "palms" or self.palm_technique != "chest_full":
+                raise ValueError("experimental contact requires a surface profile and full chest-level palms")
+        elif self.contact_profile is not None:
+            raise ValueError("surface profiles require frictional_contact support")
+        if self.palm_technique in ("chest_level", "chest_full") and (self.hand_support != "palms" or self.support_boundary not in ("fixed_points", "frictional_contact")):
             raise ValueError("chest-level palms require fixed-points palm support")
         return self
 

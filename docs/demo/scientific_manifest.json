@@ -1,12 +1,12 @@
 {
-  "run_id": "9ed1e5d7-40b9-4d4c-96f8-8fcc98e6ac1b",
+  "run_id": "23945f13-419c-4ce4-b12d-c08458cd9ad2",
   "status": "computed",
-  "created_at": "2026-11-12T14:45:11.960169+00:00",
-  "scenario_id": "pushup_palms",
-  "scenario_version": "1.5.0",
-  "scenario_sha256": "b9af9b93730805dfe431cbe841d6594e3c13ee1cb427c4018133274e9c8eca2f",
-  "request_sha256": "4f708c3ab65d8b60b9f38c3b27a9e08332fb143ac9d6122f1860e39b8f801300",
-  "idempotency_key_sha256": null,
+  "created_at": "2026-11-26T15:51:07.235341+00:00",
+  "scenario_id": "pushup_flat_palm",
+  "scenario_version": "1.0.0",
+  "scenario_sha256": "73a299be6fa8228cac63afc10666eb952b3fa87c9e9b318360dc5099894f5c81",
+  "request_sha256": "0f0b47ef5b6f6b1967d590ea097aeab437af4e4f7bc47e09644c10ac8bb91994",
+  "idempotency_key_sha256": "4a3b6216a5d840a38ffde20e58c592adf92568dcec1cde2a42a0ee3b71282c6e",
   "model": {
     "id": "ms_human_700",
     "source_url": "https://github.com/google-deepmind/mujoco_menagerie/tree/98a70c569c4c1b6da467a20012f766ee1f8dc521/ms_human_700",
@@ -19,7 +19,7 @@
       "builder": "human_models_mcp.adapters.pushup.pushup_model",
       "source_variant": "primary",
       "timestep_s": 0.0005,
-      "friction": 1.3,
+      "friction": 0.8,
       "muscle_strength_scale": 1.0,
       "added_floor_and_pads": [
         "palm_r",
@@ -28,7 +28,7 @@
         "toe_l"
       ],
       "added_root_support": false,
-      "added_equalities": 4,
+      "added_equalities": 2,
       "passive_damping_floor": 10,
       "pad_floor_solref": [
         0.004,
@@ -48,18 +48,19 @@
       "parameters": {
         "control": "assisted_muscle",
         "hand_support": "palms",
-        "support_boundary": "fixed_points",
+        "support_boundary": "frictional_contact",
+        "contact_profile": "articulated_palms_v1",
         "knuckle_technique": "legacy_flared",
         "palm_technique": "chest_full",
         "muscle_strength_scale": 1.0,
-        "friction": 1.3,
+        "friction": 0.8,
         "timestep_s": 0.0005,
         "render": false
       },
       "hand_support": "palms",
-      "support_boundary": "fixed_points",
+      "support_boundary": "frictional_contact",
       "cycle_duration_s": 4.0,
-      "contact_preload_m": 2e-05,
+      "contact_preload_m": 0,
       "ik": {
         "schema_version": "1.0.0",
         "source_revision": "98a70c569c4c1b6da467a20012f766ee1f8dc521",
@@ -111,84 +112,24 @@
         "unchanged": "All other native joint ranges, internal equalities, muscle strengths/curves, body mass/inertia.",
         "reference_asset_sha256": "a4ea41d27ebcca8fc71c065587b1895325dad0f97ee1e01b9719ed57ee8423c6",
         "reference_asset": "palm_reference_input.json",
-        "max_support_closure_m": 1.26610813415099e-13
+        "max_support_closure_m": 1.26610813415099e-13,
+        "hand_reference": "source digit range fit and bilateral palm/toe height alignment"
       },
-      "fixed_supports": [
-        {
-          "geom": "palm_r",
-          "body": "hand_r",
-          "local_point_m": [
-            -0.0033380016162204663,
-            -0.0449876595397095,
-            -0.036999999999997056
-          ],
-          "world_anchor_m": [
-            1.249827220932168,
-            -0.15503710476264293,
-            0.0
-          ]
-        },
-        {
-          "geom": "palm_l",
-          "body": "hand_l",
-          "local_point_m": [
-            -0.0033380014871717727,
-            -0.044987662205553225,
-            0.03699999999999879
-          ],
-          "world_anchor_m": [
-            1.2498272235560066,
-            0.155037105251355,
-            0.0
-          ]
-        },
-        {
-          "geom": "toe_r",
-          "body": "toes_r",
-          "local_point_m": [
-            0.03999999999999999,
-            -1.734723475976807e-18,
-            3.781355021606887e-18
-          ],
-          "world_anchor_m": [
-            -2.0816681711721685e-17,
-            -0.08500000000000005,
-            0.015
-          ]
-        },
-        {
-          "geom": "toe_l",
-          "body": "toes_l",
-          "local_point_m": [
-            0.03999999999999999,
-            -1.734723475976807e-18,
-            -6.409271483439692e-18
-          ],
-          "world_anchor_m": [
-            -1.7836266942572454e-09,
-            0.0849897429249419,
-            0.015
-          ]
-        }
-      ],
-      "fixed_support_solref": [
-        0.001,
-        1
-      ],
-      "fixed_support_solimp": [
-        0.9999,
-        0.9999,
-        0.001,
-        0.5,
-        2
-      ],
-      "support_guides": {
-        "count": 4,
-        "mass_each_kg": 0.0001,
-        "vertical_damping_Ns_per_m": 0.01,
-        "vertical_motion": "free; normal support remains unilateral native floor contact",
-        "unactuated": true,
-        "friction_check": "native contact cones plus aggregate Coulomb bound for each hand/foot; no pressure-map claim"
+      "contact_profile": "articulated_palms_v1",
+      "contact_floor_margin_m": 0.0,
+      "initial_clearance_m": 0.0002,
+      "initial_root_translation_z_m": 0.003293464767901134,
+      "articulated_hand": {
+        "digit_external_torque_limit_Nm": 8.0,
+        "digit_joint_gain_Nm_per_rad": 65.0,
+        "digit_joint_damping_Nms_per_rad": 0.35,
+        "distal_preload_target_N": 2.0,
+        "digit_gap_feedback_N_per_m": 1800.0,
+        "digit_gap_feedback_limit_N": 20.0,
+        "wrist_target": "world horizontal palm through bounded external joint feedback",
+        "support": "native digit capsules and six massless compliant palm patches per side",
+        "added_joint_equalities": "native bilateral 4/5 CMC coupling",
+        "mass_distribution": "neutral total hand mass, COM and inertia maintained by partitioning primary inertial"
       },
       "hands": {
         "support": "palms",
@@ -211,7 +152,7 @@
           "5pm_flexion": 0.0,
           "5md_flexion": 0.0
         },
-        "finger_dynamics": "rigid posture; no independent finger integration or grip-force estimation",
+        "finger_dynamics": "native digit hinges and 4/5 CMC coupling; passive patch loads are proxy mechanics",
         "left_posture": "sagittal reflection of source right posture; native source mirrored meshes",
         "bone_geometries": [
           "hand_detail_r_capitate",
@@ -312,11 +253,19 @@
           "APL_l_tendon"
         ],
         "lengthrange": "native manipulation-hand actuator length ranges where supplied; unchanged source maximum forces",
-        "support_points_per_hand": 3,
-        "mechanical_pad_radius_m": 0.009,
+        "palm_contact_patch_count_per_hand": 6,
+        "digit_contact_capsule_count_per_hand": 14,
+        "palm_patch_radii_m": {
+          "heel": 0.011,
+          "thenar": 0.011,
+          "hypothenar": 0.011,
+          "distal_radial": 0.01,
+          "distal": 0.01,
+          "distal_ulnar": 0.01
+        },
         "wrist_ligaments": "unavailable: no discrete ligament elements in the pinned model",
         "tendon_mechanics": "native muscle-tendon transmission paths; no independently deformable tendon tissue",
-        "retained_hand_inertia": "primary source hand mass/inertia, no mass from added display meshes"
+        "retained_hand_inertia": "neutral total mass, COM and inertia preserved; donor child inertials allocated at one quarter of the native values"
       },
       "wrist_range_derivation": {
         "status": "literature-informed engineering envelope; not subject calibrated",
@@ -364,23 +313,37 @@
     "parameters": {
       "control": "assisted_muscle",
       "hand_support": "palms",
-      "support_boundary": "fixed_points",
+      "support_boundary": "frictional_contact",
+      "contact_profile": "articulated_palms_v1",
       "knuckle_technique": "legacy_flared",
       "palm_technique": "chest_full",
       "muscle_strength_scale": 1.0,
-      "friction": 1.3,
+      "friction": 0.8,
       "timestep_s": 0.0005,
       "render": false
     },
     "integration_steps": 8800,
+    "parameter_origins": {
+      "control": "scenario_default",
+      "hand_support": "scenario_default",
+      "support_boundary": "scenario_default",
+      "contact_profile": "scenario_default",
+      "knuckle_technique": "scenario_default",
+      "palm_technique": "scenario_default",
+      "muscle_strength_scale": "scenario_default",
+      "friction": "scenario_default",
+      "timestep_s": "scenario_default",
+      "render": "scenario_default"
+    },
     "environment": {
       "python": "3.12.16",
-      "platform": "Linux-7.0.0-42-generic-x86_64-with-glibc2.41",
-      "package_version": "0.7.0",
+      "platform": "Linux-7.0.0-44-generic-x86_64-with-glibc2.41",
+      "package_version": "0.9.0rc2",
       "machine": "x86_64",
+      "code_sha256": "b4f2be2c053eb666853527763f2759c65b744626262d640e03d1c4260d014fe8",
       "requirements_lock_sha256": "73ee3af58aa13fc14c079a9fe0be8f2ae9dd932ce1699097133eb174c1142bd3",
       "render_requested": "osmesa",
-      "runtime_environment_sha256": "02fc3db61755582d035c32969fa81a3d634ea974a2d4267b36e1e185f323b5b1"
+      "runtime_environment_sha256": "0e26791d5075eca3b76f81ec2ae36ca6a243080fa11da3e557b359b999846484"
     },
     "result_status": "computed",
     "simulation_time_s": 4.400000000000281,
@@ -400,16 +363,16 @@
         "hip_adduction_r": 3500.0,
         "hip_rotation_r": 3500.0,
         "knee_angle_r": 3500.0,
-        "ankle_angle_r": 0.0,
-        "subtalar_angle_r": 0.0,
-        "mtp_angle_r": 0.0,
+        "ankle_angle_r": 3500.0,
+        "subtalar_angle_r": 3500.0,
+        "mtp_angle_r": 3500.0,
         "hip_flexion_l": 3500.0,
         "hip_adduction_l": 3500.0,
         "hip_rotation_l": 3500.0,
         "knee_angle_l": 3500.0,
-        "ankle_angle_l": 0.0,
-        "subtalar_angle_l": 0.0,
-        "mtp_angle_l": 0.0,
+        "ankle_angle_l": 3500.0,
+        "subtalar_angle_l": 3500.0,
+        "mtp_angle_l": 3500.0,
         "L5_S1_FE": 3500.0,
         "L5_S1_LB": 3500.0,
         "L5_S1_AR": 3500.0,
@@ -426,13 +389,55 @@
         "pro_sup_r": 2000.0,
         "deviation_r": 2000.0,
         "flexion_r": 2000.0,
+        "digit_r_cmc_flexion": 65.0,
+        "digit_r_cmc_abduction": 65.0,
+        "digit_r_mp_flexion": 65.0,
+        "digit_r_ip_flexion": 65.0,
+        "digit_r_2mcp_abduction": 65.0,
+        "digit_r_2mcp_flexion": 65.0,
+        "digit_r_2pm_flexion": 65.0,
+        "digit_r_2md_flexion": 65.0,
+        "digit_r_3mcp_abduction": 65.0,
+        "digit_r_3mcp_flexion": 65.0,
+        "digit_r_3pm_flexion": 65.0,
+        "digit_r_3md_flexion": 65.0,
+        "digit_r_4cmc_flexion": 65.0,
+        "digit_r_4mcp_abduction": 65.0,
+        "digit_r_4mcp_flexion": 65.0,
+        "digit_r_4pm_flexion": 65.0,
+        "digit_r_4md_flexion": 65.0,
+        "digit_r_5mcp_abduction": 65.0,
+        "digit_r_5mcp_flexion": 65.0,
+        "digit_r_5pm_flexion": 65.0,
+        "digit_r_5md_flexion": 65.0,
         "elv_angle_l": 2000.0,
         "shoulder_elv_l": 2000.0,
         "shoulder_rot_l": 2000.0,
         "elbow_flexion_l": 2000.0,
         "pro_sup_l": 2000.0,
         "deviation_l": 2000.0,
-        "flexion_l": 2000.0
+        "flexion_l": 2000.0,
+        "digit_l_cmc_flexion": 65.0,
+        "digit_l_cmc_abduction": 65.0,
+        "digit_l_mp_flexion": 65.0,
+        "digit_l_ip_flexion": 65.0,
+        "digit_l_2mcp_abduction": 65.0,
+        "digit_l_2mcp_flexion": 65.0,
+        "digit_l_2pm_flexion": 65.0,
+        "digit_l_2md_flexion": 65.0,
+        "digit_l_3mcp_abduction": 65.0,
+        "digit_l_3mcp_flexion": 65.0,
+        "digit_l_3pm_flexion": 65.0,
+        "digit_l_3md_flexion": 65.0,
+        "digit_l_4cmc_flexion": 65.0,
+        "digit_l_4mcp_abduction": 65.0,
+        "digit_l_4mcp_flexion": 65.0,
+        "digit_l_4pm_flexion": 65.0,
+        "digit_l_4md_flexion": 65.0,
+        "digit_l_5mcp_abduction": 65.0,
+        "digit_l_5mcp_flexion": 65.0,
+        "digit_l_5pm_flexion": 65.0,
+        "digit_l_5md_flexion": 65.0
       },
       "external_torque_limit_Nm": 200,
       "assistance": "bounded external residual after actual muscle force",
@@ -449,122 +454,127 @@
     "metrics": [
       {
         "name": "chest_excursion_m",
-        "value": 0.2786512921473093,
+        "value": 0.28594533089655394,
         "unit": "m"
       },
       {
         "name": "chest_return_error_m",
-        "value": 3.234674832375273e-05,
+        "value": 0.0038272236827229245,
         "unit": "m"
       },
       {
         "name": "max_support_slip_m",
-        "value": 9.463100806624153e-05,
+        "value": 0.056102831587284664,
         "unit": "m"
       },
       {
         "name": "min_support_fraction",
-        "value": 1.0,
+        "value": 0.9497678847756219,
         "unit": "1"
       },
       {
         "name": "max_penetration_m",
-        "value": 0.0003652682429466994,
+        "value": 0.0016842938125744972,
         "unit": "m"
       },
       {
         "name": "max_hinge_limit_violation_rad",
-        "value": 0.001853141231057509,
+        "value": 0.02307442040010832,
         "unit": "rad"
       },
       {
         "name": "max_slide_limit_violation_m",
-        "value": 5.528332723226531e-05,
+        "value": 0.0001572276593532814,
         "unit": "m"
       },
       {
         "name": "max_force_balance_error_N",
-        "value": 4.42414031914039e-09,
+        "value": 5.711932569973168e-09,
         "unit": "N"
       },
       {
         "name": "max_moment_balance_error_Nm",
-        "value": 5.788153932684164e-09,
+        "value": 7.44955526260021e-09,
         "unit": "N*m"
       },
       {
         "name": "max_transmission_sum_error",
-        "value": 2.2737367544323206e-13,
+        "value": 4.547473508864641e-13,
         "unit": "componentwise N or N*m"
       },
       {
         "name": "max_friction_violation_N",
-        "value": 0.0,
+        "value": 1.7763568394002505e-15,
         "unit": "N"
       },
       {
         "name": "max_external_generalized_force",
-        "value": 70.91351953421058,
+        "value": 134.92819817504127,
         "unit": "N*m"
       },
       {
         "name": "max_plank_joint_deviation_rad",
-        "value": 0.10200563522235509,
+        "value": 0.11479086365371813,
         "unit": "rad"
       },
       {
         "name": "external_work_J",
-        "value": 578.0138057221518,
+        "value": 669.1436058185841,
         "unit": "J"
       },
       {
         "name": "max_wrist_shaft_extension_rad",
-        "value": 1.5657962804945922,
+        "value": 1.5799973867358164,
         "unit": "rad"
       },
       {
-        "name": "max_support_point_displacement_m",
-        "value": 9.463100806624153e-05,
+        "name": "palm_r_max_material_marker_drift_m",
+        "value": 0.012934333483308106,
         "unit": "m"
       },
       {
-        "name": "max_support_point_speed_m_per_s",
-        "value": 0.005911638445377464,
-        "unit": "m/s"
+        "name": "palm_l_max_material_marker_drift_m",
+        "value": 0.012616848478078296,
+        "unit": "m"
       },
       {
-        "name": "support_constraint_work_J",
-        "value": -0.025020729575425074,
-        "unit": "J"
+        "name": "toe_r_max_material_marker_drift_m",
+        "value": 0.05591140704817458,
+        "unit": "m"
+      },
+      {
+        "name": "toe_l_max_material_marker_drift_m",
+        "value": 0.056102831587284664,
+        "unit": "m"
       },
       {
         "name": "max_wrist_ahead_head_m",
-        "value": -0.2730951591723232,
+        "value": -0.2797823725693531,
         "unit": "m"
       },
       {
         "name": "max_wrist_ahead_shoulder_m",
-        "value": -0.043710848244275846,
+        "value": -0.048907060430852134,
         "unit": "m"
       },
       {
         "name": "max_palm_shoulder_chest_gap_m",
-        "value": 0.039631876393857235,
+        "value": 0.0427574184564119,
         "unit": "m"
       },
       {
         "name": "max_palm_ahead_shoulder_m",
-        "value": -0.0007215860155298334,
+        "value": -0.005919452555765087,
         "unit": "m"
       },
       {
         "name": "min_fingers_forward_cosine",
-        "value": 0.9730248128404484,
+        "value": 0.972978411242624,
         "unit": "1"
       },
       {
         "name": "bottom_shoulder_above_elbow_m",
-        "value": 0.04040909917823038,
+        "value": 0.03472816690690439,
         "unit": "m"
       }
     ],
@@ -673,6 +683,28 @@
           "palm_l_ahead_shoulder_m": "m",
           "palm_l_ahead_chest_caudal_m": "m",
           "palm_l_shoulder_chest_gap_m": "m",
+          "palm_r_heel_N": "N",
+          "palm_r_thenar_N": "N",
+          "palm_r_hypothenar_N": "N",
+          "palm_r_distal_radial_N": "N",
+          "palm_r_distal_N": "N",
+          "palm_r_distal_ulnar_N": "N",
+          "palm_r_digit_1_N": "N",
+          "palm_r_digit_2_N": "N",
+          "palm_r_digit_3_N": "N",
+          "palm_r_digit_4_N": "N",
+          "palm_r_digit_5_N": "N",
+          "palm_l_heel_N": "N",
+          "palm_l_thenar_N": "N",
+          "palm_l_hypothenar_N": "N",
+          "palm_l_distal_radial_N": "N",
+          "palm_l_distal_N": "N",
+          "palm_l_distal_ulnar_N": "N",
+          "palm_l_digit_1_N": "N",
+          "palm_l_digit_2_N": "N",
+          "palm_l_digit_3_N": "N",
+          "palm_l_digit_4_N": "N",
+          "palm_l_digit_5_N": "N",
           "pectoralis_r_activation": "1",
           "pectoralis_r_absolute_path_force_N": "N",
           "pectoralis_r_power_W": "W",
@@ -699,11 +731,14 @@
     },
     "contacts": {
       "index": "contacts.json",
-      "support": "support.json"
+      "support": "support.json",
+      "manifest": "contact_manifest.json",
+      "surfaces": "contact_surfaces.json",
+      "integration_events": "contact_steps.json"
     }
   },
   "scientific": {
-    "scope": "Standard-width palms at chest level, 31 cm between supports, with a synthetic full-amplitude reference from 0.1 to 1.9 rad elbow flexion. Only two wrist extension coordinate bounds differ from the source model, using a separately declared literature-informed envelope; geometric shaft extension is checked at every step. This is not subject calibration or evidence of pure muscle-driven control. Earlier chest_level partial motion and legacy_reach remain explicit for archive replay. Full primary 700-muscle body with source-derived rigid palms finger posture, genuine detailed hand meshes and 48 source hand transmissions. Wrist dynamics and multi-point hand contacts are measured. Prescribed sticking points prevent horizontal support drift; native floor normals remain unilateral. Bounded external residual joint assistance stabilizes the engineering reference; this is not pure muscle-driven control, finger dynamics or ligament tissue simulation. Read separate acceptance gates.",
+    "scope": "Experimental derivative of the synthetic chest-level palm reference. Native unilateral collision and friction supply ground reactions. Measure the heel, thenar and hypothenar regions, distal palm and five digits on each side. Source digit hinges are integrated under contact with bounded joint assistance. Compliant pads are an engineering contact representation.",
     "validation_level": "numerical_sanity",
     "limitations": [
       "Model-specific musculotendon geometry; no population normative or patient-specific claims.",
@@ -718,9 +753,7 @@
       "All 700 native muscle dynamics/transmissions retained, but force parameters and recruitment are unvalidated for push-ups.",
       "Model activation is dimensionless dynamical state, not surface EMG, percent MVIC, clinical strength or injury risk.",
       "Native muscle-tendon paths are not muscle volumes; no external atlas registration or subject calibration.",
-      "Prescribed sticking points restrict horizontal motion; free vertical numerical guides preserve unilateral floor normals. This is an ideal boundary condition, not calibrated deformable skin friction.",
-      "Four unactuated 0.1 g vertical guides add small inertia/damping; actual guide reactions are included in force balance and aggregate per-limb Coulomb checks at every integration step.",
-      "Detailed hands use native manipulation meshes and muscle paths in rigid open/closed finger poses; no independent finger dynamics, ligament forces or tissue pressure.",
+      "Detailed hands use source digit joints with bounded external assistance, native routes and compliant floor patches; no ligament forces or tissue pressure.",
       "Left posture mirrors the source right hand with native mirrored meshes; primary hand mass/inertia retained. Hand actuator length ranges use the manipulation source where provided.",
       "Full palms use a separately declared wrist envelope and stance; palms/knuckles are not an isolated causal comparison.",
       "Assisted muscle mode applies recorded bounded residual generalized joint torques in addition to genuine muscle forces; it is not pure muscle-driven dynamics.",
@@ -777,25 +810,31 @@
     ],
     "acceptance": {
       "full_cycle_kinematics": "PASS",
-      "four_supports": "PASS",
-      "numerical_bounds": "PASS",
-      "stationary_supports": "PASS",
+      "four_supports": "FAIL",
+      "numerical_bounds": "FAIL",
+      "stationary_supports": "FAIL",
+      "no_world_support_equalities": "PASS",
+      "no_unintended_floor_contacts": "PASS",
+      "unilateral_friction_cones": "PASS",
       "reference_hand_placement": "PASS",
       "forward_fingers": "PASS",
       "bottom_depth": "PASS",
       "hand_support_geometry": "PASS",
       "elbow_extension": "PASS",
       "wrist_extension_envelope": "PASS",
-      "full_pushup": "PASS",
+      "distributed_palms_and_digits": "PASS",
+      "full_pushup": "FAIL",
       "muscle_driven": "NOT_ACHIEVED",
       "external_control": "USED",
       "human_experimental_validation": "NOT_VALIDATED",
       "volumetric_anatomy_registration": "UNAVAILABLE",
-      "finger_dynamics": "RIGID_SOURCE_POSTURE",
+      "finger_dynamics": "SOURCE_DIGIT_JOINTS",
       "wrist_ligaments": "NOT_MODELED",
-      "wrist_range_derivation": "LITERATURE_INFORMED_NOT_CALIBRATED"
+      "wrist_range_derivation": "LITERATURE_INFORMED_NOT_CALIBRATED",
+      "skin_contact_pressure": "NOT_MODELED",
+      "frictional_support": "NOT_ACHIEVED"
     },
-    "numerical_status": "validated_for_named_checks",
+    "numerical_status": "failed_named_bounds",
     "validation_scope": "Only the executable checks named in this run; no human experimental or clinical validation."
   },
   "artifacts": {
@@ -809,109 +848,354 @@
       "bytes": 975,
       "mime_type": "application/json"
     },
+    "contact_manifest.json": {
+      "sha256": "3e378f199dd0fa3f12c97e8b2ae8ade738633bd54492c46f696293a12be726b5",
+      "bytes": 58953,
+      "mime_type": "application/json"
+    },
     "contact_map.json": {
-      "sha256": "6e6c4a657e5df1bf550c8e23cd2f16e462c366da696255826ccb6634ef04495d",
-      "bytes": 1655,
+      "sha256": "3e378f199dd0fa3f12c97e8b2ae8ade738633bd54492c46f696293a12be726b5",
+      "bytes": 58953,
+      "mime_type": "application/json"
+    },
+    "contact_steps.json": {
+      "sha256": "4048b7ce4c4a4ae6a6dbce593955d447f6afae8fb72cf756a155445e68cc8043",
+      "bytes": 4376,
+      "mime_type": "application/json"
+    },
+    "contact_steps_000.json.gz": {
+      "sha256": "7c2d693d936ce40202966765c1a21421551f8e723d2902a47eae3efbb63d7888",
+      "bytes": 507015,
+      "mime_type": "application/gzip"
+    },
+    "contact_steps_001.json.gz": {
+      "sha256": "b23409aa46c6b5bd2b508d6e85db4f338e063fe0d26a02028a1c370832b721f8",
+      "bytes": 579359,
+      "mime_type": "application/gzip"
+    },
+    "contact_steps_002.json.gz": {
+      "sha256": "7acbeda9ac20cd712cd46a0ca3d9217f62255f758e36abd76f38de2b9b0ec0fd",
+      "bytes": 583215,
+      "mime_type": "application/gzip"
+    },
+    "contact_steps_003.json.gz": {
+      "sha256": "c0e232a67d58875aee569ed4bc31721e60e8f897e2a3ae362f545a503766e65e",
+      "bytes": 580338,
+      "mime_type": "application/gzip"
+    },
+    "contact_steps_004.json.gz": {
+      "sha256": "93415d00a47fb4a7fbbb40f73513b61c18b79005958fad718d22a38538b7e75d",
+      "bytes": 586111,
+      "mime_type": "application/gzip"
+    },
+    "contact_steps_005.json.gz": {
+      "sha256": "b2bb6ce8a4523b6a4d73ebecb191bc6163887074ac893889e133359eb61ae5a2",
+      "bytes": 576391,
+      "mime_type": "application/gzip"
+    },
+    "contact_steps_006.json.gz": {
+      "sha256": "4a3feeb12240f6cfb9653ba58e8a8271b8b734b8676907ce704f46b692dc1f00",
+      "bytes": 560845,
+      "mime_type": "application/gzip"
+    },
+    "contact_steps_007.json.gz": {
+      "sha256": "2ca6e8311ca70963ec6c66b35b2a08b8664becd14c59e1ee460616c4c79024a7",
+      "bytes": 546836,
+      "mime_type": "application/gzip"
+    },
+    "contact_steps_008.json.gz": {
+      "sha256": "95c0a82cf116a986550a47cf2fcbc3271f1470093ea3ef7faabd322570c134fe",
+      "bytes": 549482,
+      "mime_type": "application/gzip"
+    },
+    "contact_steps_009.json.gz": {
+      "sha256": "84e12a496feb0bd23c28900a56aec0b45a3db5f84096aaa2ca61c6b7f05988bd",
+      "bytes": 549176,
+      "mime_type": "application/gzip"
+    },
+    "contact_steps_010.json.gz": {
+      "sha256": "2b45c24c377a01f7ebf85912d2fb000fc7fe5081fd328783e04f9177d4e86db5",
+      "bytes": 548300,
+      "mime_type": "application/gzip"
+    },
+    "contact_steps_011.json.gz": {
+      "sha256": "a19478d380c47ff01bd0c6e2c5c22deea64cadbb6541fdd17aa1a8b38e2fd10a",
+      "bytes": 545531,
+      "mime_type": "application/gzip"
+    },
+    "contact_steps_012.json.gz": {
+      "sha256": "3c1971e3e87d55761d8dcf3c384eabd0ee583fdc54360cec74a413884264df80",
+      "bytes": 547755,
+      "mime_type": "application/gzip"
+    },
+    "contact_steps_013.json.gz": {
+      "sha256": "06d0f4f60fd33bc2d2509e0472c349dfa7b450547eef1afc0d183886f6e51d81",
+      "bytes": 547530,
+      "mime_type": "application/gzip"
+    },
+    "contact_steps_014.json.gz": {
+      "sha256": "e18431200a43ee3a6d2d80dafe364c6c5e01ab119b757dacb9df5a0971da56cb",
+      "bytes": 547803,
+      "mime_type": "application/gzip"
+    },
+    "contact_steps_015.json.gz": {
+      "sha256": "f89da0b85904cc546c17a7def77cd9c30cb3129e85b63a92879621b33a64d1aa",
+      "bytes": 544741,
+      "mime_type": "application/gzip"
+    },
+    "contact_steps_016.json.gz": {
+      "sha256": "367b59cae874504eb3d9b912515402ed6ea32f81e5c1875aaaef5af6ec4ab4e4",
+      "bytes": 539920,
+      "mime_type": "application/gzip"
+    },
+    "contact_steps_017.json.gz": {
+      "sha256": "f5969b39f561f17ce72cd383b8f3bdb84b6359f78c565364cf741ed5cbd5effe",
+      "bytes": 535156,
+      "mime_type": "application/gzip"
+    },
+    "contact_steps_018.json.gz": {
+      "sha256": "a191fc74151b036f5d8935b24c6e824b0a924d69bac10a0db3b4500420827dc9",
+      "bytes": 537493,
+      "mime_type": "application/gzip"
+    },
+    "contact_steps_019.json.gz": {
+      "sha256": "cc277310901fd4d8d0e8f97519c3596fc935c6575026381ddafc3f6cc18b2880",
+      "bytes": 545902,
+      "mime_type": "application/gzip"
+    },
+    "contact_steps_020.json.gz": {
+      "sha256": "74fd0519bfa0cd6078118e7eb6602e886f40c326bd19f675f943b04d58e3d1a1",
+      "bytes": 546297,
+      "mime_type": "application/gzip"
+    },
+    "contact_steps_021.json.gz": {
+      "sha256": "6d7cb3c466ae5cbfc045acca1ac9ae28eb610002f5eb1f266a42adc088c95f05",
+      "bytes": 545855,
+      "mime_type": "application/gzip"
+    },
+    "contact_steps_022.json.gz": {
+      "sha256": "6d3ced2bc214901dc74f6609c1eee42d998a80ebd9219a36f174d1075d3a3198",
+      "bytes": 547844,
+      "mime_type": "application/gzip"
+    },
+    "contact_steps_023.json.gz": {
+      "sha256": "aab9a82e295ac689109bfc9666ed51c0db274712145958b94be7069148a7a0d0",
+      "bytes": 548331,
+      "mime_type": "application/gzip"
+    },
+    "contact_steps_024.json.gz": {
+      "sha256": "65739c73f96927b2737922c5bfcabf57b01355cd19f3747dacfa2c01dc978653",
+      "bytes": 547484,
+      "mime_type": "application/gzip"
+    },
+    "contact_steps_025.json.gz": {
+      "sha256": "df15e65455df5ae8c682ec8a6224a40672b96b8db7c43d01b1a5dadf1c0fb365",
+      "bytes": 547970,
+      "mime_type": "application/gzip"
+    },
+    "contact_steps_026.json.gz": {
+      "sha256": "1198911e78bdd8ae4ea5463c2fcf8d0acf4041fc1ae36f1d52ecf063bbad9a6e",
+      "bytes": 544795,
+      "mime_type": "application/gzip"
+    },
+    "contact_steps_027.json.gz": {
+      "sha256": "baa61a78664ed68421a663b286023b6477a8d9f9c604cf38eace2e1c3b495b09",
+      "bytes": 543576,
+      "mime_type": "application/gzip"
+    },
+    "contact_steps_028.json.gz": {
+      "sha256": "00f78b4107af59dd94ef735419463d4878c539013e7a041af0346c91c03239c3",
+      "bytes": 575872,
+      "mime_type": "application/gzip"
+    },
+    "contact_steps_029.json.gz": {
+      "sha256": "004044e49523a15284e7cd82d97d013f3668f97567ae0be0c7556aaf25f6631f",
+      "bytes": 587490,
+      "mime_type": "application/gzip"
+    },
+    "contact_steps_030.json.gz": {
+      "sha256": "25af6146040fd5fa7f1046c51ecb5d50691331461f11866f489ec9ee9b3c1f81",
+      "bytes": 583894,
+      "mime_type": "application/gzip"
+    },
+    "contact_steps_031.json.gz": {
+      "sha256": "97adaba29c62709e4f7bb73dcc9ee09cc97d6a4917184e07ddf83287a5b6db0e",
+      "bytes": 579624,
+      "mime_type": "application/gzip"
+    },
+    "contact_steps_032.json.gz": {
+      "sha256": "0e92761abea0db01773a91ead8aa517d47f26f15615c6302860dbd57b37fa73f",
+      "bytes": 579566,
+      "mime_type": "application/gzip"
+    },
+    "contact_steps_033.json.gz": {
+      "sha256": "0e97ae7da854e7c405caa4a8816da2fd90e906db691b6a89aa02391ee696eea2",
+      "bytes": 573073,
+      "mime_type": "application/gzip"
+    },
+    "contact_steps_034.json.gz": {
+      "sha256": "a0045088b888e29d29da3bf40f52dbd5c91df82d79b31452d66144b0a292e7f4",
+      "bytes": 216419,
+      "mime_type": "application/gzip"
+    },
+    "contact_surfaces.json": {
+      "sha256": "85db6d4b0d8a368370be54319b431c05fcb82ed602de27d5065d3baab0a20385",
+      "bytes": 681872,
       "mime_type": "application/json"
     },
     "contacts.json": {
-      "sha256": "ed2126ccdb84ed18660f4ae0c0d7967837026373f1ad2d74e1ae2fa98ddd8860",
-      "bytes": 326,
+      "sha256": "85e3d07931452376fb5f9acba984d49bf044908f37a00f3660215416095ae190",
+      "bytes": 601,
       "mime_type": "application/json"
     },
     "contacts_000.json": {
-      "sha256": "fec652afe9fecfba65bbf82374a9b0305e372405e64e60137e04ea42d09b6998",
-      "bytes": 162540,
+      "sha256": "93602303a56f9a46342b7796b9445e006f1f58a572eee13c5fb6288059b2771d",
+      "bytes": 173963,
       "mime_type": "application/json"
     },
     "contacts_001.json": {
-      "sha256": "c011b68637b61e85543a1658f1964d5719c9048df15fd0852c269244d8b29e3e",
-      "bytes": 162001,
+      "sha256": "76b5225773c2260d2d110452695f3c8b956efa17a4a2cea6442c4eadb11657a0",
+      "bytes": 174797,
       "mime_type": "application/json"
     },
     "contacts_002.json": {
-      "sha256": "4cd299baf692b7712914a89f0c2346c4e867717594cc0577964dddd086614b6f",
-      "bytes": 162015,
+      "sha256": "792570828cedf1cda064bd2e3d6f38cfb6a0890171084c544cac809f02bb80ab",
+      "bytes": 175024,
       "mime_type": "application/json"
     },
     "contacts_003.json": {
-      "sha256": "82adf37dae24bc9c8e1ef49285c0d944f683a346d7ba390bb0d11371143e6d49",
-      "bytes": 162145,
+      "sha256": "e64f516d51cd269b06ced5bc5ccf3745aebb7c725b8de2fb167366e97277ad5d",
+      "bytes": 174227,
       "mime_type": "application/json"
     },
     "contacts_004.json": {
-      "sha256": "0fc9479db96f4f14961d8db34a7377ad92a8a4a166200d69560da11165f2414f",
-      "bytes": 162258,
+      "sha256": "3b841ca280d1248441bc9c64ef39d31310913c79d4e924e3d464720344ada921",
+      "bytes": 174809,
       "mime_type": "application/json"
     },
     "contacts_005.json": {
-      "sha256": "00fee7f44e45b25905564e5c9f4c92821cd6133c75258a270816db8046e42408",
-      "bytes": 162317,
+      "sha256": "67a08cf0385fcff1b24441c6ede6db421512831dfb2964cedf9ba67a8187686e",
+      "bytes": 174934,
       "mime_type": "application/json"
     },
     "contacts_006.json": {
-      "sha256": "34bac1a2a7e4b9b591abc82d44953332e13442e4b18d258fce839c704b382c8f",
-      "bytes": 161964,
+      "sha256": "5b6218a92bd270890a6e9a8e9a8f1d4a278909142549f13e2aa30acbc4c5e7a5",
+      "bytes": 174981,
       "mime_type": "application/json"
     },
     "contacts_007.json": {
-      "sha256": "071e1a14aede465300e13fdb5bb0a96e8d8e1b942e6755a08a6a56835ee08868",
-      "bytes": 162379,
+      "sha256": "b19610d1450d2914ec1854b25f834fc57bdadc7808b613aebef95e153422180c",
+      "bytes": 174664,
       "mime_type": "application/json"
     },
     "contacts_008.json": {
-      "sha256": "e255d3d533cc6fc89a12476a34cabeb8bd66416b59db0958288222c658ead331",
-      "bytes": 133120,
+      "sha256": "344697fbd43bd44ec8892522cb51fb94ae2a9e9ebae99a5218a7a42006e57236",
+      "bytes": 175051,
+      "mime_type": "application/json"
+    },
+    "contacts_009.json": {
+      "sha256": "30f3018efe278927d06958217f67b841ee4adb1fb476e548b49685539d5c6b44",
+      "bytes": 174832,
+      "mime_type": "application/json"
+    },
+    "contacts_010.json": {
+      "sha256": "b87dd5b37d6715090aeca4b446a5addb2db3065033fe7e00a399036c72e1dc0c",
+      "bytes": 174898,
+      "mime_type": "application/json"
+    },
+    "contacts_011.json": {
+      "sha256": "08309f02196e4e88b25a8dfa3d2e19a072d5bc8586b07fd908ff8ee73d238a0d",
+      "bytes": 175052,
+      "mime_type": "application/json"
+    },
+    "contacts_012.json": {
+      "sha256": "0a62349d58ecdd45a9f959727556daaa7dac5367d7d6903df04a5b8ea0683c91",
+      "bytes": 174558,
+      "mime_type": "application/json"
+    },
+    "contacts_013.json": {
+      "sha256": "d5b2890f69c274bea304c2bf616053b5271afba9915edfc29dbfe0ed6e9e2ecd",
+      "bytes": 174729,
+      "mime_type": "application/json"
+    },
+    "contacts_014.json": {
+      "sha256": "b13f7ab4a9495d97f23515022fa1478f199c32955a55a86e89ff40176bbe4e19",
+      "bytes": 174690,
+      "mime_type": "application/json"
+    },
+    "contacts_015.json": {
+      "sha256": "cafc446748a1ce47c7af64f0663ccc7d89f7f612dda534b238a67d73ee974b44",
+      "bytes": 174735,
+      "mime_type": "application/json"
+    },
+    "contacts_016.json": {
+      "sha256": "336f2e65103d686537f6038f5668cb05cda7df0c8c886167b256387c710ee18e",
+      "bytes": 173674,
+      "mime_type": "application/json"
+    },
+    "contacts_017.json": {
+      "sha256": "d982443baeb6113a2cb25225ddfbe79d5422a88b5287e50dd8b304d11733973c",
+      "bytes": 174639,
+      "mime_type": "application/json"
+    },
+    "contacts_018.json": {
+      "sha256": "9963c0c9e445890aed3f91b0afd4d267ed98ac85b30b446bc54783877a21a285",
+      "bytes": 174552,
+      "mime_type": "application/json"
+    },
+    "contacts_019.json": {
+      "sha256": "1b92635ce6688722b6e7930b0eb5a36fa14eede5daa086bfc0e0ddfdfe967612",
+      "bytes": 100172,
       "mime_type": "application/json"
     },
     "environment.json": {
-      "sha256": "02fc3db61755582d035c32969fa81a3d634ea974a2d4267b36e1e185f323b5b1",
-      "bytes": 8675,
+      "sha256": "0e26791d5075eca3b76f81ec2ae36ca6a243080fa11da3e557b359b999846484",
+      "bytes": 9455,
       "mime_type": "application/json"
     },
     "initial_conditions.json": {
-      "sha256": "20230956676f88e8207138227db2c031220860bcd5de0cb9534e11784a13fe8d",
-      "bytes": 1888,
+      "sha256": "b806caa65e789ecdce35e016bfd7637f9563d97c375e627fcac82e959141fe28",
+      "bytes": 2308,
       "mime_type": "application/json"
     },
     "model_recipe.json": {
-      "sha256": "331e8137bee89d5f802d6a902ad01daae7b66d87d22b5a8b0a9418692bcf96cc",
-      "bytes": 10142,
+      "sha256": "c53209d1b28e975a50a8112ced2540ed0b3825bfe512046bf29d7bf85e829b05",
+      "bytes": 9677,
       "mime_type": "application/json"
     },
     "muscle_ranking.json": {
-      "sha256": "95c99d71eb2d27dfb84a5bd3af23e6e302df021968b2be193c8efe3b3430c02b",
-      "bytes": 171614,
+      "sha256": "edf2651099ffe9b66f3a05baa7747b177a9b3ffcfb9150459c1622ffe74513d5",
+      "bytes": 171338,
       "mime_type": "application/json"
     },
     "muscles_000.npz": {
-      "sha256": "216fd171106cb02aad0a3abde591047a3cd1f4c703252a3f0cb4708b08308774",
-      "bytes": 1285360,
+      "sha256": "1736f33def1624b52908f49d06da9cc2c509aa3141dd94f7bd095052baf466f2",
+      "bytes": 1338765,
       "mime_type": "application/octet-stream"
     },
     "muscles_001.npz": {
-      "sha256": "ea33126ba5aa2645f7b5d0d889a85a11afc0f4674804adbc326279cce717d7b9",
-      "bytes": 1317219,
+      "sha256": "a2570f8fb81c0a47cd44f9c8933e54d49752c7250252b1dd6cbedc97771ca4f9",
+      "bytes": 1353364,
       "mime_type": "application/octet-stream"
     },
     "muscles_002.npz": {
-      "sha256": "14884d4aef3ee2de012558837fd6387d45c07d988e61ef5204bab6e198eb9639",
-      "bytes": 1318705,
+      "sha256": "1e693b8c9d2b025bec33b7572cafcb5cf9e4fc6b2658c2bf2308264aef83bff5",
+      "bytes": 1354297,
       "mime_type": "application/octet-stream"
     },
     "muscles_003.npz": {
-      "sha256": "b6d13582a91b8a8e173a73d122e0cd1fb170f4be537709ca54cf3dfd942a60ca",
-      "bytes": 1308296,
+      "sha256": "04308d346e139a5eb2f07eb7dece7dd1d73e213eb2d5ee80d0ee73ad8adfed8a",
+      "bytes": 1346065,
       "mime_type": "application/octet-stream"
     },
     "muscles_004.npz": {
-      "sha256": "0f1886ad8cbe553949c94d57a63009d4aa08bd7c3723ba78cdbdc705e5f0b673",
-      "bytes": 1310075,
+      "sha256": "674ff7d47d1f9d7411e26ecbd8eea041a6b7c204739c5b85e4dc0674e77693ca",
+      "bytes": 1350947,
       "mime_type": "application/octet-stream"
     },
     "muscles_005.npz": {
-      "sha256": "ed432803d66ab9f403d59d88a1a493ee605688a9596c9b5b88c1020ecef68e6c",
-      "bytes": 717989,
+      "sha256": "62cd17aebae7929f0902c373871dd8436897b2381f3b25f14b6f2dc81ed40190",
+      "bytes": 742248,
       "mime_type": "application/octet-stream"
     },
     "palm_reference_input.json": {
@@ -919,49 +1203,49 @@
       "bytes": 22331,
       "mime_type": "application/json"
     },
+    "palm_regions.json": {
+      "sha256": "83599f97a36f1aaf9cb0b0f31d0ae9d3c8a873f2927ef5ac2a4a2ccade87e503",
+      "bytes": 382305,
+      "mime_type": "application/json"
+    },
     "pectorals.csv": {
-      "sha256": "211b12fc8d99428e91e7aa1e59b17f6f21caff75131e81991c949f328cef26f1",
-      "bytes": 105805,
+      "sha256": "2f6c09982011f886bcca33e79d4e72252ed5382f33e12e1fba9e054674a95e27",
+      "bytes": 106658,
       "mime_type": "text/csv"
     },
     "pectorals.json": {
-      "sha256": "db41bf1f50cf046683442d2e84aca3d2b1d67f649edf10eccd1240d9e90d482c",
-      "bytes": 2706,
+      "sha256": "a715f50d796b7560b9069a92edbc0f9a418639ca0b601a707e94e5269ed9eb15",
+      "bytes": 2709,
       "mime_type": "application/json"
     },
     "reference.npz": {
-      "sha256": "a3fbe4dcfb81bd4c39409c47fb6219f67e61dd7b602d321db6ad8393f5a464f4",
-      "bytes": 11080,
+      "sha256": "71062a8eef540f1a9a6ac304a6ee9aa8b23bf26a24250b10e6368946ba5a209e",
+      "bytes": 11390,
       "mime_type": "application/octet-stream"
     },
     "series.csv": {
-      "sha256": "c0563ad6c1dd5829e2580f5afe8304a26a54ee57fec9707473c506ba99fdad9e",
-      "bytes": 224675,
+      "sha256": "b74c2e13fc75f918fd0bcc8c8aaad963ffe779281c087594a38f7b356bd4bc01",
+      "bytes": 269253,
       "mime_type": "text/csv"
     },
     "summary.json": {
-      "sha256": "2f05f2e5854ca3e85e09c33b7324c473eca6757d1794b38bfd8d30ac4d48903b",
-      "bytes": 7576,
+      "sha256": "beb64cc2f9f481dc4c60e9ec87e9d5bf351ba8cc4b0dcf42e74df09529c1078b",
+      "bytes": 8606,
       "mime_type": "application/json"
     },
     "support.json": {
-      "sha256": "c7b7d434920e8d14ea1d02ddb2ade8299f9efa99fa5ad63247b9b7deccb18be0",
-      "bytes": 535131,
-      "mime_type": "application/json"
-    },
-    "support_stationarity.json": {
-      "sha256": "0c9428a0ad34257e1567db0e6951e53f8d160493f19b6d72795bd85f50cdce04",
-      "bytes": 900,
+      "sha256": "4b97cc966e67fd9c55ce8e9b389982a30b342ebd132b96f199026825e65c6d47",
+      "bytes": 123207,
       "mime_type": "application/json"
     },
     "trajectory.npz": {
-      "sha256": "49e311faa3e64e2829de718db7a86234341507db90dab2eb3df1ed19cdfdd317",
-      "bytes": 1348026,
+      "sha256": "2dd080c91e00293b76ab5ca2c0501b4839c88bf1848b4c4dc8655fa639092bd1",
+      "bytes": 1555119,
       "mime_type": "application/octet-stream"
     },
     "trajectory_metadata.json": {
-      "sha256": "a348485a500041bfb880cdc9ee7a9340989947892a1220483eb899d3718ad516",
-      "bytes": 16055,
+      "sha256": "fc49da0da0760e67a55d246ae076d21ae7e4f3770cd68557706e552bb2f766c3",
+      "bytes": 17155,
       "mime_type": "application/json"
     },
     "validation.json": {
@@ -970,8 +1254,8 @@
       "mime_type": "application/json"
     },
     "wrists.json": {
-      "sha256": "33e4e658cfee499576d3e18e85ec8f2dbcf3ba2f94226ea99423848a8f33885a",
-      "bytes": 743755,
+      "sha256": "141152ebdfa18384e27aaf5be96c847b19703066f56b63662c33a033bcdd3bbd",
+      "bytes": 813010,
       "mime_type": "application/json"
     }
   },
@@ -981,11 +1265,11 @@
     "next": "render_result with saved states"
   },
   "counts": {
-    "nq": 89,
-    "nv": 89,
+    "nq": 129,
+    "nv": 129,
     "actuators": 700,
     "tendons": 700,
-    "equality_constraints": 46
+    "equality_constraints": 44
   },
-  "completed_at": "2026-11-12T14:45:43.587652+00:00"
+  "completed_at": "2026-11-26T15:51:55.247016+00:00"
 }

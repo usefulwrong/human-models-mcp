@@ -92,21 +92,3 @@ def test_supported_unknown_and_known_unsupported_have_distinct_evidence():
     assert get_model_capabilities("ms_human_700", "joint_pd_tracking")["status"] == "available"
     assert get_model_capabilities("ms_human_700", "defecation")["reason"] == "known_unsupported"
     assert get_model_capabilities("ms_human_700", "invented_quantity")["reason"] == "unknown_quantity"
-
-
-def test_v04_report_does_not_promote_stale_results(tmp_path):
-    import runpy
-    from unittest.mock import patch
-    reports = tmp_path / "reports"
-    reports.mkdir()
-    gates = {name: {"status": "fail"} for name in ("e2e", "clean-check", "package", "doctor")}
-    release = {"gates": gates, "release_status": "BLOCKED", "timestamp": "test", "baseline_head": "old",
-               "head": "old", "new_commits": [], "source_sha256": "test", "image_id": None}
-    (reports / "V04_RELEASE_CHECK.json").write_text(json.dumps(release))
-    (reports / "e2e.json").write_text('{"status":"pass"}')
-    module = runpy.run_path(str(home() / "scripts/write_v04_report.py"))
-    with patch.dict(module["main"].__globals__, ROOT=tmp_path):
-        module["main"]()
-    text = (reports / "V04_HANDOFF.md").read_text()
-    assert "Current scientific E2E did not pass" in text
-    assert "Both transports and seven fresh host clients passed" not in text

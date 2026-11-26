@@ -1,0 +1,7 @@
+validation_level: numerical_sanity
+checks:
+  finite_state: true
+  zero_engine_warnings: true
+  activation_bounds: true
+  repeat_run_absolute_tolerance: 0.0000000001
+limitations: All 700 muscles with declared mechanical contact pads and added passive damping. Named numerical checks and separate acceptance gates do not establish experimental or clinical validity. Repeat tolerance is checked by the independent E2E.

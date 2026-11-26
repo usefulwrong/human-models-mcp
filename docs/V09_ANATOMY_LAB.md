@@ -1,18 +1,19 @@
-# Anatomy Explorer · Anatomy Lab v0.9
+# Anatomy Explorer and the Anatomy Lab MCP tool
 
 Anatomy Lab adds a local BodyParts3D 4.3 viewer, a source-aware FMA registry
 and an optional read-only MCP query tool. The source package contains the
 installer, viewer and source pins. The installer retrieves the atlas and
-builds its derived scene on the operator's machine.
+builds its derived scene on your machine.
 
 ## Install the atlas
 
-Use a Python environment with the project's pinned dependencies and Node.js.
-Running the installer downloads the published inputs, verifies every pinned
-byte and prepares the full viewer. The local source cache supports reusing a
-completed download across installations.
+After [Linux setup](GETTING_STARTED.md), activate the project's pinned Python
+environment from the checkout root. Install Node.js for the viewer's local
+bundle preparation. The installer verifies every pinned input and prepares the
+viewer. The source cache can be reused in a second installation.
 
 ```sh
+. .client-venv/bin/activate
 python scripts/anatomy_lab/provision.py outputs/anatomy-lab
 ```
 
@@ -37,12 +38,13 @@ python scripts/anatomy_lab/provision.py outputs/anatomy-lab \
   --cache /path/to/transferred-source-cache --offline
 ```
 
-## Open the viewer and MCP
+## Open the viewer
 
 ```sh
 export PYTHONPATH="$PWD/src:$PWD/scripts/anatomy_lab"
 export HMM_LAB_CATALOG="$PWD/outputs/anatomy-lab/catalog.json"
-python -m lab_web --site outputs/anatomy-lab/site
+export HMM_LAB_SITE="$PWD/outputs/anatomy-lab/site"
+python -m lab_web
 ```
 
 Open `http://127.0.0.1:8766/`. Use `--lan "$LAN_ADDRESS_WITH_PREFIX"`
@@ -52,6 +54,12 @@ Choose a featured organ, search by name or by exact FMA/FJ identifier,
 or browse an anatomical system. System shortcuts are curated entry points.
 The source hierarchy uses the Registry's direct Part-of and Is-a edges
 and shows both parents and children. Source coverage varies by branch.
+
+[![Anatomy Explorer showing a static BodyParts3D heart with the Structure inspector](demo/explorer-heart.png)](demo/explorer-heart.png)
+
+**STATIC ATLAS** · Choose **Heart** to inspect FMA7088 and its source mesh
+coverage. The Structure inspector flags conflicting source identities.
+[Screenshot provenance and credits](demo/README.md#anatomy-explorer)
 
 Click or tap a visible object for its exact FJ and recorded concept
 candidates. Check the patient side and the source of each candidate.
@@ -91,11 +99,54 @@ export HMM_LAB_SITE="$site"
 python -m lab_web --site "$site"
 ```
 
-Launch `python -m lab_mcp` under the same environment for stdio discovery.
-The `anatomy_lab` tool provides search, typed relationships, source coverage,
-bounded spatial checks, scenes and regional saved-frame binding.
-The browser and stdio tool share the Registry operations with
-`POST /api/query`. For the composite resolver, use a request such as
+## Query anatomy_lab
+
+Run these commands from the checkout root in a shell with the Python
+environment and the three variables from [Open the viewer](#open-the-viewer).
+Start a separate shell with the same settings if the viewer is already running.
+
+For an MCP client, use the absolute path to `.client-venv/bin/python` as its
+stdio command, with arguments `["-m", "lab_mcp"]`. Pass `PYTHONPATH`,
+`HMM_LAB_CATALOG` and `HMM_LAB_SITE` to the server process. After discovery,
+call the tool named `anatomy_lab` with an outer `request` field. This
+official-SDK example launches the stdio server and searches the local catalog.
+
+```sh
+python - <<'PY'
+import asyncio
+import json
+import os
+import sys
+from mcp import Client, StdioServerParameters
+
+async def main():
+    server = StdioServerParameters(
+        command=sys.executable, args=["-m", "lab_mcp"], env=dict(os.environ)
+    )
+    async with Client(server) as client:
+        reply = await client.call_tool("anatomy_lab", {
+            "request": {"operation": "anatomy.search", "query": "heart", "limit": 5}
+        })
+        assert not reply.is_error
+        assert reply.structured_content["status"] == "ok"
+        print(json.dumps(reply.structured_content, indent=2))
+
+asyncio.run(main())
+PY
+```
+
+The browser's HTTP endpoint accepts the inner request directly while
+`lab_web` is running. Use the same request without a server via `lab_cli`.
+
+```sh
+request='{"operation":"anatomy.search","query":"heart","limit":5}'
+curl --fail-with-body -sS http://127.0.0.1:8766/api/query \
+  -H 'Content-Type: application/json' --data "$request"
+printf '%s\n' "$request" | python -m lab_cli
+```
+
+The result includes the heart concept (FMA7088). Use exact concepts and a
+representation to resolve source meshes. For the composite resolver, send:
 
 ```json
 {
@@ -148,7 +199,7 @@ A user-generated motion artifact can be opened with **Open saved motion**.
 For MCP motion binding, set `HMM_LAB_MOTION` to a reviewed regional export
 whose sibling run store holds the saved source trajectory. The existing
 MuJoCo and Blender workflows generate and verify those artifacts.
-[Saved-state workflow](V08_WORKFLOW.md)
+[Saved-state workflow](PREVIEW_WORKFLOW.md)
 
 Static views represent the indicated source atlas. Region motion is an
 engineering registration. Clinical inference and full anatomical movement
@@ -175,27 +226,29 @@ Start the MCP server or viewer using that catalog. In
 only that historical source. The result retains the original OWL
 predicate. Authored 4.3i inference coverage remains partial.
 
-## Replay a whole-body assisted push-up
+## Replay the experimental flat-palm run
 
 The Explorer can open a locally installed `hmm.anatomy.motion/1` produced from the
-original saved `pushup_palms` integration states. The builder is
+original saved `pushup_flat_palm` integration states. The builder is
 `scripts/anatomy_lab/moving/build.py`. It uses the pinned native model, published
 MyoSuite authored weights for matching joints, and the separately licensed
-bilateral Z-Anatomy rectus extraction. Build and Blender import are deterministic
-local commands. The typed server serves existing artifacts. Skin and organ
-groups remain available in the static atlas.
+bilateral Z-Anatomy rectus extraction. Build and Blender import use saved
+states. Skin and organ groups remain available in the static atlas.
+The current replay uses external joint assistance and shows `full_pushup=FAIL`.
+[Hands, contact evidence and saved state clock](demo/README.md)
 
 Configure `HMM_LAB_WHOLE` with the administrator-chosen MotionScene JSON path,
 `HMM_LAB_WHOLE_SHA` with its SHA-256 and `HMM_LAB_WHOLE_RESULTS` with the directory
 of pinned run UUIDs. `HMM_LAB_WHOLE_RENDER_SHA` optionally pins the
 `render/receipt.json` beside the GLB. Open `/?motion=whole` on loopback or use
-**Open assisted push-up replay** in the existing Explorer. The timeline scrubs
+**Open saved motion replay** in the Explorer. The timeline scrubs
 exact source indices. Between exact states, Play uses labeled interpolation.
 Anatomy materials are constant display colors.
 
 The same typed request envelope works through HTTP `/api/query`, the
 `anatomy_lab` stdio MCP tool and `lab_cli.py`. Operations are
-`whole.discover`, `whole.open`, `whole.set_view` and `whole.artifact`.
+`whole.discover`, `whole.open`, `whole.set_view`, `whole.artifact` and
+`whole.contact`.
 `whole.set_view` round-trips the `hmm.anatomy.motion-view/1` document containing
 run, digest, exact frame, visible layers and camera. The existing
 `hmm.anatomy.scene/1` remains the static/regional contract. The artifact reply
@@ -323,21 +376,47 @@ V1 evidence receipts remain readable. Coordinate-bearing v1 logs need
 re-annotation against v2 triangle anchors. The v2 receipt adds explicit
 source provenance, geometry fit, expert review, attachment footprint and
 human physiological validation fields. The server only reads the
-operator-installed, SHA-pinned receipt. Annotation editing and downloads
+locally installed, SHA-pinned receipt. Annotation editing and downloads
 take place locally in the browser. The historical candidate footprint
 format is accepted separately as v1.
 
 ## Enable Muscle Intelligence for a saved run
 
-Stage the overlay in a fresh directory. Set these four paths to absolute
+Build and stage the overlay in fresh directories. Set the paths below to absolute
 paths from the same installation. The MotionScene and compiled v3 crosswalk
 must have been produced from the same run, atlas and source model.
 
 ```sh
-atlas=/absolute/path/to/anatomy-lab
-motion=/absolute/path/to/motion.json
-crosswalk=/absolute/path/to/CROSSWALK_V3.json
-results=/absolute/path/to/results
+run="$PWD/results/RUN_UUID"  # The computed pushup_flat_palm run
+atlas="$PWD/outputs/anatomy-lab"
+clip="$PWD/outputs/flat-palm-clip"
+myo_glb=/path/to/pinned/fullbody_atlas_light.glb
+myo_sim=/path/to/pinned/myo-sim
+rectus="$PWD/render_jobs/rectus.npz"
+export PYTHONPATH="$PWD/src:$PWD/scripts:$PWD/scripts/anatomy_lab:$PWD/scripts/anatomy_lab/moving:$myo_sim"
+
+python scripts/anatomy_lab/moving/build.py --run "$run" \
+  --manifest-sha "$(sha256sum "$run/manifest.json" | cut -d' ' -f1)" \
+  --myo-glb "$myo_glb" --atlas "$atlas" --rectus "$rectus" --output "$clip" \
+  --accept-licenses CC-BY-4.0,CC-BY-SA-4.0,CC-BY-SA-2.1-JP
+python scripts/muscle_intelligence/crosswalk.py --run "$run" \
+  --catalog "$atlas/catalog.json" --myo "$myo_glb" --myo-sim "$myo_sim" \
+  --clip "$clip" --output "$clip/crosswalk-v2.json"
+python scripts/muscle_intelligence/registration_crosswalk.py --v2 "$clip/crosswalk-v2.json" \
+  --v2-sha256 "$(sha256sum "$clip/crosswalk-v2.json" | cut -d' ' -f1)" \
+  --catalog "$atlas/catalog.json" --myo-sim "$myo_sim" \
+  --model "$PWD/models/ms_human_700" --output "$clip/crosswalk-v3.json"
+```
+
+Use [the pinned moving-atlas sources](MOVING_ATLAS.md) and the
+[rectus preparation recipe](ANATOMICAL_EVIDENCE.md#prepare-the-z-anatomy-rectus-input).
+When using an exported run directory, install it under the exact UUID in your
+chosen results store before starting the viewer.
+
+```sh
+motion="$clip/motion.json"
+crosswalk="$clip/crosswalk-v3.json"
+results="$(dirname "$run")"
 app="$PWD/outputs/anatomy-app"
 
 python scripts/muscle_intelligence/stage.py "$app" --assets "$atlas/site"
@@ -351,8 +430,9 @@ export HMM_LAB_MUSCLE_SELECTION="$app/shared-selection.json"
 python -m lab_web
 ```
 
-Open `http://127.0.0.1:8766/?motion=whole`. Use the same environment for
-`python -m lab_mcp` over stdio. The export tools are
+Open `http://127.0.0.1:8766/?motion=whole`. Pass these environment settings
+to the same [MCP connector](#query-anatomy_lab) to enable saved-motion and
+muscle queries. The export tools are
 `scripts/anatomy_lab/moving/build.py`,
 `scripts/muscle_intelligence/crosswalk.py` and
 `scripts/muscle_intelligence/registration_crosswalk.py`. Run each with
@@ -367,3 +447,8 @@ a native actuator remains queryable even if its anatomy is unmapped.
 The optional landmark editor takes a separately pinned evidence receipt.
 Its records preserve the distinction between candidate marks and a
 completed independent review.
+
+The [scientific quantity receipt](SCIENTIFIC_QUANTITY_CONTRACT.md) records
+the exact saved sample, numerical definitions and artifact hashes behind
+the inspector and Blender export. The [reference parameter inventory](REFERENCE_MODEL_PARAMETERS.md)
+describes the inputs eligible for bounded engineering checks.

@@ -11,7 +11,7 @@
 </head>
 <body>
 <header class="masthead">
-  <div class="brand"><span class="mark" aria-hidden="true">+</span><div><span class="product">HUMAN MODELS MCP</span><h1>Anatomy Explorer</h1></div></div>
+  <div class="brand"><span class="mark" aria-hidden="true">+</span><div><span class="product">HUMAN MODELS MCP · 0.9.0rc2</span><h1>Anatomy Explorer</h1></div></div>
   <div class="files">
     <button id="export" type="button">Save scene</button>
     <label class="file-button" for="import">Open scene</label><input type="file" id="import" accept="application/json,.json" aria-label="Open scene">
@@ -46,7 +46,7 @@
   <section class="stage" aria-label="Spatial view">
     <canvas id="view" aria-label="3D anatomy view. Drag to rotate and click to inspect a mesh."></canvas>
     <div class="stage-actions">
-      <div><span class="stage-label">ATLAS VIEW</span><p id="viewport-title">Anterior surface</p></div>
+      <div><span class="stage-label">STATIC ATLAS</span><span class="stage-label motion-label">MOVING ILLUSTRATIVE</span><p id="viewport-title">Anterior surface</p></div>
       <button id="reset" type="button">Reset view</button>
     </div>
     <div class="stage-footer">
@@ -89,7 +89,7 @@
       <output id="constituent-info" aria-live="polite"></output>
       <div id="mesh-candidates"></div>
     </section>
-    <button id="whole-open" type="button">Open assisted push-up replay</button>
+    <button id="whole-open" type="button">Open saved motion replay</button>
     <section id="whole-layers" aria-label="Motion layers" hidden>
       <div id="whole-layer-options"></div>
       <button id="whole-static" type="button">Return to static atlas</button>

@@ -14,8 +14,8 @@ make render-build
 make render-preview
 ```
 
-The quick preview computes `pushup_palms`, renders five states on CPU and prints
-a new local HTML path. For a previously computed run in the same store:
+The quick preview computes `pushup_flat_palm`, prints its full-cycle
+acceptance, renders five states on CPU and prints a local HTML path. For a previously computed run in the same store:
 
 ```sh
 make render-start
@@ -28,7 +28,7 @@ Replace the UUID placeholder. Both runtime and renderer need the same
 independent SDK path with explicit resolution, FPS and sample settings:
 
 ```sh
-.client-venv/bin/python examples/mcp-client/render_client.py --scenario pushup_palms --profile scientific --frames 23 --fps 5 --width 960 --height 540 --samples 8 --device cpu --timeout 900 --output outputs/my-sdk-render
+.client-venv/bin/python examples/mcp-client/render_client.py --scenario pushup_flat_palm --profile scientific --frames 23 --fps 5 --width 960 --height 540 --samples 8 --device cpu --timeout 900 --output outputs/my-sdk-render
 ```
 
 This computes a new run; add `--run-id <uuid>` to reuse existing states. It
@@ -43,7 +43,7 @@ No AI account is needed. Large artifacts are retrieved in ≤256 KiB MCP chunks.
 | `muscle_paths` | 418 distinct upper-body native transmission routes for push-ups, with actual activation |
 | `arm_muscles`, `lumbar_muscles`, `abdominal_muscles`, `hand_tendons` | Overlapping subsets: 170, 236, 40 and 48 paths; do not add counts |
 | `pectoral_muscles` | Six bilateral PECM1–3 paths, not a net chest force |
-| `hand_contacts` | Mechanical pads, measured floor forces and moments about wrists |
+| `hand_contacts` | Contact proxies and saved model floor reactions and moments about the wrists |
 | `joint_axes`, `center_of_mass` | Source joint anchors/axes and mass-weighted COM |
 | `contact_forces`, `applied_moments` | Contact reactions and separately declared external loads |
 
@@ -55,13 +55,13 @@ Detailed hand tubes have a 0.7 mm display radius; other regional paths use
 1.2 mm. Force arrows scale at 0.0006 m/N, moment arrows at 0.006 m/(N m).
 Neither arrow scale nor material color is a physical constitutive property.
 
-Original `pushup` muscle mode and assisted palm/fist runs have distinct
-acceptance copied into each passport. Rendering an experiment does not promote
-its evidence level. Rejected techniques and incomplete cycles are labeled.
+Each passport carries the acceptance of its own run. The current articulated
+flat-palm replay preserves `full_pushup=FAIL` and its support failures.
+Historical muscle, palm and fist runs retain their original acceptance.
 The optional `pectoralis_atlas` layer depicts a right clavicular pectoralis
 surface with illustrative skinning. Clinical quantities, ligaments and tissue
 mechanics remain outside the scope.
-[Preset recipes, atlas installation and Evidence Contract](V08_ANATOMICAL_EVIDENCE.md)
+[Preset recipes, atlas installation and Evidence Contract](ANATOMICAL_EVIDENCE.md)
 
 ## Clock, coordinates and independent checks
 
@@ -83,8 +83,7 @@ are normalized for USD; original vertices and distinct valid triangles remain.
 the original USD working files and checks sampled transforms/overlays.
 `scripts/render_e2e.py` provides `audit_media`, which runs those checks plus
 FFprobe timing/dimensions and a complete FFmpeg decode. It does not infer human
-accuracy from matching meshes. The [RC audit](../reports/PUBLIC_RELEASE_AUDIT.md)
-records the actual checks and visual inspection for the [public demo](demo/README.md).
+accuracy from matching meshes. The [current demo](demo/README.md) includes its saved clock and asset checksums.
 
 ## Limits and GPU
 

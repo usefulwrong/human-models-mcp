@@ -1,8 +1,8 @@
 include README.md LICENSE CITATION.cff CONTRIBUTING.md CHANGELOG.md SECURITY.md requirements.in requirements.lock models.lock.json Makefile Dockerfile compose.yaml .dockerignore
-include AGENTS.md
 recursive-include scenarios *.yaml *.md
 recursive-include skills *.md
 recursive-include docs *.md
+prune docs/demo
 recursive-include scripts *.py *.sh
 recursive-include scripts/anatomy_lab *.css *.html *.html.in *.js *.json
 recursive-include scripts/muscle_intelligence *.cjs *.js *.json *.patch
@@ -17,3 +17,4 @@ recursive-include benchmarks *.xml *.csv *.json *.md
 recursive-include .github *.yml *.yaml
 
 include Dockerfile.render Dockerfile.render.dockerignore compose.render-gpu.yaml renderer.lock.json requirements-render.lock visual_sources.json
+global-exclude *.orig *.rej *.pyc

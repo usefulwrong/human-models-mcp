@@ -5,40 +5,26 @@ and pinned MS-Human-700 assets. `computed` means execution finished. A named
 numerical PASS is not human experimental validation. No clinical or exercise
 safety interpretation is supported.
 
-## Push-up configurations
+## Current flat-palm experiment
 
-| Property | `pushup` 1.0.0 | `pushup_palms` 1.5.0 | `pushup_knuckles` 1.2.0 |
-| --- | --- | --- | --- |
-| Default control | Native muscle recruitment | Muscle recruitment + external residual joint assistance | Muscle recruitment + external residual joint assistance |
-| Reference | Synthetic descent/ascent | Frozen, synthetic full palm cycle (`chest_full`) | Synthetic neutral-grip, tucked-elbow cycle |
-| Contact | Mechanical spherical hand/toe proxies | Three palm pads per hand + toe pads, ideal horizontal sticking guides | Two knuckle pads per hand + toe pads, ideal horizontal sticking guides |
-| Wrist ranges | Native | Two lower flexion-coordinate bounds changed from −0.6 to −0.930016 rad; geometric shaft extension checked separately | Native |
-| Fingers | Primary rigid hand | Fixed open source-derived posture | Fixed curled source-derived posture |
-| Muscle-only gate | Reported per run | `NOT_ACHIEVED` when assisted | `NOT_ACHIEVED` when assisted |
+`pushup_flat_palm` saves 111 samples from the integrated motion over 4.4 seconds. It uses
+700 native actuator paths, articulated fingers, compliant palm patches
+and fingertip capsules, frictional floor contacts and external joint
+assistance. In the current replay the distributed palm-and-digit criterion
+passes. The full cycle, four supports, stationary supports and numerical
+bounds fail. An execution can complete with one or more failed criteria.
 
-All use the full primary model's 700 muscle dynamics actuators. Recruitment,
-feedback, extra passive damping, collision proxies and reference construction
-are engineering assumptions. Scapular coordinates remain source-coupled.
-A `pushup` run with `control: external` is a separate externally controlled case.
-The detailed-hand configurations never inherit its muscle-only result.
+The two lower wrist-flexion limits are explicitly derived. The associated
+90° shaft-angle envelope is an engineering check. Model space angles,
+contact proxy patch geometry and controller loads do not supply clinical
+joint ranges or skin pressure. [Contact model](CONTACT_MODEL_AND_LIMITATIONS.md)
+[Scenario sources](../scenarios/pushup_flat_palm/references.md)
 
-For palms, the 90° wrist shaft envelope is literature-informed, not calibrated
-to an individual or a clinical joint-angle mapping. It is checked at each
-integration step; the source files are unchanged. Its motivation and exact
-derivation are in [hand methods](HAND_DETAIL.md) and the
-[scenario references](../scenarios/pushup_palms/references.md).
-
-Horizontal sticking is prescribed through vertically free guides, not predicted
-from friction alone. Floor collisions provide unilateral normal forces. Guide
-reactions and native contacts must satisfy the aggregate friction bound;
-inadequate friction fails numerical/exercise acceptance even if points stay put.
-Submillimetre residual motion is measured, not described as mathematically zero.
-
-Palms and fists differ in stance, wrist range and controller response. Their
-forces are not a controlled causal comparison of human wrist loading. Neither
-trajectory has been validated against synchronized human motion, force plates
-or EMG. The [demo passport and raw states](demo/README.md) preserve its actual
-acceptance and external-force accounting.
+The original `pushup`, `pushup_palms` and `pushup_knuckles` remain available
+for explicit reproducibility requests. The fixed-points palm and knuckle
+routes prescribe horizontal sticking. Their saved acceptance applies to
+their own controller and boundaries. [Historical hand methods](HAND_DETAIL.md)
+[Current demo evidence](demo/README.md)
 
 ## Quantities and units
 
@@ -99,4 +85,4 @@ BodyParts3D or bilateral rectus surfaces from Z-Anatomy. Registration is
 illustrative. Fit residuals and geometry transfer checks accompany the
 render. Native muscle-path activation and atlas surface shading describe
 different quantities. The local Fit3D workflow compares geometric observables.
-[Anatomical replay and Evidence Contract](V08_ANATOMICAL_EVIDENCE.md)
+[Anatomical replay and Evidence Contract](ANATOMICAL_EVIDENCE.md)

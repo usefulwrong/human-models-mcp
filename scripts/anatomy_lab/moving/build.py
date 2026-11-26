@@ -17,6 +17,7 @@ from human_models_mcp.atlas_registration import native_bone, nearest, rigid_fit
 from human_models_mcp.rectus import SOURCE as Z_SOURCE, register as rectus_register, segment_frame, skin as rectus_skin
 from human_models_mcp.scene_export import load_saved_run, restore_state
 from glb import B4, BASIS, Clip, array, face_vectors, unpack
+from contact_overlay import experimental_overlays, floor_events
 
 
 LIMIT = .00005
@@ -238,7 +239,7 @@ def metrics(points, deformed, reference, faces):
             "orientation_proxy_faces": (np.sum(vectors * reference(base), axis=-1) < 0).sum(axis=1).tolist()}
 
 
-def muscle_meshes(clip, source, blob, bp, matches, deltas, mats, sample, times, indices, folder):
+def muscle_meshes(clip, source, blob, bp, matches, deltas, mats, sample, times, indices, folder, floor_z):
     rows, qa, variant = [], {}, {}
     start = perf_counter()
     for source_node, node in enumerate(source["nodes"]):
@@ -264,9 +265,6 @@ def muscle_meshes(clip, source, blob, bp, matches, deltas, mats, sample, times, 
             continue
         if not np.allclose(weights.sum(1), 1, rtol=0, atol=1e-6):
             raise ValueError("source weights do not sum to one")
-        n, _ = clip.mesh(name, "MUSCLES", points, faces, mats[color], weights, joints,
-                         source_node=source_node, **source_identity(name, bp))
-        row["node"] = n
         transforms = deltas[:, joints]
         bound = apply(transforms, points[None, :, None, :])
         positions = np.sum(bound * weights[None, ..., None], axis=2)
@@ -277,6 +275,14 @@ def muscle_meshes(clip, source, blob, bp, matches, deltas, mats, sample, times, 
             vectors = np.einsum("fvkij,vj->fvki", transforms[:, face_point, :, :3, :3], base)
             return np.sum(vectors * weights[None, face_point, :, None], axis=2)
         qa[name] = metrics(points, positions, ref, faces)
+        if floor_z is not None and name in ("Right extensor indicis [FJ1493]", "Left extensor indicis [FJ1493M]"):
+            depth = float(floor_z - positions[..., 1].min())
+            if depth > 1e-6:
+                row.update(mode="excluded_floor_crossing", max_depth_below_floor_m=depth)
+                continue
+        n, _ = clip.mesh(name, "MUSCLES", points, faces, mats[color], weights, joints,
+                         source_node=source_node, **source_identity(name, bp))
+        row["node"] = n
         check = np.unique(np.linspace(0, len(points) - 1, 5, dtype=int))
         samples_record(name, n, positions[:, check], sample, check)
         if name in ("Clavicular part of right pectoralis major [FJ1447]",
@@ -344,19 +350,36 @@ def main(args):
         if digest(args.run / name) != manifest["artifacts"][name]["sha256"]:
             raise ValueError("source run artifact changed: " + name)
     run, model, data, _, _, states, times, qpos, spec, _ = load_saved_run(args.run)
-    if run["status"] != "computed" or run["scenario_id"] not in {"pushup", "pushup_palms"}:
+    if run["status"] != "computed" or run["scenario_id"] not in {"pushup", "pushup_palms", "pushup_palms_contact", "pushup_flat_palm"}:
         raise ValueError("a computed push-up run is required")
     control = run["execution"]["parameters"]["control"]
     if run["scientific"]["acceptance"]["muscle_driven"] == "PASS" or control != "assisted_muscle":
         raise ValueError("This binding is pinned to the assisted palm run")
-    phases = dict(zip(json.loads((args.run / "summary.json").read_text())["key_indices"],
-                      ("start", "bottom", "return"), strict=True))
+    key_indices = json.loads((args.run / "summary.json").read_text())["key_indices"]
+    if key_indices[1] in (key_indices[0], key_indices[2]):
+        key_indices[1] = int(np.argmin(abs(times - 2.2)))
+        phase_names = ("start", "target bottom", "return time")
+    else:
+        phase_names = ("start", "bottom", "return")
+    phases = dict(zip(key_indices, phase_names, strict=True))
     selected = np.unique([0, len(times) // 4, *phases, len(times) * 3 // 4, len(times) - 1])
     rectus = rectus_register(args.rectus, run["model"])
     neutral = mj.MjData(model)
     mj.mj_forward(model, neutral)
     bones = visible_geoms(model)
     pads = [g for g in range(model.ngeom) if re.fullmatch(r"(palm|toe)_[rl](?:_[12])?", model.geom(g).name)]
+    contact = "contact_manifest.json" in run["artifacts"]
+    layers = dict(LAYERS)
+    if contact:
+        for name in ("contact_manifest.json", "contact_surfaces.json"):
+            if digest(args.run / name) != run["artifacts"][name]["sha256"]:
+                raise ValueError("contact artifact changed: " + name)
+        manifest = json.loads((args.run / "contact_manifest.json").read_text())
+        surface_frames = json.loads((args.run / "contact_surfaces.json").read_text())["frames"]
+        pads = [row["geom_id"] for row in manifest["collision_geoms"].values()]
+        layers["OVERLAYS"] = {"mode": "registered_rigid", "available": True,
+                             "description": "Floor-only proxy envelopes, native normals and visible depth markers"}
+        debug_events = []
     geoms = bones + pads
     raw_glb = args.myo_glb.read_bytes()
     doc, blob = unpack(raw_glb)
@@ -366,6 +389,8 @@ def main(args):
     frames = []
     for i, time_s in enumerate(times):
         restore_state(model, data, states[i], spec, qpos[i], time_s)
+        if contact:
+            debug_events.append(floor_events(model, data))
         for g in geoms:
             poses[g].append(geom_pose(data, g))
         _, checks, sites = rectus_skin(model, data, rectus)
@@ -377,6 +402,16 @@ def main(args):
             rectus_poses[side].append(matrix(rotation * [1, 1, length / rest], lo))
         frames.append({"state_index": i, "frame_time": float(time_s), "state_sha256": sha(states[i].tobytes()),
                        "phase": phases.get(i, "motion")})
+        if contact:
+            saved = surface_frames[i]
+            if saved["state_sha256"] != frames[-1]["state_sha256"] or saved["time_s"] != float(time_s):
+                raise ValueError("contact samples and saved state differ")
+            frames[-1]["floor_contact_count"] = len(debug_events[-1])
+            frames[-1]["min_surface_distance_m"] = {
+                limb: min((dist for name, (dist, _) in saved["surfaces"].items()
+                           if manifest["visible_surfaces"][name]["body"].startswith(bodies)), default=None)
+                for limb, bodies in {"right hand": ("hand_r",), "left hand": ("hand_l",),
+                    "right foot": ("toes_r", "calcn_r"), "left foot": ("toes_l", "calcn_l")}.items()}
     poses = {g: np.array(values) for g, values in poses.items()}
     clip = Clip(times)
     mats = {name: clip.material(name.title(), color) for name, color in {
@@ -422,8 +457,15 @@ def main(args):
                        "source_mesh_sha256": sha(points.tobytes() + faces.tobytes())})
         check = np.unique(np.linspace(0, len(points) - 1, 5, dtype=int))
         samples_record(name, n, apply(poses[g][:, None], points[check]) @ BASIS.T, sample, check)
-    clip.mesh("World floor", "BODY", [[-2, 0, -2], [-2, 0, 2], [3, 0, 2], [3, 0, -2]],
-              np.array([[0, 1, 2], [0, 2, 3]]), mats["floor"])
+    floor = model.geom("floor").id
+    if contact:
+        extent_x, extent_y = model.geom_size[floor, :2]
+        local = np.array([[-extent_x, -extent_y, 0], [extent_x, -extent_y, 0],
+                          [extent_x, extent_y, 0], [-extent_x, extent_y, 0]])
+        floor_points = apply(geom_pose(neutral, floor), local) @ BASIS.T
+    else:
+        floor_points = [[-2, 0, -2], [-2, 0, 2], [3, 0, 2], [3, 0, -2]]
+    clip.mesh("World floor", "BODY", floor_points, np.array([[0, 1, 2], [0, 2, 3]]), mats["floor"])
     # The unit sphere is a display of the actual model pad centre and radius.
     points = np.array([[np.sin(t) * np.cos(p), np.sin(t) * np.sin(p), np.cos(t)]
                        for t in np.linspace(0, np.pi, 9) for p in np.arange(16) * np.pi / 8])
@@ -431,15 +473,18 @@ def main(args):
                       for a, b in [(16 * row + col, 16 * row + (col + 1) % 16)]
                       for face in ((a, a + 16, b), (b, a + 16, b + 16))])
     faces = clean_faces(points, faces)
-    for g in pads:
+    if contact:
+        experimental_overlays(clip, model, poses, pads, manifest, surface_frames, debug_events, points, faces)
+    for g in ([] if contact else pads):
         name = model.geom(g).name
         radius = float(model.geom_size[g, 0])
         node, _ = clip.mesh(name, "OVERLAYS", points * radius, faces, mats["pad"], proxy="native_sphere")
         clip.transforms(node, B4 @ poses[g] @ B4.T)
         pad_records.append({"name": name, "node": node, "geom_id": g, "radius_m": radius,
                             "centres_m": poses[g][:, :3, 3].tolist()})
+    floor_z = manifest["floor"]["position_m"][2] if contact and manifest["profile"] == "articulated_palms_v1" else None
     muscles, qa, variants, skin_time = muscle_meshes(clip, doc, blob, bp, matches, deltas, mats,
-                                                      sample, times, selected, folder)
+                                                  sample, times, selected, folder, floor_z)
     z_rows = []
     for side, (points, length, faces, tendon) in rectus.items():
         label = f"Rectus abdominis muscle.{side}"
@@ -481,16 +526,23 @@ def main(args):
                             "license_sha256": digest(args.atlas / "BodyParts3D-LICENSE"),
                             "receipt_sha256": digest(args.atlas / "source-receipt.json")},
                    "z_anatomy": Z_SOURCE},
-        "frames": frames, "cameras": CAMERAS, "layers": LAYERS, "default_layers": ["BODY", "SKELETON", "MUSCLES"],
+        "frames": frames, "cameras": CAMERAS, "layers": layers, "default_layers": ["BODY", "SKELETON", "MUSCLES"],
         "default_camera": "side",
         "artifacts": {"motion.glb": {"sha256": clip_sha, "bytes": path.stat().st_size}},
     }
+    if contact:
+        scene["contact"] = {"profile": manifest["profile"], "floor": manifest["floor"],
+                            "manifest_sha256": run["artifacts"]["contact_manifest.json"]["sha256"]}
+        scene["excluded_display_surfaces"] = [
+            {k: row[k] for k in ("name", "source_node", "source_mesh_sha256", "mode", "max_depth_below_floor_m")}
+            for row in muscles if row["mode"] == "excluded_floor_crossing"
+        ]
     coverage = {"schema_version": "hmm.anatomy.motion.coverage/1", "run_id": run["run_id"],
                 "native_bones": native, "source_surfaces": muscles, "z_anatomy_surfaces": z_rows,
                 "contacts": [{k: v for k, v in pad.items() if k != "centres_m"} for pad in pad_records],
                 "bind_correspondences": correspondence, "counts": dict(Counter(row["mode"] for row in muscles)),
                 "static_disputed_objects": {fj: bp[fj] for fj in ("FJ3028", "FJ6043")},
-                "native_detailed_hand_meshes": len(detailed_hands), "layers": LAYERS}
+                "native_detailed_hand_meshes": len(detailed_hands), "layers": layers}
     write(folder / "coverage.json", coverage)
     scene["artifacts"]["coverage.json"] = {"sha256": digest(folder / "coverage.json"),
                                           "bytes": (folder / "coverage.json").stat().st_size}

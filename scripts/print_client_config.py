@@ -1,4 +1,4 @@
-"""Print portable-to-this-checkout Codex configuration; never edit user config."""
+"""Print a local MCP stdio configuration for this checkout."""
 
 import json
 import os

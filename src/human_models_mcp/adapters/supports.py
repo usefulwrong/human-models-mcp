@@ -227,24 +227,34 @@ def install_fixed_supports(mj, spec, anchors):
         eq.solimp[:] = [.9999, .9999, .001, .5, 2]
 
 
-def fixed_support_command(mj, model, data, poses, active, orientations):
+def fixed_support_command(mj, model, data, poses, active, orientations, *, frictional=False, joint_gains=None):
     """Joint feedback plus gravity/load-sharing feedforward; no root actuation."""
     from .pushup import target_pose, coordinate_tangent
     reference = target_pose(poses, float(data.time), 4.0)
-    gains = np.full(model.nq, 3500.0)
-    gains[45:85] = 2000
-    gains[[15, 16, 17, 30, 31, 32]] = 0
+    gains = joint_gains
+    if gains is None:
+        gains = np.full(model.nq, 3500.0)
+        gains[45:85] = 2000
+        if not frictional:
+            gains[[15, 16, 17, 30, 31, 32]] = 0
     tangent = coordinate_tangent(model, data, active)
     desired = gains[active] * (reference[active] - data.qpos[active])
     names = ("palm_r", "palm_l", "toe_r", "toe_l")
-    points = np.array([data.site_xpos[model.site("material_" + n).id] for n in names])
+    if frictional:
+        markers = [model.geom(n).id for n in names]
+        points = data.geom_xpos[markers]
+        jacobian = mj.mj_jacGeom
+    else:
+        markers = [model.site("material_" + n).id for n in names]
+        points = data.site_xpos[markers]
+        jacobian = mj.mj_jacSite
     mass = model.body_subtreemass[model.body("pelvis").id]
     loads = np.linalg.lstsq(np.vstack((np.ones(4), points[:, 0], points[:, 1])),
                            mass * 9.81 * np.r_[1, data.subtree_com[model.body("pelvis").id, :2]], rcond=None)[0]
     feedforward = data.qfrc_bias.copy()
-    for name, normal in zip(names, loads, strict=True):
+    for marker, normal in zip(markers, loads, strict=True):
         linear = np.zeros((3, model.nv))
-        mj.mj_jacSite(model, data, linear, None, model.site("material_" + name).id)
+        jacobian(model, data, linear, None, marker)
         feedforward -= linear[2] * normal
     desired += tangent.T @ feedforward
     for side in "rl":

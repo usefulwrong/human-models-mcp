@@ -113,6 +113,9 @@ def run_scenario(scenario_id: str, parameters: dict | None = None, idempotency_k
             "engine": card["engine"],
             "execution": {"method": scenario["method"], "physics_backend": "cpu", "render_backend": "none",
                           "seed": None, "parameters": params, "integration_steps": 0,
+                          "parameter_origins": {name: ("explicit_request" if name in (parameters or {}) else
+                                                      "scenario_default" if name in scenario["defaults"] else "schema_default")
+                                                for name in params},
                           "environment": {"python": platform.python_version(), "platform": platform.platform(),
                                           "package_version": __version__, "machine": platform.machine(),
                                           "code_sha256": code_sha256(),
@@ -214,7 +217,7 @@ def run_scenario(scenario_id: str, parameters: dict | None = None, idempotency_k
                     if path.stat().st_size > 2 * 1024 * 1024:
                         raise ValueError("artifact exceeds 2 MiB: " + name)
                     manifest["artifacts"][name] = {"sha256": hashlib.sha256(path.read_bytes()).hexdigest(),
-                        "bytes": path.stat().st_size, "mime_type": mimetypes.guess_type(name)[0] or "application/octet-stream"}
+                        "bytes": path.stat().st_size, "mime_type": "application/gzip" if path.suffix == ".gz" else (mimetypes.guess_type(name)[0] or "application/octet-stream")}
         except Exception as exc:
             manifest["status"] = manifest["execution"]["result_status"] = "failed"
             manifest["scientific"]["validation_level"] = "unvalidated"

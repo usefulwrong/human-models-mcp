@@ -73,6 +73,20 @@ class WholeMotion:
             raise LookupError("no whole-body animation for that run")
         if request.operation == "whole.open":
             return {"status": "ok", "motion_sha256": self.sha, "motion": scene}
+        if request.operation == "whole.contact":
+            from human_models_mcp.contact_results import get_contact
+            from human_models_mcp.results import error
+
+            if "contact" not in scene:
+                return error("unsupported", "no experimental contact evidence for this motion")
+            result = get_contact(scene["run_id"], request.part, sample=request.sample)
+            if result["status"] == "ok":
+                frame = scene["frames"][request.sample]
+                if (result["state_sha256"] != frame["state_sha256"] or result["time_s"] != frame["frame_time"]
+                        or result["scientific_quantity"]["sources_sha256"]["contact_manifest.json"]
+                        != scene["contact"]["manifest_sha256"]):
+                    raise ValueError("contact receipt differs from the installed MotionScene")
+            return result
         if request.operation == "whole.artifact":
             with self.open_artifact(request.artifact_id, scene) as (_, identity):
                 return {"status": "ok", **identity, "artifact_id": request.artifact_id,

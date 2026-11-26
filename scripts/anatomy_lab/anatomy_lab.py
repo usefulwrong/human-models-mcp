@@ -206,11 +206,18 @@ class WholeArtifact(Contract):
     artifact_id: Literal["motion.glb", "coverage.json", "scene.blend", "assisted-pushup.mp4"]
 
 
-WHOLE_REQUESTS = (WholeDiscover, WholeOpen, WholeSetView, WholeArtifact)
+class WholeContact(Contract):
+    operation: Literal["whole.contact"]
+    run_id: UUID
+    part: str = Field(min_length=1, max_length=100)
+    sample: int = Field(strict=True, ge=0, le=400)
+
+
+WHOLE_REQUESTS = (WholeDiscover, WholeOpen, WholeSetView, WholeArtifact, WholeContact)
 
 
 Request = Annotated[SourceRequest | Search | ConceptRequest | Resolve | Identify | Spatial | SceneRequest | MotionRequest
-                    | WholeDiscover | WholeOpen | WholeSetView | WholeArtifact,
+                    | WholeDiscover | WholeOpen | WholeSetView | WholeArtifact | WholeContact,
                     Field(discriminator="operation")]
 REQUEST = TypeAdapter(Request)
 FMA_ID = TypeAdapter(Fma)
@@ -814,7 +821,7 @@ class Registry:
             raise ValueError("saved run manifest SHA-256 mismatch")
         manifest = json.loads(manifest_bytes)
         trajectory = read_bounded(run / "trajectory.npz", 2 * 1024 * 1024)
-        if (manifest["scenario_id"] != "pushup_palms" or manifest["status"] != "computed"
+        if (manifest["scenario_id"] not in {"pushup_flat_palm", "pushup_palms"} or manifest["status"] != "computed"
                 or manifest["run_id"] != metadata["run_id"]
                 or digest(trajectory) != metadata["source_sha"]
                 or metadata["source_sha"] != manifest["artifacts"]["trajectory.npz"]["sha256"]):

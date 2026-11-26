@@ -28,7 +28,12 @@ expected = json.loads((output / "scene/expected.json").read_text())
 for name, sha in expected["source_files"].items():
     assert hashlib.sha256((source / name).read_bytes()).hexdigest() == sha
 root = Path("/app/models/ms_human_700")
-if run["scenario_id"] in ("pushup", "pushup_palms", "pushup_knuckles"):
+pushup_scenarios = {"pushup", "pushup_palms", "pushup_knuckles", "pushup_palms_contact", "pushup_flat_palm"}
+if run["scenario_id"] in {"pushup_palms_contact", "pushup_flat_palm"}:
+    from human_models_mcp.scene_export import load_saved_run
+
+    _, model, _, _, recipe, *_ = load_saved_run(source)
+elif run["scenario_id"] in pushup_scenarios:
     recipe = json.loads((source / "model_recipe.json").read_text())
     spec = mj.MjSpec.from_file(str(root / "MS-Human-700.xml"))
     if recipe.get("hand_support", "legacy_point") != "legacy_point":
@@ -186,7 +191,7 @@ for index in (0, len(expected["frames"]) // 2, len(expected["frames"]) - 1):
     mj.mj_forward(model, data)
     assert np.array_equal(data.qpos, archive["qpos"][frame["source_index"]])
     assert abs(data.time - frame["time_s"]) < 1e-12
-    if run["scenario_id"] in ("pushup", "pushup_palms", "pushup_knuckles"):
+    if run["scenario_id"] in pushup_scenarios:
         assert not np.any(data.xfrc_applied) and not np.any(data.qfrc_applied[:6])
         if run["execution"]["parameters"]["control"] == "muscle":
             assert not np.any(data.qfrc_applied)

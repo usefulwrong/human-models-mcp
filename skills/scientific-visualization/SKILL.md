@@ -9,7 +9,7 @@ description: Render saved human-models-mcp experiments through the verified Blen
    scenario's `describe_model`. Read `list_render_profiles` for live profiles,
    layers, option bounds and unsupported anatomy. Do not guess available layers.
 2. Select `elbow_tracking`, `loaded_elbow`, `standing_contact_probe`,
-   `assisted_stance`, `pushup`, `pushup_palms` or `pushup_knuckles`.
+   `assisted_stance`, `pushup_flat_palm`, `pushup` or `pushup_knuckles`.
    Run the scenario with `parameters={"render":false}` if a new
    experiment is needed, or use an existing successful `get_result(run_id=...)`.
    Require `computed` and a manifest-listed `trajectory.npz`. Other scenarios
@@ -95,7 +95,12 @@ does not upgrade an unsuccessful physical experiment. Read source.zip for all
 
 ## Detailed hands and regional layers
 
-Use `pushup_palms` and `pushup_knuckles` for the two source-derived fixed finger
+The current preview uses `pushup_flat_palm`. Query its exact sample with
+`get_contact`, inspect `distributed_palms_and_digits` independently from
+`full_pushup`, and retain the actual science statuses in every replay.
+[Contact model and limits](../../docs/CONTACT_MODEL_AND_LIMITATIONS.md)
+
+Historical `pushup_palms` and `pushup_knuckles` use source-derived fixed finger
 postures. Defaults use `assisted_muscle`: real muscle forces plus explicit
 residual external joint torques. Require `external_control=USED` and do not
 describe them as pure muscle-driven, even when `full_pushup=PASS`.
@@ -117,7 +122,7 @@ calibrated clinical extension angles. Compare the two variants as engineering
 scenarios with different reference hand placements, not an isolated causal or
 safety experiment. [Details](../../docs/HAND_DETAIL.md).
 
-For detailed-hand runs require `stationary_supports=PASS` and retrieve
+For legacy fixed-point runs inspect `stationary_supports` and retrieve
 `support_stationarity.json`: all native hand/toe pads and four prescribed points
 must stay within 0.5 mm horizontally at every integration step. Defaults are
 `support_boundary: fixed_points`, 0.5 ms integration and 4.4 s total. Horizontal
@@ -134,7 +139,7 @@ widened to force a reference. Muscle forces require recomputation after changing
 technique; neither expected EMG nor rendering colors may manufacture them.
 
 Before implementing or accepting human exercise motion, follow the repository
-[reference-first rule](../../AGENTS.md#human-movement-references-before-implementation).
+[reference-first rule](../../docs/MOVEMENT_METHODS.md).
 Search for real people performing the named variant, open the actual images or
 video frames, and record viewed phases/angles and source URLs before choosing
 the trajectory. Compare model limits with those references; preserve an honest
@@ -142,7 +147,7 @@ negative result if they are incompatible. A numeric PASS is not a technique PASS
 For push-ups explicitly inspect bilateral pectoral forces/activation; rendering
 colors must remain computed values and cannot be supplied from expected EMG.
 
-## Evidence and recipes in v0.8
+## Evidence and recipes
 
 Choose a recipe via `list_render_profiles` and pass it to `render_result` with
 bounded options. Use the job and artifact IDs to retrieve `evidence.json`,
@@ -151,11 +156,11 @@ and retain the separate asset attribution. Read `anatomy_registration.json` for
 mesh transfer, attachment gaps and scope. Keep licensed Fit3D inputs and overlays
 local. An aesthetic overlay supplies no measured anatomy.
 
-[Anatomical evidence guide](../../docs/V08_ANATOMICAL_EVIDENCE.md)
+[Anatomical evidence guide](../../docs/ANATOMICAL_EVIDENCE.md)
 
 For the local whole-body review, use the pinned MyoSuite full-resolution
 reference and the deterministic arm replay command in the
-[upper-limb review](../../docs/V08_UPPER_LIMB_REVIEW.md#reproduction-and-status).
+[upper-limb review](../../docs/CONTACT_MODEL_AND_LIMITATIONS.md).
 Read the open-edge, native path, and intersection reports alongside paired
 renders. Compare triangle-pair counts only for fixed topology. The replay is
 an illustrative Blender workflow with the original saved model states.

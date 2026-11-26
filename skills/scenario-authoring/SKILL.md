@@ -104,7 +104,7 @@ reconstruction, coordinate/time/unit checks and real Blender E2E. Preserve origi
 scientific outputs; make rendering a separate job from an immutable computed run.
 
 Before implementing or accepting human exercise motion, follow the repository
-[reference-first rule](../../AGENTS.md#human-movement-references-before-implementation).
+[reference-first rule](../../docs/MOVEMENT_METHODS.md).
 Search for real people performing the named variant, open the actual images or
 video frames, and record viewed phases/angles and source URLs before choosing
 the trajectory. Compare model limits with those references; preserve an honest
@@ -112,14 +112,14 @@ negative result if they are incompatible. A numeric PASS is not a technique PASS
 For push-ups explicitly inspect bilateral pectoral forces/activation; rendering
 colors must remain computed values and cannot be supplied from expected EMG.
 
-## Evidence and recipes in v0.8
+## Evidence and render recipes
 
 Record the named exercise variant, comparable landmarks, axis and unit
 conventions, and the distinction between authored motion and independent
 measurements. Check the scenario's named gates before rendering, and preserve
 failed controls and original states.
 
-[Anatomical evidence guide](../../docs/V08_ANATOMICAL_EVIDENCE.md)
+[Anatomical evidence guide](../../docs/ANATOMICAL_EVIDENCE.md)
 
 When adding a criterion, record its status in scientific acceptance and
 document its thresholds, units, window and source. Keep categorical scope

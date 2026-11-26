@@ -167,9 +167,9 @@ assert not {"bpy", "pxr", "mujoco"} & sys.modules.keys()
 names = {tool.name for tool in asyncio.run(mcp.list_tools())}
 assert {
     "list_render_profiles", "render_result", "get_render_job",
-    "get_render_artifact", "run_scenario", "get_artifact",
+    "get_render_artifact", "run_scenario", "get_artifact", "get_contact",
 } <= names
-assert len(names) == 14
+assert len(names) == 15
 """
     subprocess.run([sys.executable, "-c", code], check=True)
 

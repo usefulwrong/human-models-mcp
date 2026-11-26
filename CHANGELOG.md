@@ -1,5 +1,17 @@
 # Release notes
 
+## 0.9.0rc2 — Research Preview candidate
+
+- Sets `pushup_flat_palm` as the current palm preview and research default.
+  Preserves the failed full-cycle checks and the passed hand-region criterion.
+- Rebuilds the browser and Blender views from the same exact articulated run.
+  Records the exclusion of two illustrative meshes after measured floor crossings.
+
+- Improves full-body fit, saved-frame navigation and the compact muscle inspector.
+- Identifies the failed articulated flat-palm contact experiment separately
+  from the historical assisted cycle.
+- Refreshes the public source and demo release path with separate data licenses.
+
 ## 0.9.0rc1 — Research Preview candidate
 
 - Packages the optional Anatomy Explorer, BodyParts3D 4.3 registry and
@@ -23,7 +35,7 @@
 - Render recipe reuse now includes renderer lock digests. Artifact manifests
   and evidence share the same verified metadata.
 - Preserved the v0.7.1 simulation scenarios and results contract. Anatomical
-  acceptance remains **PARTIAL**. See the [v0.8 handoff](docs/RELEASE_080.md).
+  acceptance remains **PARTIAL**. See the [v0.8 release notes](https://github.com/usefulwrong/human-models-mcp/releases/tag/v0.8).
 
 ### Research workflow completion
 
@@ -54,7 +66,7 @@ private text and path traversal hidden inside nested ZIPs.
 The public demo was generated with v0.7.0; its original passport, scientific
 results, and hashes have not been rewritten. Prior RC reports remain historical
 evidence for v0.7.0; they are not an independent Docker/GPU E2E for v0.7.1.
-See [Publication](docs/PUBLICATION.md) and [v0.7.1 upgrade](docs/RELEASE_071.md)
+See [Publication](docs/PUBLICATION.md) and [v0.7.1 release notes](https://github.com/usefulwrong/human-models-mcp/releases/tag/v0.7.1)
 for the clean-tree guard and target-host verification. No new clinical, anatomical, or biomechanical claim is made.
 
 ## 0.7.0 — Public Research Preview RC
@@ -80,7 +92,7 @@ Compose names retain `-night` for compatibility with existing stores; user
 commands use Make. Image tags and the preview project can be isolated through
 environment variables during release testing.
 
-The current status and actual commands are in [the RC audit](reports/PUBLIC_RELEASE_AUDIT.md).
+The original run and artifact checksums are in the historical release archives.
 CPU reproducibility and visual transfer checks do not establish clinical accuracy,
 human push-up validation, ligament mechanics or cross-platform equivalence.
 GPU status is reported separately; this project does not install drivers.

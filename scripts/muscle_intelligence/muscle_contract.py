@@ -43,6 +43,7 @@ class MuscleSearch(MuscleRequest):
 class MuscleSeries(MuscleRequest):
     operation: Literal["muscle.timeseries"]
     metric: Metric = "activation"
+    unit: Literal["1", "N", "m", "m/s", "W", "J"] | None = None
     actuator_ids: list[Index] = Field(default_factory=list, max_length=16)
     group_id: Group | None = None
     start_s: FiniteFloat | None = Field(default=None, ge=0, le=3600)

@@ -1,104 +1,69 @@
 # Human Models MCP
 
-**Watch a full-body simulation and inspect the muscle signals behind every frame.**
+A local, programmable anatomy atlas and MuJoCo research environment. Inspect the
+model signals and contact evidence behind each saved frame in a browser, over
+MCP or in Blender.
 
-v0.9.0rc1 Research Preview · MuJoCo + MS-Human-700 · [MIT code](LICENSE) · [Asset licenses](notices/THIRD_PARTY.md)
+**0.9.0rc2 Research Preview** · Linux x86-64 · [MCP](docs/MCP_API.md) ·
+[Blender](docs/RENDERING.md) · [Asset licenses](notices/THIRD_PARTY.md)
 
-## Whole-body assisted push-up
+## Experimental flat-palm replay
 
-[![Whole-body Blender animation of an assisted palm push-up, from setup through lowering and return](docs/demo/v09/whole-body.gif)](docs/demo/v09/whole-body.mp4)
+The preview uses `pushup_flat_palm` with articulated fingers, distributed
+frictional contacts and external joint assistance. Its palm-and-digit
+distribution criterion passed. The full cycle, four supports, stationary
+supports and numerical bounds **failed**.
 
-The browser and Blender replay the same **111 saved states over 4.4 seconds**.
-Anatomy Explorer shows **290 illustrative moving muscle surfaces** and lets you
-pause, seek and inspect a muscle by side, FMA concept or source mesh.
+[![Experimental flat-palm replay from exact MuJoCo states. Full push-up failed.](docs/demo/whole-body.gif)](docs/demo/whole-body.mp4)
 
-[Play the MP4](docs/demo/v09/whole-body.mp4) ·
-[Open the pectoralis inspector capture](docs/demo/v09/pectoralis-inspector.png) ·
-[See the demo evidence and credits](docs/demo/v09/README.md)
+[Demo evidence and credits](docs/demo/README.md) ·
+[Contact measurements and limitations](docs/CONTACT_MODEL_AND_LIMITATIONS.md)
 
-### Muscle signals at the same time points
+## Start locally
 
-[![Native activation and force plots for left and right pectoralis and triceps, with the bottom of the push-up marked at 2.2 seconds](docs/demo/v09/muscle-signals.png)](docs/demo/v09/muscle-signals.png)
-
-The MCP and browser expose eight signal fields for **all 700 native actuators**.
-The plot shows model activation and transmission-force magnitude for the left
-and right pectoralis and triceps. The dashed line marks the bottom at **2.2 s**.
-[Download the plotted data](docs/demo/v09/muscle-signals.csv)
-
-The crosswalk has **76 reviewed correspondences**. A geometry-only surface
-has no linked signal. The push-up uses recorded joint assistance
-(`muscle_driven=NOT_ACHIEVED`, `external_control=USED`).
-Surface motion is illustrative, activation is a model output, and human
-experimental validation remains `NOT_VALIDATED`.
-[Release notes and capability matrix](docs/RELEASE_090.md)
-
-## Start here
-
-Use Python 3.12 on Linux x86-64 with Docker Engine, Compose and Make:
+Use Linux x86-64, Docker Engine with Compose, GNU Make and Python 3.12 with
+`venv`. Run from the root of the full public source tree.
 
 ```sh
 make build
-make client
+python3 scripts/experiment.py --scenario pushup_flat_palm --output outputs/my-flat-palm
 ```
 
-The example opens a real MCP stdio session and runs the default elbow sweep.
-[Install the optional Anatomy Explorer and Muscle Intelligence overlay](docs/V09_ANATOMY_LAB.md).
+The command writes model outputs, named acceptance checks and the saved-state
+clock. [Setup and offline use](docs/GETTING_STARTED.md) ·
+[Query MCP, open the browser and export Blender](docs/PREVIEW_WORKFLOW.md)
 
-## Compute and render the push-up
+## Hands at the bottom of the replay
 
-Linux x86-64, Docker Engine + Compose, GNU Make and Python 3.12 with `venv`.
-The first build downloads the pinned model and renderer. Start with the
-scientific and muscle views on CPU. [Setup and troubleshooting](docs/GETTING_STARTED.md)
+| Right hand | Left hand |
+| --- | --- |
+| [![Right hand at saved state 55](docs/demo/hand-right.png)](docs/demo/hand-right.png) | [![Left hand at saved state 55](docs/demo/hand-left.png)](docs/demo/hand-left.png) |
 
-```sh
-export HMM_UID="$(id -u)" HMM_GID="$(id -g)"
-make render-build
-make render-start
-python3 scripts/visualize.py research --scenario pushup_palms \
-  --recipe pushup_scientific --recipe pushup_muscle_paths \
-  --recipe pushup_cinematic --idempotency-key palms-first
-```
+Blender close-ups at saved state 55 (2.20 s). The overlays show contact
+proxies and reaction directions. The stationary-support check failed.
+[Contact evidence and display exclusions](docs/demo/README.md#visible-geometry-and-contact)
 
-Use the returned run UUID to inspect the muscle-only criterion and the job
-UUID to check progress or download completed media.
+## Anatomy Explorer
 
-```sh
-python3 scripts/visualize.py evidence RUN_UUID --claim-id gate:muscle_driven
-python3 scripts/visualize.py status JOB_UUID
-python3 scripts/visualize.py download JOB_UUID --output outputs/palms-scientific
-```
+[![Anatomy Explorer with the static heart selected and source coverage in the Structure inspector](docs/demo/explorer-heart.png)](docs/demo/explorer-heart.png)
 
-After [provisioning the optional licensed anatomy](docs/V08_WORKFLOW.md#install-and-provision),
-replay the same run with the regional atlas.
+**STATIC ATLAS** · Heart (FMA7088) selected in the browser. The Structure
+inspector lists available meshes and flags source identity differences.
+[Install Anatomy Explorer](docs/V09_ANATOMY_LAB.md#install-the-atlas) ·
+[Query the `anatomy_lab` MCP tool](docs/V09_ANATOMY_LAB.md#query-anatomy_lab)
 
-```sh
-python3 scripts/visualize.py render --run-id RUN_UUID --recipe pushup_rectus \
-  --frames 61 --fps 14 --device cpu --wait --output outputs/palms-anatomy
-```
+## Explore the evidence
 
-[Reproduce the historical v0.8 four-view demo](docs/V08_WORKFLOW.md)
+| View | What you can inspect |
+| --- | --- |
+| [Matched browser and Blender phases](docs/demo/matched-phases.png) | 111 saved states over 4.4 s. The floor and saved positions are preserved. |
+| [Contact inspector](docs/demo/desktop-contact.png) | Native contact proxies, per-state receipts and explicit failed checks. |
+| [Muscle inspector](docs/demo/desktop-pectoralis.png) and [signal plots](docs/demo/muscle-signals.png) | 700 native actuators, partial anatomy associations and an exact state clock. |
+| [Static atlas layers](docs/demo/static-atlas.png) | BodyParts3D layers for skin, skeleton, musculature and organs. |
 
-## Connect an agent
+Human experimental validation remains `NOT_VALIDATED`. Native activation and
+force describe model transmission paths. Static atlas geometry and illustrative
+moving surfaces have their own provenance and scope.
 
-```sh
-python3 scripts/print_client_config.py
-make client
-```
-
-Copy the printed stdio configuration into the MCP client. Discover scenarios
-and recipes with `list_scenarios` and `list_render_profiles`. Then call
-`run_scenario` with a `visualization` object to calculate once and queue named
-views. The reply carries the run UUID, acceptance records and job UUIDs.
-`get_result` provides claim-level evidence. Blender artifacts are retrieved
-in checksum-verified chunks. [MCP schemas and Python example](docs/V08_WORKFLOW.md#mcp-and-python)
-
-## Methods and scope
-
-[Scientific scope](docs/SCIENTIFIC_SCOPE.md) ·
-[Rendering and reproducibility](docs/RENDERING.md) ·
-[Anatomical mapping and Fit3D](docs/V08_ANATOMICAL_EVIDENCE.md) ·
-[Experimental moving atlas](docs/V08_MOVING_ATLAS.md) ·
-[v0.8 release notes](docs/RELEASE_080.md) ·
-[Historical public demo](docs/demo/README.md)
-
-Built by [UsefulWrong](https://github.com/usefulwrong). See [citation](CITATION.cff) and [contributing](CONTRIBUTING.md).
+[Capability matrix](docs/RELEASE_090.md) · [Scientific scope](docs/SCIENTIFIC_SCOPE.md) ·
+[Publication guide](docs/PUBLICATION.md) · [Citation](CITATION.cff)

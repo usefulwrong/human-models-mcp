@@ -14,11 +14,13 @@ def main():
             raise RuntimeError("cannot enforce worker parent-death signal")
         if os.getppid() != int(os.environ["HMM_PARENT_PID"]):
             raise SystemExit("executor exited before worker startup")
-    resource.setrlimit(resource.RLIMIT_CPU, (45, 50))
     resource.setrlimit(resource.RLIMIT_FSIZE, (2 * 1024 * 1024, 2 * 1024 * 1024))
     resource.setrlimit(resource.RLIMIT_NOFILE, (128, 128))
     # Address space is bounded by Docker's memory limit; Mesa reserves large virtual ranges.
     request = json.load(sys.stdin)
+    articulated = (request["operation"] == "pushup"
+                   and request["parameters"].get("contact_profile") == "articulated_palms_v1")
+    resource.setrlimit(resource.RLIMIT_CPU, (70, 75) if articulated else (45, 50))
     try:
         from .catalog import model_card
         card = model_card(verify=True, model_id=request.get("model_id", "ms_human_700"))

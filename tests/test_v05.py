@@ -114,24 +114,6 @@ def test_real_fresh_client_handles_unrequested_render(tmp_path):
     assert result['run']['status'] == 'computed' and result['png'] is None and result['motion'] is None
 
 
-def test_v05_handoff_never_promotes_stale_science(tmp_path):
-    import runpy
-    from unittest.mock import patch
-    from human_models_mcp.registry import home
-    reports = tmp_path/'reports'
-    reports.mkdir()
-    release = {'gates': {key: {'status': 'fail'} for key in ('e2e', 'clean-check', 'package', 'doctor')},
-               'release_status': 'BLOCKED', 'timestamp': 'test', 'baseline_head': 'old', 'head': 'old',
-               'new_commits': [], 'source_sha256': 'test', 'image_id': None}
-    (reports/'V05_RELEASE_CHECK.json').write_text(json.dumps(release))
-    (reports/'e2e.json').write_text('stale invalid scientific evidence')
-    writer = runpy.run_path(str(home()/'scripts/write_v05_report.py'))['main']
-    with patch.dict(writer.__globals__, ROOT=tmp_path):
-        writer()
-    text = (reports/'V05_HANDOFF.md').read_text()
-    assert 'Current science E2E failed' in text and 'Current real-engine E2E passed' not in text
-
-
 def test_connector_generation_uses_current_bundle_location(tmp_path):
     import shutil
     import subprocess
@@ -156,16 +138,6 @@ def test_offline_export_cannot_mount_outside_project(tmp_path, monkeypatch):
     monkeypatch.setattr(sys, 'argv', ['experiment', '--output', str(tmp_path.parent/'outside-export')])
     with pytest.raises(ValueError, match='inside this project'):
         main()
-
-
-def test_missing_git_is_reported_without_inventing_history():
-    import runpy
-    from unittest.mock import patch
-    from human_models_mcp.registry import home
-    read = runpy.run_path(str(home()/'scripts/release_check.py'))['git_read']
-    with patch('subprocess.run', side_effect=FileNotFoundError('git')):
-        result = read('rev-parse', 'HEAD')
-    assert result.returncode == 127 and not result.stdout and result.stderr
 
 
 def test_contact_candidates_and_loaded_support_are_distinguished(tmp_path):

@@ -148,7 +148,7 @@ test mount; it cannot be supplied through MCP tool parameters.
 
 ## v0.5 contact extension
 
-The same ten MCP tools serve two fixed model IDs. catalog.MODEL_FILES maps
+The core MCP tools serve two fixed model IDs. catalog.MODEL_FILES maps
 primary and locomotion to reviewed pinned entry files; callers cannot pass an
 arbitrary XML path. describe_scenario.model selects the card. Old backends remain
 primary-only; the two contact backends require locomotion and strict schemas.
@@ -166,7 +166,7 @@ scientific.numerical_status without changing tool names or execution statuses.
 The first-experiment launcher uses the local official-SDK client after make build.
 In an offline bundle it runs the packaged client inside the bounded image and
 mounts only a chosen project-local export parent. A stdlib connector generator
-resolves the current bundle location; no developer's static codex.toml is shipped.
+resolves the current bundle location at runtime.
 Package checks rename the completed bundle before testing the connector/clients.
 
 ## 0.6 separate visualization runtime

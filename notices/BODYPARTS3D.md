@@ -1,6 +1,6 @@
 # BodyParts3D attribution and asset boundaries
 
-The optional v0.8 visual layer uses three pinned BodyParts3D 4.3 objects.
+The optional regional rendering recipe uses three pinned BodyParts3D 4.3 objects.
 BodyParts3D, © The Database Center for Life Science (DBCLS).
 
 | Object | Representation | Concept | Anatomy |
@@ -18,11 +18,16 @@ of these objects and adapted meshes in the Blender scene and scene archive.
 [Pinned mirror's data notice](https://github.com/olivercase/body_parts_3d_api/blob/fd527e6f4daf732fd814314d9257df5877b844bc/LICENSE) ·
 [CC BY-SA 2.1 Japan](https://creativecommons.org/licenses/by-sa/2.1/jp/)
 
-The OBJ files remain in the operator's cache. The project ships an asset lock
+The OBJ files remain in the local cache. The project ships an asset lock
 with object URLs, IDs, sizes and SHA-256. The original simulation archive
 keeps the scientific input files. Each atlas render ships the source notice
 in `anatomy_registration.json`, the scene metadata and the Evidence Contract.
 The MIT license covers the wrapper code.
+
+The current Explorer screenshot and static layer sheet use geometry from the
+pinned BodyParts3D 4.3 mirror under CC BY-SA 2.1 Japan. The browser renders
+the adapted display packs, including visibility, color and context settings.
+[Screenshots, credits and exact source receipt](../docs/demo/README.md#anatomy-explorer)
 
 ## Whole-body reference preview
 
@@ -58,4 +63,4 @@ The `pushup_rectus` recipe extracts only the bilateral rectus objects and checks
 the portable NPZ against its pinned digest. It fits the meshes to the saved
 model's pubic and costal sites and applies geometric axial scale and fibre
 shading. Public stills and video containing these adapted surfaces carry
-CC BY-SA 4.0. [Reproduction and evidence](../docs/V08_WORKFLOW.md)
+CC BY-SA 4.0. [Reproduction and evidence](../docs/PREVIEW_WORKFLOW.md)

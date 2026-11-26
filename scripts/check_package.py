@@ -33,7 +33,6 @@ with tempfile.TemporaryDirectory() as temp:
     for name in (
         "pyproject.toml",
         "README.md",
-        "AGENTS.md",
         "LICENSE",
         "CITATION.cff",
         "CONTRIBUTING.md",
@@ -75,9 +74,10 @@ with tempfile.TemporaryDirectory() as temp:
         assert any(p.endswith("/scenarios/assisted_stance/scenario.yaml") for p in members)
         assert any(p.endswith("/scenarios/pushup/scenario.yaml") for p in members)
         assert any(p.endswith("/scenarios/pushup_palms/scenario.yaml") for p in members)
+        assert any(p.endswith("/scenarios/pushup_flat_palm/scenario.yaml") for p in members)
         assert any(p.endswith("/scenarios/pushup_knuckles/scenario.yaml") for p in members)
         assert any(p.endswith("/docs/HAND_DETAIL.md") for p in members)
-        assert any(p.endswith("/AGENTS.md") for p in members)
+        assert not any(p.endswith(("/AGENTS.md", ".orig", ".rej")) for p in members)
         assert any(p.endswith("/tests/fixtures/rejected_knuckle_pose.json") for p in members)
         assert any(p.endswith("/adapters/palms_full_reference_v1.json") for p in members)
         assert any(p.endswith("/atlas_pectoralis.json") for p in members)

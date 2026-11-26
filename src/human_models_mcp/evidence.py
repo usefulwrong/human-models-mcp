@@ -2,9 +2,11 @@
 
 import hashlib
 import json
+import math
 from pathlib import Path
 
 from .results import error, get_artifact, get_run
+from .scientific_quantity import CONTACT, DERIVED, MUSCLE, PUSHUP_METRICS, quantity, scientific_quantity, sources
 
 
 def code_sha256():
@@ -65,19 +67,25 @@ def evidence_context(run, summary=None, validation=None):
 def get_evidence(run_id, claim_id=None):
     """Query metric:<name> or artifact:<id>; omit the ID to enumerate evidence."""
     run = get_run(run_id)
-    if "scientific" not in run:
+    if "error" in run:
         return run
     try:
+        metrics = run.get("outputs", {}).get("metrics", [])
+        if any(not math.isfinite(metric["value"]) for metric in metrics):
+            raise ValueError("run manifest contains a nonfinite metric")
         context = evidence_context(run, read_json(run, "summary.json"), read_json(run, "validation.json"))
-    except (OSError, ValueError) as exc:
+    except (OSError, ValueError, KeyError, TypeError, AttributeError) as exc:
         return error("integrity_error", str(exc))
     checked = (context["computed_status"] == "completed"
                and all(x["status"] == "PASS" for x in context["numeric_checks"]))
     execution = run["execution"]
     time_window = ([0, execution["simulation_time_s"]] if execution.get("simulation_time_s") else None)
     claims = {}
-    for metric in run.get("outputs", {}).get("metrics", []):
+    metric_definitions = {}
+    for metric in metrics:
         name = metric["name"]
+        if metric.get("definition"):
+            metric_definitions[name] = metric["definition"]
         side = metric.get("side")
         if side is None:
             side = next((side for token, side in (("r", "right"), ("l", "left")) if token in name.split("_")), None)
@@ -114,7 +122,49 @@ def get_evidence(run_id, claim_id=None):
             "validation_status": "unvalidated",
             "confidence_explanation": "This status applies to the named scenario criterion under the recorded controls.",
         }
+    catalog = {}
+    names = run.get("outputs", {}).get("muscles", {}).get("chunks", [])
+    if names:
+        catalog.update(MUSCLE)
+    if "contact_manifest.json" in run.get("artifacts", {}):
+        catalog.update(CONTACT)
+    for name, definition in catalog.items():
+        claims["quantity:" + name] = {
+            "quantity": name, "unit": definition["unit"], "value": None, "time_window_s": time_window,
+            "definition": definition["definition"], "reference_comparison": {"status": "NOT_AVAILABLE"},
+            "evidence_class": "quantity_definition", "validation_status": "unvalidated",
+        }
     if claim_id is not None and claim_id not in claims:
-        return error("unsupported", "No evidence for the requested claim. Use a listed metric, gate or artifact ID.")
+        return error("unsupported", "No evidence for the requested claim. Use a listed metric, gate, quantity or artifact ID.")
     selected = claims if claim_id is None else {claim_id: claims[claim_id]}
-    return {**context, "claims": [dict(claim, claim_id=key) for key, claim in selected.items()]}
+    definitions, files = {}, {}
+    comparison = None
+    for key, claim in selected.items():
+        kind, name = key.split(":", 1)
+        if kind == "quantity":
+            definitions[key] = {**catalog[name], "quantity_id": name}
+            if name in ("overlay", "display_surface"):
+                definitions[key]["scope"] = "installed_motion_scene"
+            if name in MUSCLE:
+                files.update(sources(run, "trajectory.npz", "trajectory_metadata.json", "actuators.json",
+                                     *names, "muscle_ranking.json"))
+            else:
+                files.update(sources(run, "contact_manifest.json", "contact_surfaces.json", "contacts.json"))
+        elif kind == "metric":
+            pushup_definition = PUSHUP_METRICS.get(name) if run["scenario_id"].startswith("pushup") else None
+            definition = metric_definitions.get(name) or pushup_definition
+            definitions[key] = quantity(claim["unit"], definition or
+                                        "Run metric as emitted by the scenario. See its method and validation contract.",
+                                        DERIVED if pushup_definition else None)
+            definitions[key].update(quantity_id=name, definition_status="AVAILABLE" if definition else "NOT_AVAILABLE")
+            files.update(sources(run, "summary.json", "validation.json", "series.csv"))
+            if claim_id is not None and claim["reference_comparison"]["status"] == "COMPARED":
+                comparison = claim["reference_comparison"]
+        elif kind == "artifact":
+            files.update(sources(run, name))
+        else:
+            files.update(sources(run, "summary.json", "validation.json"))
+    return {**context, "claims": [dict(claim, claim_id=key) for key, claim in selected.items()],
+            "scientific_quantity": scientific_quantity(
+                run, definitions, files=files, window={"simulation_time_s": time_window, "sampling": "run_scope"},
+                comparison=comparison, uncertainty=context["scope_limitations"])}

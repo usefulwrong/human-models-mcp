@@ -129,7 +129,7 @@ function render() {
   const height = canvas.clientHeight;
   if (canvas.width !== width || canvas.height !== height) context.setSize(width, height, false);
   camera.aspect = width / Math.max(1, height);
-  camera.zoom = whole.active() ? Math.min(1, camera.aspect / .95) : 1;
+  camera.zoom = whole.active() ? Math.min(1, camera.aspect / 1.45) : 1;
   if (frameData) {
     camera.fov = THREE.MathUtils.radToDeg(2*Math.atan(36/(2*motionCamera.lensMm*camera.aspect)));
   }
@@ -811,7 +811,8 @@ try {
 }
 window.hmmViewer = {
   getScene, setScene, setComposite, pick, installMotion, showFrame, render,
-  whole: { seek: whole.seek, status: whole.status, sample: whole.sample, matrix: whole.matrix, weights: whole.weights },
+  whole: { seek: whole.seek, status: whole.status, sample: whole.sample, matrix: whole.matrix, weights: whole.weights,
+    setCamera: whole.setCamera, surfaceAudit: whole.surfaceAudit },
   visibleFjIds: () => frameData ? [...motionParts.keys()] : pickTargets.map(o => o.name),
   stats: () => ({revision, ...context.info.render}),
   project: p => {

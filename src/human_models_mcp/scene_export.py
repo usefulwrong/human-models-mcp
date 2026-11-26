@@ -44,12 +44,23 @@ def load_saved_run(source):
         raise ValueError("incompatible source engine; saved states require the exact recorded MuJoCo version")
     if any(run["model"].get(key) != card[key] for key in ("revision", "asset_sha256")):
         raise ValueError("incompatible source model revision/hash; retargeting is not supported")
-    pushup = run["scenario_id"] in ("pushup", "pushup_palms", "pushup_knuckles")
+    pushup = run["scenario_id"] in ("pushup", "pushup_palms", "pushup_knuckles", "pushup_palms_contact", "pushup_flat_palm")
     if pushup:
         from .adapters.pushup import pushup_model
 
         recipe = json.loads((source / "model_recipe.json").read_text())
-        _, model, data = pushup_model(recipe["timestep_s"], recipe["friction"], recipe["muscle_strength_scale"], recipe.get("hand_support", "legacy_point"), recipe.get("support_boundary", "frictional"), recipe["parameters"].get("knuckle_technique", "legacy_flared"), recipe["parameters"].get("palm_technique", "legacy_reach"))
+        parameters = recipe["parameters"]
+        profile = recipe.get("contact_profile")
+        margin = recipe.get("contact_floor_margin_m")
+        if profile and margin is None:
+            original = json.loads((source / "contact_manifest.json").read_text())
+            margin = original["floor"].get("margin_m", .001)
+        _, model, data = pushup_model(
+            recipe["timestep_s"], recipe["friction"], recipe["muscle_strength_scale"],
+            recipe.get("hand_support", "legacy_point"), recipe.get("support_boundary", "frictional"),
+            parameters.get("knuckle_technique", "legacy_flared"), parameters.get("palm_technique", "legacy_reach"),
+            profile, contact_floor_margin_m=margin or 0.,
+        )
     elif run["scenario_id"] in ("elbow_tracking", "loaded_elbow"):
         from .adapters.loaded import fixture_model
 
@@ -392,7 +403,8 @@ def export_scene(job):
                 "hands": source_wrists[index]["hands"] if source_wrists else [],
                 "hand_pads": [{"name": model.geom(g).name, "position_m": data.geom_xpos[g].tolist(),
                                "radius_m": float(model.geom_size[g, 0])} for g in range(model.ngeom)
-                              if model.geom(g).name.startswith("palm_")],
+                              if model.geom(g).name.startswith("palm_")
+                              and model.geom_contype[g] and model.geom_type[g] == mj.mjtGeom.mjGEOM_SPHERE],
             }
         )
     normalization = []

@@ -13,7 +13,8 @@ def stage(target, assets):
     target.mkdir()
     source = ROOT / "scripts/anatomy_lab"
     shutil.copytree(source, target / "lab", ignore=shutil.ignore_patterns("__pycache__", "node_modules"))
-    subprocess.run(["patch", "--batch", "--forward", "--fuzz=0", "-p1", "-i", str(HERE / "anatomy_lab.patch")],
+    subprocess.run(["patch", "--batch", "--forward", "--no-backup-if-mismatch", "--fuzz=0",
+                    "-p1", "-i", str(HERE / "anatomy_lab.patch")],
                    cwd=target / "lab", check=True)
     for name in ("muscle_contract.py", "muscle_data.py", "registration_evidence.py"):
         shutil.copyfile(HERE / name, target / "lab" / name)

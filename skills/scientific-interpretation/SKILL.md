@@ -160,6 +160,11 @@ force and is not a causal importance or EMG ranking. Group averages are averages
 of source paths, not muscle volume weighting or observed EMG. EMG comparisons
 are qualitative literature context; no percent-MVIC conversion is available.
 
+The current preview uses `pushup_flat_palm`. Query its exact sample with
+`get_contact`, inspect `distributed_palms_and_digits` independently from
+`full_pushup`, and retain the actual science statuses in every replay.
+[Contact model and limits](../../docs/CONTACT_MODEL_AND_LIMITATIONS.md)
+
 For `pushup_palms` and `pushup_knuckles`, defaults use `assisted_muscle`: actual
 muscles plus external residual generalized joint forces, with zero root/body
 assistance. `full_pushup=PASS` does not imply `muscle_driven=PASS`. Inspect the
@@ -172,7 +177,7 @@ isolated palm-versus-knuckle causal load comparison. Discrete ligaments, intrins
 finger control and separate tendon elasticity are not modeled. See
 [hand-detail derivation](../../docs/HAND_DETAIL.md).
 
-For detailed-hand runs require `stationary_supports=PASS` and retrieve
+For legacy fixed-point runs inspect `stationary_supports` and retrieve
 `support_stationarity.json`: all native hand/toe pads and four prescribed points
 must stay within 0.5 mm horizontally at every integration step. Defaults are
 `support_boundary: fixed_points`, 0.5 ms integration and 4.4 s total. Horizontal
@@ -189,7 +194,7 @@ widened to force a reference. Muscle forces require recomputation after changing
 technique; neither expected EMG nor rendering colors may manufacture them.
 
 Before implementing or accepting human exercise motion, follow the repository
-[reference-first rule](../../AGENTS.md#human-movement-references-before-implementation).
+[reference-first rule](../../docs/MOVEMENT_METHODS.md).
 Search for real people performing the named variant, open the actual images or
 video frames, and record viewed phases/angles and source URLs before choosing
 the trajectory. Compare model limits with those references; preserve an honest
@@ -197,7 +202,7 @@ negative result if they are incompatible. A numeric PASS is not a technique PASS
 For push-ups explicitly inspect bilateral pectoral forces/activation; rendering
 colors must remain computed values and cannot be supplied from expected EMG.
 
-## Evidence and recipes in v0.8
+## Evidence and recipes
 
 Use `get_result(run_id, claim_id="metric:<name>")` and render `evidence.json`.
 Check execution, named thresholds, mapping, and external comparison separately.
@@ -205,7 +210,7 @@ Only claim the named observable. Treat absent comparisons as unavailable, model
 activation as dimensionless, and skinning as a visual rig. A render or simulation
 PASS gives no evidence of human safety, tissue mechanics or EMG.
 
-[Anatomical evidence guide](../../docs/V08_ANATOMICAL_EVIDENCE.md)
+[Anatomical evidence guide](../../docs/ANATOMICAL_EVIDENCE.md)
 
 ## Claim-specific statuses
 

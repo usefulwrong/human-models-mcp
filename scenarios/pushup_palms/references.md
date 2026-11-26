@@ -174,3 +174,40 @@ the saved model contact diagnostics. The human sources offer no matched
 return image or timestamp. This closure only changes the presentation.
 [ACE start and bottom](https://www.acefitness.org/resources/everyone/blog/5983/two-classic-exercises-everyone-should-master/) ·
 [Intziegianni et al., Fig. 1(a)](https://www.mdpi.com/2813-0413/5/1/18)
+
+## Contact geometry review (2026-11-26)
+
+Reopened the original ACE top/bottom photographs and Intziegianni et al. Figure
+1(a), standard-width flat-palm push-ups. The ACE side view shows extended arms
+at the top, elbows bending on descent, the palm remaining in the chest/shoulder
+region and the forefoot supporting the body. The study's front view shows
+forward, spread fingers and elbows moving outward at the bottom. The photos
+do not provide an underside or return frame, metric finger angles, or a
+contact-pressure distribution. Foot spacing differs between the examples.
+The contact experiment reuses the existing frozen reference and rigid finger
+geometry. Proxy clearance, joint targets and comparison thresholds are
+engineering inputs. See [ACE](https://www.acefitness.org/resources/everyone/blog/5983/two-classic-exercises-everyone-should-master/)
+and [Figure 1](https://pub.mdpi-res.com/muscles/muscles-05-00018/article_deploy/html/images/muscles-05-00018-g001.png).
+
+## Distributed palm and digit contact follow-up (2026-11-26)
+
+Reopened the ACE side photographs (top and bottom) and Intziegianni et
+al. Figure 1(a), both frames of the standard-width variant. Both show
+the palm heel down below the wrist and the fingers opened toward the
+head. In the frontal photograph the thumb sits on the medial side,
+separated from the index in the plane of the hand. The elbows move out
+as the chest lowers. The sources do not resolve pressure under any
+digit, hand thickness, the underside or the return.
+[ACE photographs](https://www.acefitness.org/resources/everyone/blog/5983/two-classic-exercises-everyone-should-master/)
+· [Figure 1(a)](https://pub.mdpi-res.com/muscles/muscles-05-00018/article_deploy/html/images/muscles-05-00018-g001.png)
+
+Use separate bilateral targets for the palm heel, radial and ulnar
+sides, distal palm and digits I–V. Report actual native bearing forces
+by region and digit. Test whether the thumb is abducted in the plane of
+the palm and near the other fingertips in depth, without any digit
+being the sole support. Central palm arch conformity is a geometric
+observation, not a requirement for uniform tissue pressure.
+Chuckpaiwong and Harnroongroj measured named palmar regions in human
+push-ups. Their reported regions guide the measurement partition.
+Their peak pressures are not calibration data for this model.
+[Palmar pressure study](https://pubmed.ncbi.nlm.nih.gov/19644626/)

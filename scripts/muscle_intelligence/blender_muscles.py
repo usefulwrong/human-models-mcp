@@ -143,7 +143,8 @@ def overlay(folder, output, evidence, crosswalk=None, controls=None):
             "frame": selection["frame"], "data": selection["sample"], "material": material.name,
             "world_points_glb_m": [sample["world_glb_m"][anchor][j] for _, j in samples_pairs],
             "vertex_ids": [i for i, _ in samples_pairs], "activation": activation,
-            "acceptance": selection["acceptance"]}
+            "acceptance": selection["acceptance"],
+            **({"scientific_quantity": selection["scientific_quantity"]} if "scientific_quantity" in selection else {})}
     page.write(json.dumps(provenance, ensure_ascii=True))
     if chosen:
         receipt = views[chosen]
@@ -214,8 +215,19 @@ def reopen(output):
         delta = float(np.max(np.linalg.norm(world - record["world_points_glb_m"], axis=1)))
         assert delta < .0001
         assert scene["run_id"] and scene["muscle_mapping_sha256"]
+        evidence = record.get("scientific_quantity")
+        if evidence:
+            frame = record["frame"]
+            assert evidence["run_id"] == scene["run_id"]
+            assert evidence["motion_sha256"] == scene["motion_sha256"]
+            assert evidence["mapping_revision_sha256"] == scene["muscle_mapping_sha256"]
+            assert evidence["window"]["state_index"] == frame["state_index"]
+            assert evidence["window"]["state_sha256"] == frame["state_sha256"]
+            assert evidence["window"]["time_s"] == frame["frame_time"]
+            assert evidence["quantities"][record["selection"]["metric"]]["availability"] == "AVAILABLE"
         receipts[group] = {"asset": record["asset"], "frame": record["frame"], "max_point_error_m": delta,
                            "color_error": error_color, "rgb_linear": rgb.tolist(), "raw_sample": record["data"],
+                           **({"scientific_quantity": evidence} if evidence else {}),
                            "world_glb_m": world.tolist()}
         obj.hide_viewport = hidden
     controls = {}
@@ -224,7 +236,7 @@ def reopen(output):
         by_node = {o["motion_node"]: o for o in scene.objects if o.type == "MESH" and "motion_node" in o}
         for label, result in selected.items():
             scene.frame_set(result["frame"]["state_index"])
-            controls[label] = {k: result.get(k) for k in ("frame", "asset", "sample", "mapping_status")}
+            controls[label] = {k: result.get(k) for k in ("frame", "asset", "sample", "mapping_status", "scientific_quantity")}
             controls[label]["display_ids"] = [by_node[i]["display_asset_id"] for i in result["display_nodes"]]
             if "registration" in result:
                 controls[label]["registration"] = result["registration"]

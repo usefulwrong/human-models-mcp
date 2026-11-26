@@ -187,6 +187,7 @@ async function importView(page, view) {
         return value.selection?.overlay && value.selection.display_node === 239 && value.frame.state_index === 55;
       },null,{polling:300});
       assert.ok(stored);
+      await page.locator("#muscle-options summary").click();
       await page.locator("#muscle-opacity-scope").selectOption("surface");
       const alpha = value => page.locator("#muscle-opacity").evaluate((el, v) => {
         el.value = v;

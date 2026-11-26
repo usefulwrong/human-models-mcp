@@ -35,13 +35,17 @@ def source_hand(support):
     return mj, spec, model, data, posture
 
 
-def configure_hands(primary, support):
-    """Bake genuine source articulated-hand geometry/routes into a declared fixed posture."""
+def configure_hands(primary, support, *, articulated=False):
+    """Install source finger geometry and tendon routes with the requested joint model."""
     mj, source, model, data, posture = source_hand(support)
     root = ET.fromstring(primary.to_xml())
+    if articulated:
+        from .articulated_palms import FINGER_CAPSULES, PALM_PATCHES, add_bodies, add_patches
+
+        root.find("./keyframe/key").attrib.pop("qpos", None)
     raw = ET.fromstring(source.to_xml())
     hand = model.body("capitate").id
-    rotation = data.xmat[hand].reshape(3, 3)
+    hand_rotation = data.xmat[hand].reshape(3, 3)
     descendants = {hand}
     for b in range(hand + 1, model.nbody):
         if model.body_parentid[b] in descendants:
@@ -49,7 +53,7 @@ def configure_hands(primary, support):
     raw_geoms = {e.get("name"): e for e in raw.findall(".//body/geom")}
     raw_sites = {e.get("name"): e for e in raw.findall(".//body/site")}
     anchors = {"index": "2proxph", "middle": "3proxph", "little": "5proxph"}
-    points = {n: rotation.T @ (data.xpos[model.body(b).id] - data.xpos[hand]) for n, b in anchors.items()}
+    points = {n: hand_rotation.T @ (data.xpos[model.body(b).id] - data.xpos[hand]) for n, b in anchors.items()}
     # The pads are declared mechanical thickness offsets from source bony landmarks.
     if support == "palms":
         centers = np.array([[0, -.015, 0], points["index"], points["little"]])
@@ -64,11 +68,15 @@ def configure_hands(primary, support):
         for element in list(target_hand.findall("geom")):
             if element.get("class") == "bone":
                 target_hand.remove(element)
+        bodies = (add_bodies(mj, root, target_hand, model, data, hand, descendants, side, reflection)
+                  if articulated else dict.fromkeys(descendants, target_hand))
         def transformed(element, bid, name):
             value = copy.deepcopy(element)
             body_rotation = data.xmat[bid].reshape(3, 3)
             local = np.fromstring(value.get("pos", "0 0 0"), sep=" ")
-            position = rotation.T @ (data.xpos[bid] + body_rotation @ local - data.xpos[hand])
+            frame = bid if articulated else hand
+            rotation = data.xmat[frame].reshape(3, 3)
+            position = rotation.T @ (data.xpos[bid] + body_rotation @ local - data.xpos[frame])
             quat = np.fromstring(value.get("quat", "1 0 0 0"), sep=" ")
             mat = np.empty(9)
             mj.mju_quat2Mat(mat, quat)
@@ -91,7 +99,9 @@ def configure_hands(primary, support):
                 if mirrored is None:
                     raise ValueError("upstream mirrored hand mesh missing: " + element.get("name"))
                 new.set("mesh", mirrored.get("mesh"))
-            target_hand.append(new)
+            if articulated:
+                new.set("mass", "0")
+            bodies[int(model.geom_bodyid[gid])].append(new)
             added_bones.append(new.get("name"))
         copied = set()
         tendons = {e.get("name"): e for e in raw.findall("./tendon/spatial")}
@@ -123,7 +133,7 @@ def configure_hands(primary, support):
                     obj = model.site(name) if is_site else model.geom(name)
                     bid = int(obj.bodyid[0])
                     if bid in descendants:
-                        parent = target_hand
+                        parent = bodies[bid]
                         new = transformed(element, bid, identifier)
                     else:
                         body_name = model.body(bid).name
@@ -148,20 +158,27 @@ def configure_hands(primary, support):
                     parent.append(new)
                 target.append(new_part)
             rerouted.append(original_name)
+        if articulated:
+            add_patches(mj, target_hand, model, data, hand, bodies, side, reflection)
         for i, position in enumerate(centers):
             ET.SubElement(target_hand, "geom", name=f"palm_{side}" if i == 0 else f"palm_{side}_{i}",
                           type="sphere", size="0.009", pos=" ".join(map(str, reflection @ position)),
                           mass="0", contype="2", conaffinity="4", friction="1.3 .005 .0001", solref=".01 1", rgba=".05 .65 .6 .5")
     return mj.MjSpec.from_string(ET.tostring(root, encoding="unicode")), {
         "support": support, "source": "pinned MS-Human-700-Manipulation.xml right articulated hand and native mirrored left meshes",
-        "source_finger_joint_posture_rad": posture, "finger_dynamics": "rigid posture; no independent finger integration or grip-force estimation",
+        "source_finger_joint_posture_rad": posture, "finger_dynamics": ("native digit hinges and 4/5 CMC coupling; passive patch loads are proxy mechanics" if articulated
+                            else "rigid posture; no independent finger integration or grip-force estimation"),
         "left_posture": "sagittal reflection of source right posture; native source mirrored meshes",
         "bone_geometries": added_bones, "rerouted_tendons": rerouted,
         "lengthrange": "native manipulation-hand actuator length ranges where supplied; unchanged source maximum forces",
-        "support_points_per_hand": len(centers), "mechanical_pad_radius_m": .009,
+        **({"palm_contact_patch_count_per_hand": len(PALM_PATCHES),
+            "digit_contact_capsule_count_per_hand": len(FINGER_CAPSULES),
+            "palm_patch_radii_m": {region: radius for region, _, radius in PALM_PATCHES.values()}}
+           if articulated else {"support_points_per_hand": len(centers), "mechanical_pad_radius_m": .009}),
         "wrist_ligaments": "unavailable: no discrete ligament elements in the pinned model",
         "tendon_mechanics": "native muscle-tendon transmission paths; no independently deformable tendon tissue",
-        "retained_hand_inertia": "primary source hand mass/inertia, no mass from added display meshes"}
+        "retained_hand_inertia": ("neutral total mass, COM and inertia preserved; donor child inertials allocated at one quarter of the native values"
+                                  if articulated else "primary source hand mass/inertia, no mass from added display meshes")}
 
 
 def measure_knuckle_technique(model, data):
@@ -208,7 +225,7 @@ def measure_palm_technique(model, data):
         values[f"hand_{side}_palm_down_cosine"] = float(rotation[2, 2] * (1 if side == "r" else -1))
         values[f"hand_{side}_ahead_head_m"] = float(hand[0] - head[0])
         values[f"hand_{side}_ahead_shoulder_m"] = float(hand[0] - shoulder[0])
-        pads = [g for g in range(model.ngeom) if model.geom(g).name.startswith("palm_" + side)]
+        pads = [g for g in range(model.ngeom) if model.geom(g).name.startswith("palm_" + side) and "_surface_" not in model.geom(g).name]
         palm = np.mean(data.geom_xpos[pads], axis=0)
         from_shoulder = float((palm - shoulder)[:2] @ forward)
         from_chest = float(palm[:2] @ forward - chest_caudal)

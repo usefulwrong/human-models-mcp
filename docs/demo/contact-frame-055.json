@@ -1,0 +1,1377 @@
+{
+  "status": "ok",
+  "measurement_status": "LOAD_BEARING",
+  "run_id": "23945f13-419c-4ce4-b12d-c08458cd9ad2",
+  "sample": 55,
+  "time_s": 2.199999999999902,
+  "state_sha256": "bda60dee28b94e1c6de242f351abefbde84dd296dc36184c871411b239d16d1f",
+  "world": "right-handed Z-up, metres",
+  "floor": {
+    "geom_id": 0,
+    "position_m": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "normal": [
+      0.0,
+      0.0,
+      1.0
+    ],
+    "contype": 0,
+    "conaffinity": 8,
+    "margin_m": 0.0,
+    "gap_m": 0.0
+  },
+  "scientific_quantity": {
+    "schema_version": "hmm.scientific_quantity/1",
+    "run_id": "23945f13-419c-4ce4-b12d-c08458cd9ad2",
+    "scenario": {
+      "id": "pushup_flat_palm",
+      "version": "1.0.0",
+      "sha256": "73a299be6fa8228cac63afc10666eb952b3fa87c9e9b318360dc5099894f5c81"
+    },
+    "model": {
+      "id": "ms_human_700",
+      "revision": "98a70c569c4c1b6da467a20012f766ee1f8dc521",
+      "asset_sha256": "a32fc82227aebf5156d9efd067d3799513044a24ca12dd117d8b9b4be436d689",
+      "source_url": "https://github.com/google-deepmind/mujoco_menagerie/tree/98a70c569c4c1b6da467a20012f766ee1f8dc521/ms_human_700",
+      "version": "1.0.0"
+    },
+    "controls": {
+      "mode": "assisted_muscle",
+      "joint_assistance": "bounded external residual after actual muscle force",
+      "external_control": "USED",
+      "support_boundary": "frictional_contact",
+      "fixed_support_equalities": "NOT_USED",
+      "resolved_parameters": {
+        "control": "assisted_muscle",
+        "hand_support": "palms",
+        "support_boundary": "frictional_contact",
+        "contact_profile": "articulated_palms_v1",
+        "knuckle_technique": "legacy_flared",
+        "palm_technique": "chest_full",
+        "muscle_strength_scale": 1.0,
+        "friction": 0.8,
+        "timestep_s": 0.0005,
+        "render": false
+      },
+      "parameter_default_provenance": {
+        "control": "scenario_default",
+        "hand_support": "scenario_default",
+        "support_boundary": "scenario_default",
+        "contact_profile": "scenario_default",
+        "knuckle_technique": "scenario_default",
+        "palm_technique": "scenario_default",
+        "muscle_strength_scale": "scenario_default",
+        "friction": "scenario_default",
+        "timestep_s": "scenario_default",
+        "render": "scenario_default"
+      }
+    },
+    "acceptance": {
+      "full_cycle_kinematics": "PASS",
+      "four_supports": "FAIL",
+      "numerical_bounds": "FAIL",
+      "stationary_supports": "FAIL",
+      "no_world_support_equalities": "PASS",
+      "no_unintended_floor_contacts": "PASS",
+      "unilateral_friction_cones": "PASS",
+      "reference_hand_placement": "PASS",
+      "forward_fingers": "PASS",
+      "bottom_depth": "PASS",
+      "hand_support_geometry": "PASS",
+      "elbow_extension": "PASS",
+      "wrist_extension_envelope": "PASS",
+      "distributed_palms_and_digits": "PASS",
+      "full_pushup": "FAIL",
+      "muscle_driven": "NOT_ACHIEVED",
+      "external_control": "USED",
+      "human_experimental_validation": "NOT_VALIDATED",
+      "volumetric_anatomy_registration": "UNAVAILABLE",
+      "finger_dynamics": "SOURCE_DIGIT_JOINTS",
+      "wrist_ligaments": "NOT_MODELED",
+      "wrist_range_derivation": "LITERATURE_INFORMED_NOT_CALIBRATED",
+      "skin_contact_pressure": "NOT_MODELED",
+      "frictional_support": "NOT_ACHIEVED"
+    },
+    "reference_comparison": {
+      "status": "NOT_AVAILABLE",
+      "execution_status": "NOT_RUN"
+    },
+    "human_validation": "NOT_VALIDATED",
+    "window": {
+      "state_index": 55,
+      "time_s": 2.199999999999902,
+      "state_sha256": "bda60dee28b94e1c6de242f351abefbde84dd296dc36184c871411b239d16d1f",
+      "sampling": "exact_saved_sample"
+    },
+    "sources_sha256": {
+      "contact_manifest.json": "3e378f199dd0fa3f12c97e8b2ae8ade738633bd54492c46f696293a12be726b5",
+      "contact_surfaces.json": "85db6d4b0d8a368370be54319b431c05fcb82ed602de27d5065d3baab0a20385",
+      "contacts.json": "85e3d07931452376fb5f9acba984d49bf044908f37a00f3660215416095ae190",
+      "contacts_000.json": "93602303a56f9a46342b7796b9445e006f1f58a572eee13c5fb6288059b2771d",
+      "contacts_001.json": "76b5225773c2260d2d110452695f3c8b956efa17a4a2cea6442c4eadb11657a0",
+      "contacts_002.json": "792570828cedf1cda064bd2e3d6f38cfb6a0890171084c544cac809f02bb80ab",
+      "contacts_003.json": "e64f516d51cd269b06ced5bc5ccf3745aebb7c725b8de2fb167366e97277ad5d",
+      "contacts_004.json": "3b841ca280d1248441bc9c64ef39d31310913c79d4e924e3d464720344ada921",
+      "contacts_005.json": "67a08cf0385fcff1b24441c6ede6db421512831dfb2964cedf9ba67a8187686e",
+      "contacts_006.json": "5b6218a92bd270890a6e9a8e9a8f1d4a278909142549f13e2aa30acbc4c5e7a5",
+      "contacts_007.json": "b19610d1450d2914ec1854b25f834fc57bdadc7808b613aebef95e153422180c",
+      "contacts_008.json": "344697fbd43bd44ec8892522cb51fb94ae2a9e9ebae99a5218a7a42006e57236",
+      "contacts_009.json": "30f3018efe278927d06958217f67b841ee4adb1fb476e548b49685539d5c6b44",
+      "contacts_010.json": "b87dd5b37d6715090aeca4b446a5addb2db3065033fe7e00a399036c72e1dc0c",
+      "contacts_011.json": "08309f02196e4e88b25a8dfa3d2e19a072d5bc8586b07fd908ff8ee73d238a0d",
+      "contacts_012.json": "0a62349d58ecdd45a9f959727556daaa7dac5367d7d6903df04a5b8ea0683c91",
+      "contacts_013.json": "d5b2890f69c274bea304c2bf616053b5271afba9915edfc29dbfe0ed6e9e2ecd",
+      "contacts_014.json": "b13f7ab4a9495d97f23515022fa1478f199c32955a55a86e89ff40176bbe4e19",
+      "contacts_015.json": "cafc446748a1ce47c7af64f0663ccc7d89f7f612dda534b238a67d73ee974b44",
+      "contacts_016.json": "336f2e65103d686537f6038f5668cb05cda7df0c8c886167b256387c710ee18e",
+      "contacts_017.json": "d982443baeb6113a2cb25225ddfbe79d5422a88b5287e50dd8b304d11733973c",
+      "contacts_018.json": "9963c0c9e445890aed3f91b0afd4d267ed98ac85b30b446bc54783877a21a285",
+      "contacts_019.json": "1b92635ce6688722b6e7930b0eb5a36fa14eede5daa086bfc0e0ddfdfe967612",
+      "trajectory.npz": "2dd080c91e00293b76ab5ca2c0501b4839c88bf1848b4c4dc8655fa639092bd1",
+      "summary.json": "beb64cc2f9f481dc4c60e9ec87e9d5bf351ba8cc4b0dcf42e74df09529c1078b"
+    },
+    "quantities": {
+      "normal_force_N": {
+        "unit": "N",
+        "definition": "Normal force component for one native collision pair at a saved state.",
+        "origin": "native_numeric_output",
+        "availability": "AVAILABLE",
+        "native_identifier": "mj_contactForce[0]",
+        "improve_estimate": "Compare time-aligned world-frame reactions summed per support with synchronized force plates under the same task and support conditions."
+      },
+      "local_force_N": {
+        "unit": "N",
+        "definition": "Force in the native contact frame acting on geom1. The opposite force acts on geom0.",
+        "origin": "native_numeric_output",
+        "availability": "AVAILABLE",
+        "native_identifier": "mj_contactForce[0:3]",
+        "improve_estimate": "Compare time-aligned world-frame reactions summed per support with synchronized force plates under the same task and support conditions."
+      },
+      "local_torque_Nm": {
+        "unit": "N*m",
+        "definition": "Torque in the native contact frame acting on geom1 about the contact point.",
+        "origin": "native_numeric_output",
+        "availability": "AVAILABLE",
+        "native_identifier": "mj_contactForce[3:6]",
+        "improve_estimate": "Compare time-aligned world-frame reactions summed per support with synchronized force plates under the same task and support conditions."
+      },
+      "force_on_geom1_world_N": {
+        "unit": "N",
+        "definition": "Transpose of the contact frame matrix times the local force on geom1.",
+        "origin": "deterministic_derived_value",
+        "availability": "AVAILABLE",
+        "native_identifier": null,
+        "improve_estimate": "Compare time-aligned world-frame reactions summed per support with synchronized force plates under the same task and support conditions."
+      },
+      "torque_on_geom1_world_Nm": {
+        "unit": "N*m",
+        "definition": "Transpose of the contact frame matrix times the local torque on geom1.",
+        "origin": "deterministic_derived_value",
+        "availability": "AVAILABLE",
+        "native_identifier": null,
+        "improve_estimate": "Compare time-aligned world-frame reactions summed per support with synchronized force plates under the same task and support conditions."
+      },
+      "position_m": {
+        "unit": "m",
+        "definition": "Native contact point in right-handed Z-up world coordinates.",
+        "origin": "native_numeric_output",
+        "availability": "AVAILABLE",
+        "native_identifier": "mjContact.pos",
+        "improve_estimate": "Use subject geometry and calibrate inertial and strength parameters from matched measurements. Reserve independent trials for comparison."
+      },
+      "frame_rows": {
+        "unit": "1",
+        "definition": "Native contact frame basis rows in world axes. Row zero is the contact normal.",
+        "origin": "native_numeric_output",
+        "availability": "AVAILABLE",
+        "native_identifier": "mjContact.frame",
+        "improve_estimate": "Use subject geometry and calibrate inertial and strength parameters from matched measurements. Reserve independent trials for comparison."
+      },
+      "friction": {
+        "unit": "mixed",
+        "definition": "Native contact coefficients ordered as two sliding, one torsional and two rolling coefficients. Sliding is dimensionless and torsional/rolling are in metres.",
+        "origin": "native_numeric_output",
+        "availability": "AVAILABLE",
+        "native_identifier": "mjContact.friction",
+        "improve_estimate": "Measure friction and compliance of the actual surfaces under the relevant loading conditions."
+      },
+      "gap_m": {
+        "unit": "m",
+        "definition": "Native collision-pair distance. Negative values indicate modeled overlap.",
+        "origin": "native_numeric_output",
+        "availability": "AVAILABLE",
+        "native_identifier": "mjContact.dist",
+        "improve_estimate": "Use subject geometry and calibrate inertial and strength parameters from matched measurements. Reserve independent trials for comparison."
+      },
+      "inclusion_margin_m": {
+        "unit": "m",
+        "definition": "Distance below which the contact constraint is eligible for inclusion.",
+        "origin": "native_numeric_output",
+        "availability": "AVAILABLE",
+        "native_identifier": "mjContact.includemargin",
+        "improve_estimate": "Use subject geometry and calibrate inertial and strength parameters from matched measurements. Reserve independent trials for comparison."
+      },
+      "signed_distance_m": {
+        "unit": "m",
+        "definition": "Minimum signed distance of mapped rigid display vertices to the modeled floor plane.",
+        "origin": "deterministic_derived_value",
+        "availability": "AVAILABLE",
+        "native_identifier": null,
+        "improve_estimate": "Use subject geometry and calibrate inertial and strength parameters from matched measurements. Reserve independent trials for comparison."
+      },
+      "vertex_world_m": {
+        "unit": "m",
+        "definition": "World position of the mapped display vertex at the reported minimum floor distance.",
+        "origin": "deterministic_derived_value",
+        "availability": "AVAILABLE",
+        "native_identifier": null,
+        "improve_estimate": "Use subject geometry and calibrate inertial and strength parameters from matched measurements. Reserve independent trials for comparison."
+      },
+      "total_normal_force_N": {
+        "unit": "N",
+        "definition": "Scalar sum of the selected part\u2019s floor-pair normal components at one saved state, counting each event once. Compare force plates with the world-frame reaction.",
+        "origin": "deterministic_derived_value",
+        "availability": "AVAILABLE",
+        "native_identifier": null,
+        "improve_estimate": "Compare time-aligned world-frame reactions summed per support with synchronized force plates under the same task and support conditions."
+      },
+      "skin_contact_pressure": {
+        "unit": "Pa",
+        "definition": "Skin stress normal to a resolved skin patch. Collision proxies provide no skin area or pressure field.",
+        "origin": null,
+        "availability": "NOT_MODELED",
+        "native_identifier": null,
+        "improve_estimate": "Measure the spatial and temporal pressure field directly with calibrated skin-interface pressure sensors."
+      }
+    },
+    "uncertainty_sources": [
+      "Collision proxy geometry and selected floor coverage.",
+      "Friction and compliance assumptions.",
+      "External assistance and lack of independent force or pressure measurements."
+    ],
+    "uncertainty_interval": {
+      "status": "NOT_AVAILABLE",
+      "reason": "No uncertainty model or independent error distribution is recorded. Use a specified measurement protocol and propagate its errors and calibrated parameter uncertainty."
+    },
+    "physiological_scaling": {
+      "status": "NOT_RUN",
+      "reason": "Use subject geometry and calibrate inertial and strength parameters from matched measurements. Reserve independent trials for comparison."
+    },
+    "contact_identity": {
+      "part": "hand_r",
+      "profile": "articulated_palms_v1",
+      "world": "right-handed Z-up, metres",
+      "origin": "native_mujoco_floor_proxy_pairs"
+    },
+    "independent_check": "Compare force plate reactions using matched support and timing. Validate skin pressure separately with a pressure measurement protocol."
+  },
+  "scenario_diagnostics": {
+    "max_support_slip_m": {
+      "value": 0.056102831587284664,
+      "unit": "m",
+      "definition": "Maximum horizontal displacement from initial pad positions over solver steps, also including guide displacements when fixed supports are used.",
+      "origin": "deterministic_derived_value",
+      "availability": "AVAILABLE",
+      "native_identifier": null,
+      "improve_estimate": "Use subject geometry and calibrate inertial and strength parameters from matched measurements. Reserve independent trials for comparison.",
+      "sampling": "run_scope",
+      "source": "summary.json"
+    },
+    "max_hinge_limit_violation_rad": {
+      "value": 0.02307442040010832,
+      "unit": "rad",
+      "definition": "Maximum positive excursion of any monitored hinge past either source or declared model bound over solver steps, clamped at zero.",
+      "origin": "deterministic_derived_value",
+      "availability": "AVAILABLE",
+      "native_identifier": null,
+      "improve_estimate": "Use subject geometry and calibrate inertial and strength parameters from matched measurements. Reserve independent trials for comparison.",
+      "sampling": "run_scope",
+      "source": "summary.json"
+    },
+    "external_work_J": {
+      "value": 669.1436058185841,
+      "unit": "J",
+      "definition": "Left-endpoint sum of applied generalized force dotted with generalized velocity, times the solver timestep.",
+      "origin": "deterministic_derived_value",
+      "availability": "AVAILABLE",
+      "native_identifier": null,
+      "improve_estimate": "Use subject geometry and calibrate inertial and strength parameters from matched measurements. Reserve independent trials for comparison.",
+      "sampling": "run_scope",
+      "source": "summary.json"
+    }
+  },
+  "total_normal_force_N": 239.0200276037629,
+  "skin_contact_pressure": {
+    "status": "NOT_MODELED",
+    "value": null,
+    "unit": "Pa"
+  },
+  "surfaces": {
+    "hand_detail_r_capitate": {
+      "geom_id": 228,
+      "collision_geoms": [
+        "palm_r_surface_hand_detail_r_capitate"
+      ],
+      "body": "hand_r",
+      "joints": [
+        "wrist_hand_r1_r",
+        "wrist_hand_r3_r"
+      ],
+      "signed_distance_m": 0.01432651417293729,
+      "vertex_world_m": [
+        1.2140229477315136,
+        -0.14207187031614724,
+        0.01432651417293729
+      ]
+    },
+    "hand_detail_r_trapezium": {
+      "geom_id": 237,
+      "collision_geoms": [
+        "palm_r_surface_hand_detail_r_trapezium"
+      ],
+      "body": "hand_r",
+      "joints": [
+        "wrist_hand_r1_r",
+        "wrist_hand_r3_r"
+      ],
+      "signed_distance_m": 0.003907789616239026,
+      "vertex_world_m": [
+        1.2134480317504537,
+        -0.12987237205567473,
+        0.003907789616239026
+      ]
+    },
+    "hand_detail_r_hamate": {
+      "geom_id": 246,
+      "collision_geoms": [
+        "palm_r_surface_hand_detail_r_hamate"
+      ],
+      "body": "hand_r",
+      "joints": [
+        "wrist_hand_r1_r",
+        "wrist_hand_r3_r"
+      ],
+      "signed_distance_m": 0.011391397777834603,
+      "vertex_world_m": [
+        1.213802228680859,
+        -0.1547223637387837,
+        0.011391397777834603
+      ]
+    },
+    "hand_detail_r_2mc": {
+      "geom_id": 247,
+      "collision_geoms": [
+        "palm_r_surface_hand_detail_r_2mc"
+      ],
+      "body": "hand_r",
+      "joints": [
+        "wrist_hand_r1_r",
+        "wrist_hand_r3_r"
+      ],
+      "signed_distance_m": 0.015966821298687615,
+      "vertex_world_m": [
+        1.2238289037383863,
+        -0.1382465308156271,
+        0.015966821298687615
+      ]
+    },
+    "hand_detail_r_3mc": {
+      "geom_id": 259,
+      "collision_geoms": [
+        "palm_r_surface_hand_detail_r_3mc"
+      ],
+      "body": "hand_r",
+      "joints": [
+        "wrist_hand_r1_r",
+        "wrist_hand_r3_r"
+      ],
+      "signed_distance_m": 0.01750515632462003,
+      "vertex_world_m": [
+        1.2234930713645356,
+        -0.14326181328371868,
+        0.01750515632462003
+      ]
+    },
+    "hand_detail_r_thumbprox": {
+      "geom_id": 240,
+      "collision_geoms": [
+        "palm_r_surface_hand_detail_r_thumbprox"
+      ],
+      "body": "hand_r_proximal_thumb",
+      "joints": [
+        "digit_r_mp_flexion"
+      ],
+      "signed_distance_m": 0.00391326744627326,
+      "vertex_world_m": [
+        1.2651015432993338,
+        -0.10284193431199083,
+        0.00391326744627326
+      ]
+    },
+    "hand_detail_r_thumbdist": {
+      "geom_id": 243,
+      "collision_geoms": [
+        "palm_r_surface_hand_detail_r_thumbdist"
+      ],
+      "body": "hand_r_distal_thumb",
+      "joints": [
+        "digit_r_ip_flexion"
+      ],
+      "signed_distance_m": 0.0032309623452886948,
+      "vertex_world_m": [
+        1.2929937400473994,
+        -0.09491172206185436,
+        0.0032309623452886948
+      ]
+    },
+    "hand_detail_r_2proxph": {
+      "geom_id": 251,
+      "collision_geoms": [
+        "palm_r_surface_hand_detail_r_2proxph"
+      ],
+      "body": "hand_r_2proxph",
+      "joints": [
+        "digit_r_2mcp_abduction",
+        "digit_r_2mcp_flexion"
+      ],
+      "signed_distance_m": 0.016723413644206535,
+      "vertex_world_m": [
+        1.3199783584225906,
+        -0.14554201047211715,
+        0.016723413644206535
+      ]
+    },
+    "hand_detail_r_2midph": {
+      "geom_id": 254,
+      "collision_geoms": [
+        "palm_r_surface_hand_detail_r_2midph"
+      ],
+      "body": "hand_r_2midph",
+      "joints": [
+        "digit_r_2pm_flexion"
+      ],
+      "signed_distance_m": 0.009720912564090363,
+      "vertex_world_m": [
+        1.3426135213293786,
+        -0.15274546606984438,
+        0.009720912564090363
+      ]
+    },
+    "hand_detail_r_2distph": {
+      "geom_id": 257,
+      "collision_geoms": [
+        "palm_r_surface_hand_detail_r_2distph"
+      ],
+      "body": "hand_r_2distph",
+      "joints": [
+        "digit_r_2md_flexion"
+      ],
+      "signed_distance_m": 0.005422131744659173,
+      "vertex_world_m": [
+        1.356006589741456,
+        -0.15903548134211518,
+        0.005422131744659173
+      ]
+    },
+    "hand_detail_r_3proxph": {
+      "geom_id": 261,
+      "collision_geoms": [
+        "palm_r_surface_hand_detail_r_3proxph"
+      ],
+      "body": "hand_r_3proxph",
+      "joints": [
+        "digit_r_3mcp_abduction",
+        "digit_r_3mcp_flexion"
+      ],
+      "signed_distance_m": 0.017530233515984726,
+      "vertex_world_m": [
+        1.3159150609868246,
+        -0.16890114544976956,
+        0.017530233515984726
+      ]
+    },
+    "hand_detail_r_3midph": {
+      "geom_id": 264,
+      "collision_geoms": [
+        "palm_r_surface_hand_detail_r_3midph"
+      ],
+      "body": "hand_r_3midph",
+      "joints": [
+        "digit_r_3pm_flexion"
+      ],
+      "signed_distance_m": 0.009600023004264534,
+      "vertex_world_m": [
+        1.342332062328736,
+        -0.17483804090245725,
+        0.009600023004264534
+      ]
+    },
+    "hand_detail_r_3distph": {
+      "geom_id": 267,
+      "collision_geoms": [
+        "palm_r_surface_hand_detail_r_3distph"
+      ],
+      "body": "hand_r_3distph",
+      "joints": [
+        "digit_r_3md_flexion"
+      ],
+      "signed_distance_m": 0.005020481750840473,
+      "vertex_world_m": [
+        1.3585314010000544,
+        -0.17642367879510784,
+        0.005020481750840473
+      ]
+    },
+    "hand_detail_r_4mc_new": {
+      "geom_id": 269,
+      "collision_geoms": [
+        "palm_r_surface_hand_detail_r_4mc_new"
+      ],
+      "body": "hand_r_fourthmc",
+      "joints": [
+        "digit_r_4cmc_flexion"
+      ],
+      "signed_distance_m": 0.017849898502994444,
+      "vertex_world_m": [
+        1.2675444984817303,
+        -0.17162785585216578,
+        0.017849898502994444
+      ]
+    },
+    "hand_detail_r_4proxph_new": {
+      "geom_id": 272,
+      "collision_geoms": [
+        "palm_r_surface_hand_detail_r_4proxph_new"
+      ],
+      "body": "hand_r_4proxph",
+      "joints": [
+        "digit_r_4mcp_abduction",
+        "digit_r_4mcp_flexion"
+      ],
+      "signed_distance_m": 0.012580122258822816,
+      "vertex_world_m": [
+        1.3053926745633808,
+        -0.1864965132190304,
+        0.012580122258822816
+      ]
+    },
+    "hand_detail_r_4midph_new": {
+      "geom_id": 275,
+      "collision_geoms": [
+        "palm_r_surface_hand_detail_r_4midph_new"
+      ],
+      "body": "hand_r_4midph",
+      "joints": [
+        "digit_r_4pm_flexion"
+      ],
+      "signed_distance_m": 0.007986123201501827,
+      "vertex_world_m": [
+        1.328314551894036,
+        -0.19321157560308522,
+        0.007986123201501827
+      ]
+    },
+    "hand_detail_r_4distph_new": {
+      "geom_id": 278,
+      "collision_geoms": [
+        "palm_r_surface_hand_detail_r_4distph_new"
+      ],
+      "body": "hand_r_4distph",
+      "joints": [
+        "digit_r_4md_flexion"
+      ],
+      "signed_distance_m": 0.005504843897706974,
+      "vertex_world_m": [
+        1.3433137502182522,
+        -0.19662483091192362,
+        0.005504843897706974
+      ]
+    },
+    "hand_detail_r_5proxph_new": {
+      "geom_id": 282,
+      "collision_geoms": [
+        "palm_r_surface_hand_detail_r_5proxph_new"
+      ],
+      "body": "hand_r_5proxph",
+      "joints": [
+        "digit_r_5mcp_abduction",
+        "digit_r_5mcp_flexion"
+      ],
+      "signed_distance_m": 0.00822715572357945,
+      "vertex_world_m": [
+        1.2930075314656377,
+        -0.1877624025474108,
+        0.00822715572357945
+      ]
+    },
+    "hand_detail_r_5midph_new": {
+      "geom_id": 285,
+      "collision_geoms": [
+        "palm_r_surface_hand_detail_r_5midph_new"
+      ],
+      "body": "hand_r_5midph",
+      "joints": [
+        "digit_r_5pm_flexion"
+      ],
+      "signed_distance_m": 0.006542799730528072,
+      "vertex_world_m": [
+        1.3143436966897188,
+        -0.1935359141855601,
+        0.006542799730528072
+      ]
+    },
+    "hand_detail_r_5distph_new": {
+      "geom_id": 288,
+      "collision_geoms": [
+        "palm_r_surface_hand_detail_r_5distph_new"
+      ],
+      "body": "hand_r_5distph",
+      "joints": [
+        "digit_r_5md_flexion"
+      ],
+      "signed_distance_m": 0.005993260321207384,
+      "vertex_world_m": [
+        1.3183767311257897,
+        -0.19475799373232827,
+        0.005993260321207384
+      ]
+    }
+  },
+  "contacts": [
+    {
+      "sample": 55,
+      "time_s": 2.199999999999902,
+      "contact": 2,
+      "geom0": 0,
+      "geom1": 229,
+      "gap_m": -0.0004781452996486073,
+      "inclusion_margin_m": 0.0,
+      "active": 1,
+      "floor_contact": 1,
+      "position_m": [
+        1.2193950323376113,
+        -0.14326517734656743,
+        -0.00023907264982430364
+      ],
+      "frame_rows": [
+        [
+          0.0,
+          0.0,
+          1.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          -1.0,
+          0.0,
+          0.0
+        ]
+      ],
+      "local_force_N": [
+        40.442874141548266,
+        -0.7559231342706809,
+        -0.6101323672286626
+      ],
+      "local_torque_Nm": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "force_on_geom1_world_N": [
+        0.6101323672286626,
+        -0.7559231342706809,
+        40.442874141548266
+      ],
+      "torque_on_geom1_world_Nm": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "normal_force_N": 40.442874141548266,
+      "friction": [
+        0.8,
+        0.8,
+        0.005,
+        0.0001,
+        0.0001
+      ]
+    },
+    {
+      "sample": 55,
+      "time_s": 2.199999999999902,
+      "contact": 3,
+      "geom0": 0,
+      "geom1": 230,
+      "gap_m": -0.0005140286000084107,
+      "inclusion_margin_m": 0.0,
+      "active": 1,
+      "floor_contact": 1,
+      "position_m": [
+        1.2407669573127487,
+        -0.12673521862774864,
+        -0.00025701430000420536
+      ],
+      "frame_rows": [
+        [
+          0.0,
+          0.0,
+          1.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          -1.0,
+          0.0,
+          0.0
+        ]
+      ],
+      "local_force_N": [
+        43.450827836678414,
+        -0.7238896637953105,
+        -0.5854050595494357
+      ],
+      "local_torque_Nm": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "force_on_geom1_world_N": [
+        0.5854050595494357,
+        -0.7238896637953105,
+        43.450827836678414
+      ],
+      "torque_on_geom1_world_Nm": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "normal_force_N": 43.450827836678414,
+      "friction": [
+        0.8,
+        0.8,
+        0.005,
+        0.0001,
+        0.0001
+      ]
+    },
+    {
+      "sample": 55,
+      "time_s": 2.199999999999902,
+      "contact": 4,
+      "geom0": 0,
+      "geom1": 231,
+      "gap_m": -0.000468514828600667,
+      "inclusion_margin_m": 0.0,
+      "active": 1,
+      "floor_contact": 1,
+      "position_m": [
+        1.232775480941811,
+        -0.164920742506692,
+        -0.0002342574143003335
+      ],
+      "frame_rows": [
+        [
+          0.0,
+          0.0,
+          1.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          -1.0,
+          0.0,
+          0.0
+        ]
+      ],
+      "local_force_N": [
+        39.2631357547052,
+        -0.7331612985634337,
+        -0.6450053912495136
+      ],
+      "local_torque_Nm": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "force_on_geom1_world_N": [
+        0.6450053912495136,
+        -0.7331612985634337,
+        39.2631357547052
+      ],
+      "torque_on_geom1_world_Nm": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "normal_force_N": 39.2631357547052,
+      "friction": [
+        0.8,
+        0.8,
+        0.005,
+        0.0001,
+        0.0001
+      ]
+    },
+    {
+      "sample": 55,
+      "time_s": 2.199999999999902,
+      "contact": 5,
+      "geom0": 0,
+      "geom1": 232,
+      "gap_m": -0.0005271467565004292,
+      "inclusion_margin_m": 0.0,
+      "active": 1,
+      "floor_contact": 1,
+      "position_m": [
+        1.2712733422149622,
+        -0.1411343183148464,
+        -0.00026357337825021546
+      ],
+      "frame_rows": [
+        [
+          0.0,
+          0.0,
+          1.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          -1.0,
+          0.0,
+          0.0
+        ]
+      ],
+      "local_force_N": [
+        44.10770085743817,
+        -0.6746840296776327,
+        -0.610118513594017
+      ],
+      "local_torque_Nm": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "force_on_geom1_world_N": [
+        0.610118513594017,
+        -0.6746840296776327,
+        44.10770085743817
+      ],
+      "torque_on_geom1_world_Nm": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "normal_force_N": 44.10770085743817,
+      "friction": [
+        0.8,
+        0.8,
+        0.005,
+        0.0001,
+        0.0001
+      ]
+    },
+    {
+      "sample": 55,
+      "time_s": 2.199999999999902,
+      "contact": 6,
+      "geom0": 0,
+      "geom1": 233,
+      "gap_m": -0.0005144673899605719,
+      "inclusion_margin_m": 0.0,
+      "active": 1,
+      "floor_contact": 1,
+      "position_m": [
+        1.2738945791967005,
+        -0.15613861622975175,
+        -0.00025723369498028593
+      ],
+      "frame_rows": [
+        [
+          0.0,
+          0.0,
+          1.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          -1.0,
+          0.0,
+          0.0
+        ]
+      ],
+      "local_force_N": [
+        42.83133150053355,
+        -0.6693015588303795,
+        -0.6339216002317344
+      ],
+      "local_torque_Nm": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "force_on_geom1_world_N": [
+        0.6339216002317344,
+        -0.6693015588303795,
+        42.83133150053355
+      ],
+      "torque_on_geom1_world_Nm": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "normal_force_N": 42.83133150053355,
+      "friction": [
+        0.8,
+        0.8,
+        0.005,
+        0.0001,
+        0.0001
+      ]
+    },
+    {
+      "sample": 55,
+      "time_s": 2.199999999999902,
+      "contact": 7,
+      "geom0": 0,
+      "geom1": 242,
+      "gap_m": -0.0005385584937952614,
+      "inclusion_margin_m": 0.0,
+      "active": 1,
+      "floor_contact": 1,
+      "position_m": [
+        1.2857391007421917,
+        -0.09585988529329842,
+        -0.00026927924689763155
+      ],
+      "frame_rows": [
+        [
+          0.0,
+          0.0,
+          1.0
+        ],
+        [
+          -0.933341947682235,
+          -0.3589885913183486,
+          0.0
+        ],
+        [
+          0.3589885913183486,
+          -0.933341947682235,
+          0.0
+        ]
+      ],
+      "local_force_N": [
+        2.1037597596241318,
+        -0.012029141693052914,
+        0.0059929317852760455
+      ],
+      "local_torque_Nm": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "force_on_geom1_world_N": [
+        0.013378696676202789,
+        -0.0012751299936384379,
+        2.1037597596241318
+      ],
+      "torque_on_geom1_world_Nm": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "normal_force_N": 2.1037597596241318,
+      "friction": [
+        0.8,
+        0.8,
+        0.005,
+        0.0001,
+        0.0001
+      ]
+    },
+    {
+      "sample": 55,
+      "time_s": 2.199999999999902,
+      "contact": 8,
+      "geom0": 0,
+      "geom1": 244,
+      "gap_m": -0.0005474920537225742,
+      "inclusion_margin_m": 0.0,
+      "active": 1,
+      "floor_contact": 1,
+      "position_m": [
+        1.3055996533345842,
+        -0.09449885269880434,
+        -0.00027374602686128756
+      ],
+      "frame_rows": [
+        [
+          0.0,
+          0.0,
+          1.0
+        ],
+        [
+          -0.9961265122736204,
+          -0.08793162994959514,
+          0.0
+        ],
+        [
+          0.08793162994959514,
+          -0.9961265122736204,
+          0.0
+        ]
+      ],
+      "local_force_N": [
+        0.99349410107694,
+        -0.006166185917116929,
+        -0.0037115158021633343
+      ],
+      "local_torque_Nm": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "force_on_geom1_world_N": [
+        0.0058159416375805,
+        0.004239342069521721,
+        0.99349410107694
+      ],
+      "torque_on_geom1_world_Nm": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "normal_force_N": 0.99349410107694,
+      "friction": [
+        0.8,
+        0.8,
+        0.005,
+        0.0001,
+        0.0001
+      ]
+    },
+    {
+      "sample": 55,
+      "time_s": 2.199999999999902,
+      "contact": 9,
+      "geom0": 0,
+      "geom1": 258,
+      "gap_m": -0.0006840148759048254,
+      "inclusion_margin_m": 0.0,
+      "active": 1,
+      "floor_contact": 1,
+      "position_m": [
+        1.3554164067986667,
+        -0.15869727495269043,
+        -0.00034200743795241226
+      ],
+      "frame_rows": [
+        [
+          0.0,
+          0.0,
+          1.0
+        ],
+        [
+          0.963287444793699,
+          -0.26847215628967297,
+          0.0
+        ],
+        [
+          0.26847215628967297,
+          0.963287444793699,
+          -0.0
+        ]
+      ],
+      "local_force_N": [
+        1.2580346363643322,
+        0.01757447461139665,
+        -0.0061643311192350675
+      ],
+      "local_torque_Nm": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "force_on_geom1_world_N": [
+        0.015274319474339446,
+        -0.010656279867290001,
+        1.2580346363643322
+      ],
+      "torque_on_geom1_world_Nm": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "normal_force_N": 1.2580346363643322,
+      "friction": [
+        0.8,
+        0.8,
+        0.005,
+        0.0001,
+        0.0001
+      ]
+    },
+    {
+      "sample": 55,
+      "time_s": 2.199999999999902,
+      "contact": 10,
+      "geom0": 0,
+      "geom1": 268,
+      "gap_m": -0.0007099941360396945,
+      "inclusion_margin_m": 0.0,
+      "active": 1,
+      "floor_contact": 1,
+      "position_m": [
+        1.3577354990291435,
+        -0.17484402550549658,
+        -0.0003549970680198477
+      ],
+      "frame_rows": [
+        [
+          0.0,
+          0.0,
+          1.0
+        ],
+        [
+          0.9736559227778787,
+          -0.22802224461564646,
+          0.0
+        ],
+        [
+          0.22802224461564646,
+          0.9736559227778787,
+          -0.0
+        ]
+      ],
+      "local_force_N": [
+        1.1201732489070761,
+        0.015699055870516076,
+        -0.005135061729919288
+      ],
+      "local_torque_Nm": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "force_on_geom1_world_N": [
+        0.014114570428452704,
+        -0.008579517225107452,
+        1.1201732489070761
+      ],
+      "torque_on_geom1_world_Nm": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "normal_force_N": 1.1201732489070761,
+      "friction": [
+        0.8,
+        0.8,
+        0.005,
+        0.0001,
+        0.0001
+      ]
+    },
+    {
+      "sample": 55,
+      "time_s": 2.199999999999902,
+      "contact": 11,
+      "geom0": 0,
+      "geom1": 271,
+      "gap_m": -0.00026205691702294205,
+      "inclusion_margin_m": 0.0,
+      "active": 1,
+      "floor_contact": 1,
+      "position_m": [
+        1.266379188235178,
+        -0.17083127201700904,
+        -0.00013102845851147016
+      ],
+      "frame_rows": [
+        [
+          0.0,
+          0.0,
+          1.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          -1.0,
+          0.0,
+          0.0
+        ]
+      ],
+      "local_force_N": [
+        21.749085063872116,
+        -0.7011966875014551,
+        -0.6751649697094791
+      ],
+      "local_torque_Nm": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "force_on_geom1_world_N": [
+        0.6751649697094791,
+        -0.7011966875014551,
+        21.749085063872116
+      ],
+      "torque_on_geom1_world_Nm": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "normal_force_N": 21.749085063872116,
+      "friction": [
+        0.8,
+        0.8,
+        0.005,
+        0.0001,
+        0.0001
+      ]
+    },
+    {
+      "sample": 55,
+      "time_s": 2.199999999999902,
+      "contact": 12,
+      "geom0": 0,
+      "geom1": 279,
+      "gap_m": -0.0006101541454456997,
+      "inclusion_margin_m": 0.0,
+      "active": 1,
+      "floor_contact": 1,
+      "position_m": [
+        1.3449226430304295,
+        -0.19480870628579136,
+        -0.0003050770727228494
+      ],
+      "frame_rows": [
+        [
+          0.0,
+          0.0,
+          1.0
+        ],
+        [
+          0.9536266755697235,
+          -0.30099196607523776,
+          0.0
+        ],
+        [
+          0.30099196607523776,
+          0.9536266755697235,
+          -0.0
+        ]
+      ],
+      "local_force_N": [
+        1.0896583517883387,
+        0.019155597912459577,
+        -0.005210067630066018
+      ],
+      "local_torque_Nm": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "force_on_geom1_world_N": [
+        0.016699100656450635,
+        -0.010734140550571213,
+        1.0896583517883387
+      ],
+      "torque_on_geom1_world_Nm": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "normal_force_N": 1.0896583517883387,
+      "friction": [
+        0.8,
+        0.8,
+        0.005,
+        0.0001,
+        0.0001
+      ]
+    },
+    {
+      "sample": 55,
+      "time_s": 2.199999999999902,
+      "contact": 13,
+      "geom0": 0,
+      "geom1": 289,
+      "gap_m": -0.00040340738983698707,
+      "inclusion_margin_m": 0.0,
+      "active": 1,
+      "floor_contact": 1,
+      "position_m": [
+        1.3296110180042748,
+        -0.19471559537577363,
+        -0.00020170369491849353
+      ],
+      "frame_rows": [
+        [
+          0.0,
+          0.0,
+          1.0
+        ],
+        [
+          0.977442997562894,
+          -0.21119939989323838,
+          0.0
+        ],
+        [
+          0.21119939989323838,
+          0.977442997562894,
+          -0.0
+        ]
+      ],
+      "local_force_N": [
+        0.6099523512263686,
+        0.01523041384743027,
+        -0.008370189903448955
+      ],
+      "local_torque_Nm": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "force_on_geom1_world_N": [
+        0.01311908228055479,
+        -0.011398037774100757,
+        0.6099523512263686
+      ],
+      "torque_on_geom1_world_Nm": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "normal_force_N": 0.6099523512263686,
+      "friction": [
+        0.8,
+        0.8,
+        0.005,
+        0.0001,
+        0.0001
+      ]
+    }
+  ]
+}

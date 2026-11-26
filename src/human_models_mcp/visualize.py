@@ -8,7 +8,7 @@ from pathlib import Path
 import time
 
 from .rendering import get_render_artifact, get_render_job, list_render_profiles, render_result
-from .research import ResearchRequest, run_research
+from .research import DEFAULT_RESEARCH_SCENARIO, ResearchRequest, run_research
 
 
 def export(job, destination):
@@ -65,7 +65,7 @@ def main():
     evidence.add_argument("run_id")
     evidence.add_argument("--claim-id")
     research = sub.add_parser("research")
-    research.add_argument("--scenario", default="pushup_palms")
+    research.add_argument("--scenario", default=DEFAULT_RESEARCH_SCENARIO)
     research.add_argument("--parameters", default="{}", help="JSON object with scenario overrides")
     research.add_argument("--recipe", choices=list(list_render_profiles()["recipes"]), action="append")
     research.add_argument("--options", default="{}", help="JSON object with render overrides")

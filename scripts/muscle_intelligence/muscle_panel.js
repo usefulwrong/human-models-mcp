@@ -21,14 +21,35 @@ export function musclePanel({ target, root, nodes, run, motionSha, stateIndex, s
   const opacity = el("muscle-opacity");
   const opacityScope = el("muscle-opacity-scope");
   const browse = el("muscle-browser");
+  const options = document.createElement("details");
+  options.id = "muscle-options";
+  const optionsTitle = document.createElement("summary");
+  optionsTitle.textContent = "Surface and time controls";
+  options.append(optionsTitle, isolate.closest("label"),
+    opacity.closest("label"), opacityScope.closest("label"), el("muscle-window"));
+  panel.append(options);
   const registration = document.createElement("details");
   const summary = document.createElement("summary");
   summary.textContent = "Identity and model route";
   const receiptText = document.createElement("p");
   receiptText.style.overflowWrap = "anywhere";
+  const scientific = document.createElement("p");
+  scientific.setAttribute("role", "status");
+  el("muscle-title").after(scientific, el("muscle-readings"));
+  const provenance = document.createElement("p");
+  provenance.style.overflowWrap = "anywhere";
   const routes = document.createElement("ul");
-  registration.append(summary, receiptText, routes);
-  el("muscle-candidates").after(registration);
+  registration.append(summary, routes);
+  const sources = document.createElement("details");
+  const sourceSummary = document.createElement("summary");
+  sourceSummary.textContent = "Saved state and sources";
+  sources.append(sourceSummary, el("muscle-identity"), el("muscle-note"), receiptText, provenance);
+  const interpretation = document.createElement("details");
+  const interpretationSummary = document.createElement("summary");
+  interpretationSummary.textContent = "Interpretation and better estimates";
+  const estimate = document.createElement("p");
+  interpretation.append(interpretationSummary, estimate);
+  el("muscle-candidates").after(sources, interpretation, registration);
   const evidence = registrationPanel({after: registration, root, nodes, invalidate});
   const palette = new Map();
   const cache = new Map();
@@ -96,6 +117,7 @@ export function musclePanel({ target, root, nodes, run, motionSha, stateIndex, s
         fill: "none", stroke: colors[i % colors.length], "stroke-width": 2}));
     }
     chart.append(svg("line", {id: "muscle-cursor", y1: pad, y2: height - pad, stroke: "white"}));
+    chart.setAttribute("aria-label", `${metrics[series.metric]} (${series.unit}) by saved time (s)`);
     el("muscle-axes").textContent = `${min.toPrecision(4)} to ${max.toPrecision(4)} ${series.unit} · ${lo.toFixed(2)}–${hi.toFixed(2)} s · ${series.state_indices.length} states`;
     el("muscle-aggregation").textContent = active ? active.exact_name :
       series.aggregation?.replaceAll("_", " ") || "Separate native paths";
@@ -120,7 +142,8 @@ export function musclePanel({ target, root, nodes, run, motionSha, stateIndex, s
     receiptText.textContent = [
       `Run ${run().run_id}`, `Motion SHA-256 ${motionSha()}`,
       `Crosswalk v${identity.crosswalk_revision ?? 1} · ${identity.mapping_revision_sha256}`,
-      `State #${frame.state_index} · ${frame.frame_time.toFixed(3)} s${isExact ? "" : " · interpolated display"}`,
+      `Saved state #${frame.state_index} · ${frame.frame_time.toFixed(3)} s · SHA-256 ${frame.state_sha256}`,
+      isExact ? "Exact saved pose" : "Interpolated render pose · signal held at the saved sample",
       "Attachment footprint: NOT_VERIFIED · Deformation validation: NOT_VERIFIED",
     ].join(" · ");
     if (!series) return;
@@ -151,7 +174,7 @@ export function musclePanel({ target, root, nodes, run, motionSha, stateIndex, s
         await request("muscle.select", {run_id: run().run_id, motion_sha256: motionSha(), state_index: stateIndex(),
           selection: settings, publish: true});
       } catch (error) {
-        if (token === generation) el("muscle-note").textContent = error.message;
+        if (token === generation) displayError(error);
       }
     }, 120);
   }
@@ -161,6 +184,9 @@ export function musclePanel({ target, root, nodes, run, motionSha, stateIndex, s
     evidence.clear();
     routes.replaceChildren();
     receiptText.textContent = "";
+    provenance.textContent = "";
+    scientific.textContent = "";
+    estimate.textContent = "";
     restoreMaterials();
     series = activation = undefined;
     chart.replaceChildren();
@@ -174,6 +200,7 @@ export function musclePanel({ target, root, nodes, run, motionSha, stateIndex, s
     const selector = chosen.actuator_id !== null ? {actuator_ids: [chosen.actuator_id]} :
       group ? {group_id: group.group_id} : null;
     el("muscle-readings").hidden = !selector;
+    el("muscle-window").hidden = !selector;
     path.disabled = chosen.display_node === null;
     overlay.disabled = chosen.actuator_id !== null || !group;
     el("muscle-legend").hidden = !chosen.overlay;
@@ -193,6 +220,26 @@ export function musclePanel({ target, root, nodes, run, motionSha, stateIndex, s
       }),
     ]);
     if (token !== generation) return;
+    const meta = receipt.scientific_quantity;
+    const definition = meta.quantities[chosen.metric];
+    scientific.textContent = receipt.data_status === "NO_DATA"
+      ? "NO_DATA · This display surface has no accepted actuator association."
+      : `MODEL OUTPUT · ${metrics[chosen.metric]} (${definition.unit})`;
+    estimate.textContent = [
+      receipt.data_status === "AVAILABLE" && definition.definition,
+      meta.quantities.display_surface?.definition,
+      receipt.data_status === "AVAILABLE" && definition.improve_estimate,
+      meta.quantities.display_surface?.improve_estimate,
+      `Human experimental validation: ${meta.human_validation}. Uncertainty interval: ${meta.uncertainty_interval.status}.`,
+    ].filter(Boolean).join(" ");
+    provenance.textContent = [
+      `Model ${meta.model.id} · revision ${meta.model.revision} · SHA-256 ${meta.model.asset_sha256}`,
+      `Run manifest SHA-256 ${meta.source_manifest_sha256}`,
+      `${Object.keys(meta.sources_sha256).length} source file hashes in the receipt`,
+      `Fixed support equalities: ${meta.controls.fixed_support_equalities}`,
+      `Independent comparison: ${meta.reference_comparison.execution_status}`,
+      `Contact boundary: ${meta.controls.support_boundary}`,
+    ].join(" · ");
     routes.replaceChildren(...(mapping?.rows ?? identity.rows).map(row => {
       const item = document.createElement("li");
       const review = row.registration_review;

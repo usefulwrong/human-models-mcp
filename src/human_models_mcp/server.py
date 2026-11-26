@@ -78,11 +78,19 @@ def run_scenario(scenario_id: str, parameters: dict | None = None, idempotency_k
 
 @mcp.tool()
 def get_result(run_id: str, claim_id: str | None = None) -> dict[str, Any]:
-    """Retrieve a run or evidence for metric:<name>, gate:<name>, artifact:<id> or all."""
+    """Retrieve a run or evidence for metric:<name>, gate:<name>, quantity:<name>, artifact:<id> or all."""
     if claim_id is not None:
         from .evidence import get_evidence
         return get_evidence(run_id, None if claim_id == "all" else claim_id)
     return get_run(run_id)
+
+
+@mcp.tool()
+def get_contact(run_id: str, part: str, sample: int | None = None,
+                time_s: float | None = None, quantity: str = "contact") -> dict[str, Any]:
+    """Read native contacts and mapped surface distances at one exact saved state."""
+    from .contact_results import get_contact as read
+    return read(run_id, part, sample, time_s, quantity)
 
 
 @mcp.tool()

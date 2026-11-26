@@ -22,7 +22,7 @@ def payload_size(value):
 async def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output", type=Path, required=True)
-    parser.add_argument("--key", default="v08-closure-public-cycle")
+    parser.add_argument("--key", default="research-flat-palm")
     parser.add_argument("--frames", type=int, default=61)
     parser.add_argument("--device", choices=("cpu", "gpu"), default="cpu")
     args = parser.parse_args()
@@ -31,7 +31,7 @@ async def main():
                "device": args.device, "timeout_s": 900}
     if args.frames == 61:
         options["fps"] = 14
-    basic = {"scenario_id": "pushup_palms", "idempotency_key": args.key}
+    basic = {"scenario_id": "pushup_flat_palm", "idempotency_key": args.key}
     source = StdioServerParameters(
         command="docker", args=["compose", "run", "--rm", "--no-deps", "-T", "runtime"],
         cwd=str(ROOT),

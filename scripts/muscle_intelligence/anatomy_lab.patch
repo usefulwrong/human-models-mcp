@@ -8,7 +8,7 @@
  
  
  Fma = Annotated[str, Field(pattern=r"^FMA[1-9][0-9]{0,8}$")]
-@@ -173,6 +174,7 @@
+@@ -179,6 +180,7 @@
      state_index: int = Field(ge=0, le=400)
      layers: list[Literal["BODY", "SKELETON", "MUSCLES", "ORGANS", "SKIN", "OVERLAYS"]] = Field(max_length=6)
      camera: WholeCamera
@@ -16,17 +16,17 @@
  
  
  class WholeDiscover(Contract):
-@@ -204,7 +206,8 @@
+@@ -217,7 +219,8 @@
  
  
  Request = Annotated[SourceRequest | Search | ConceptRequest | Resolve | Identify | Spatial | SceneRequest | MotionRequest
--                    | WholeDiscover | WholeOpen | WholeSetView | WholeArtifact,
-+                    | WholeDiscover | WholeOpen | WholeSetView | WholeArtifact
+-                    | WholeDiscover | WholeOpen | WholeSetView | WholeArtifact | WholeContact,
++                    | WholeDiscover | WholeOpen | WholeSetView | WholeArtifact | WholeContact
 +                    | MuscleSearch | MuscleSeries | MuscleSelect | MuscleSelection | MuscleRegistration,
                      Field(discriminator="operation")]
  REQUEST = TypeAdapter(Request)
  FMA_ID = TypeAdapter(Fma)
-@@ -905,6 +908,10 @@
+@@ -918,6 +921,10 @@
                  from spatial import query
  
                  return query(self, request)
@@ -55,10 +55,10 @@
 +            return {"status": "ok", "motion_sha256": self.sha, "motion": scene,
 +                    **({"muscle_analytics": {"shared_selection": self.muscles.selection_path is not None}}
 +                       if self.muscles else {})}
-         if request.operation == "whole.artifact":
-             with self.open_artifact(request.artifact_id, scene) as (_, identity):
-                 return {"status": "ok", **identity, "artifact_id": request.artifact_id,
-@@ -86,5 +89,10 @@
+         if request.operation == "whole.contact":
+             from human_models_mcp.contact_results import get_contact
+             from human_models_mcp.results import error
+@@ -100,5 +103,10 @@
                  or any(not scene["layers"][layer]["available"] for layer in chosen.layers)
                  or chosen.camera.position == chosen.camera.target):
              raise ValueError("invalid moving layers or camera")
@@ -113,14 +113,14 @@
  }
  window.hmmViewer = {
    getScene, setScene, setComposite, pick, installMotion, showFrame, render,
--  whole: { seek: whole.seek, status: whole.status, sample: whole.sample, matrix: whole.matrix, weights: whole.weights },
-+  whole: { seek: whole.seek, status: whole.status, sample: whole.sample, matrix: whole.matrix, weights: whole.weights, muscleHit: whole.muscleHit, diagnosticCamera: whole.diagnosticCamera, faceCenters: whole.faceCenters, project: whole.project, muscleColor: whole.muscleColor, muscleNodes: whole.muscleNodes, muscleState: whole.muscleState, muscleRayAudit: whole.muscleRayAudit },
+-  whole: { seek: whole.seek, status: whole.status, sample: whole.sample, matrix: whole.matrix, weights: whole.weights,
++  whole: { seek: whole.seek, status: whole.status, sample: whole.sample, matrix: whole.matrix, weights: whole.weights, muscleHit: whole.muscleHit, diagnosticCamera: whole.diagnosticCamera, faceCenters: whole.faceCenters, project: whole.project, muscleColor: whole.muscleColor, muscleNodes: whole.muscleNodes, muscleState: whole.muscleState, muscleRayAudit: whole.muscleRayAudit,
+     setCamera: whole.setCamera, surfaceAudit: whole.surfaceAudit },
    visibleFjIds: () => frameData ? [...motionParts.keys()] : pickTargets.map(o => o.name),
    stats: () => ({revision, ...context.info.render}),
-   project: p => {
 --- a/site/whole_motion.js
 +++ b/site/whole_motion.js
-@@ -1,21 +1,30 @@
+@@ -1,7 +1,8 @@
  import * as THREE from "three";
  import { request } from "./lab_bridge.js";
 -
@@ -131,7 +131,9 @@
    const el = id => document.getElementById(id);
    const timeline = el("whole-timeline");
    const layerPanel = el("whole-layers");
-   const controls = el("whole-controls");
+@@ -64,15 +65,23 @@
+   }
+   contactPart.addEventListener("change", clearContact);
    let clip, mixer, action, rig, run, layers, index, cameraName, motionSha;
 -  let pending = 0;
 +  let pending = 0, analytics, verifiedAsset;
@@ -154,17 +156,15 @@
        camera: { position: camera.position.toArray(), target: orbit.target.toArray(), fov: camera.fov },
      };
    }
-@@ -34,7 +43,8 @@
-     timeline.value = index;
-     el("whole-time").textContent = exact ?
-       `#${frame.state_index} · ${frame.frame_time.toFixed(2)} s · ${frame.phase}` :
--      `${(clock + run.frames[0].frame_time).toFixed(2)} s · interpolated (near #${frame.state_index})`;
-+      `${(clock + run.frames[0].frame_time).toFixed(2)} s · interpolated (sample #${frame.state_index})`;
+@@ -84,6 +93,7 @@
+         `${part} ${(1000 * value).toFixed(2)} mm`);
+       el("whole-time").textContent += ` · ${frame.floor_contact_count} loaded contacts · ${distances.join(" · ")}`;
+     }
 +    panel.frame(exact);
    }
  
    function pause() {
-@@ -49,6 +59,7 @@
+@@ -98,6 +108,7 @@
      index = next;
      pose(run.frames[index].frame_time - run.frames[0].frame_time);
      readout(true);
@@ -172,7 +172,7 @@
    }
  
    function animate(now) {
-@@ -77,15 +88,40 @@
+@@ -126,15 +137,40 @@
      invalidate();
    }
  
@@ -211,9 +211,9 @@
 +    panel.open(null);
 +    analytics = undefined;
      controls.hidden = true;
-     layerPanel.hidden = true;
-     if (rig) {
-@@ -112,16 +148,20 @@
+     contact.hidden = true;
+     contactValue.textContent = "";
+@@ -163,16 +199,20 @@
      let chosen;
      if (view) chosen = (await request("whole.set_view", { run_id: runId, view })).view;
      const artifact = candidate.artifacts["motion.glb"];
@@ -244,7 +244,7 @@
      if (!isCurrent()) return;
      const gltf = await loader.parseAsync(bytes, "");
      if (!isCurrent()) {
-@@ -136,11 +176,18 @@
+@@ -187,11 +227,18 @@
      enter();
      run = candidate;
      motionSha = result.motion_sha256;
@@ -264,13 +264,16 @@
        if (o.isSkinnedMesh) o.frustumCulled = false;
      });
      clip = gltf.animations[0];
-@@ -172,11 +219,12 @@
+@@ -241,7 +288,7 @@
        }));
      cameraName = run.default_camera;
      el("whole-camera").value = cameraName;
 -    setCamera(chosen?.camera ?? run.cameras[cameraName]);
 +    setCamera(chosen?.camera ?? cameraView(cameraName));
      controls.hidden = false;
+     contact.hidden = !run.contact;
+     clearContact();
+@@ -235,6 +282,7 @@
      layerPanel.hidden = false;
      showLayers();
      seek(chosen ? run.frames.findIndex(f => f.state_index === chosen.state_index) : 0);
@@ -278,7 +281,7 @@
    }
  
    el("whole-play").addEventListener("click", () => {
-@@ -195,17 +243,65 @@
+@@ -253,17 +301,65 @@
    timeline.addEventListener("input", () => seek(Number(timeline.value)));
    el("whole-camera").addEventListener("change", event => {
      cameraName = event.target.value;
@@ -287,8 +290,8 @@
    });
  
    return {
--    open, dispose, seek, currentView, active: () => !!rig, reset: () => setCamera(run.cameras[cameraName]),
-+    open, dispose, seek, currentView, active: () => !!rig, reset: () => setCamera(cameraView(cameraName)),
+-    open, dispose, seek, currentView, setCamera, active: () => !!rig, reset: () => setCamera(run.cameras[cameraName]),
++    open, dispose, seek, currentView, setCamera, active: () => !!rig, reset: () => setCamera(cameraView(cameraName)),
      status: () => run && { frame: run.frames[index], duration: clip.duration, clock, playing: !!pending,
        layers: [...layers], nodeCount: nodes.size },
      sample: (node, vertices) => {
@@ -345,7 +348,7 @@
 +    muscleState: node => ({visible: nodes.get(node).visible, opacity: nodes.get(node).material.opacity}),
      matrix: node => nodes.get(node).matrixWorld.toArray(),
      weights: node => nodes.get(node).geometry.attributes.skinWeight?.count,
-   };
+     surfaceAudit: () => {
 --- a/site/index.html
 +++ b/site/index.html
 @@ -63,7 +63,7 @@

@@ -2,7 +2,7 @@
 
 Human Models MCP is a **research preview**: a local interface between AI agents, scientific musculoskeletal computation and saved-state visualization. Scientific criticism is as valuable as code. A failed experiment with a reproducible counterexample can be a useful contribution.
 
-**Start here:** [README](README.md) · [Getting started](docs/GETTING_STARTED.md) · [Scientific scope](docs/SCIENTIFIC_SCOPE.md) · [Architecture](docs/ARCHITECTURE.md) · [Agent rules](AGENTS.md).
+**Start here:** [README](README.md) · [Getting started](docs/GETTING_STARTED.md) · [Scientific scope](docs/SCIENTIFIC_SCOPE.md) · [Architecture](docs/ARCHITECTURE.md) · [Movement methods](docs/MOVEMENT_METHODS.md).
 
 ## What we are looking for
 
@@ -65,18 +65,18 @@ Do not add `skip`, `xfail`, weaker numerical thresholds or rewritten expected da
 ```bash
 export HMM_UID="$(id -u)" HMM_GID="$(id -g)"
 make build
-python3 scripts/experiment.py --scenario pushup --output outputs/reproduction-01
+python3 scripts/experiment.py --scenario pushup_flat_palm --output outputs/reproduction-01
 ```
 
 Choose a new directory every time: existing runs and failed experiments are evidence, not disposable scratch data. Retain `manifest.json`, scientific acceptance, numerical CSV/NPZ and the model recipe. If changing a scenario, run before/after comparisons from **separate outputs** and report the model hash, inputs, units and tolerances. Do not modify historical manifests or force a new result to match a visually pleasing target.
 
-The [four-view palm demo](docs/demo/workflow/README.md) uses external joint assistance. Identify contacts, controller, wrist settings and acceptance criteria when comparing it with the muscle-controlled `pushup` scenario.
+The [articulated contact demo](docs/demo/README.md) uses external joint assistance. Identify contacts, controller, wrist settings and acceptance criteria when comparing it with the muscle-controlled `pushup` scenario.
 
 ## Scientific standards
 
 Changes to exercise pose, muscle modeling, joint bounds, contact surfaces or controls need more than a passing render.
 
-- Read [AGENTS.md](AGENTS.md) **before** changing scientific behavior, particularly the human movement reference and muscle-measurement rules.
+- Follow the [movement and measurement methods](docs/MOVEMENT_METHODS.md) when changing scientific behavior.
 - Specify the anatomical reference, mechanical assumptions and coordinate systems. Inspect actual human pose references when relevant; do not substitute a visually convenient pose or an AI-generated anatomy diagram.
 - Preserve separate labels for geometry, kinematics, forward dynamics, muscular control, externally assisted control, measured data and clinical evidence. These are different claims.
 - Where possible, test against **independent measurements** with aligned signs/units/frames and a stated comparison metric. One wrist benchmark does not validate full-body push-ups.

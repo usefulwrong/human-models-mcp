@@ -170,5 +170,22 @@ summary { padding: .65rem 0; min-height: 44px; font-weight: 660; }
   .shortcuts { grid-template-columns: repeat(2,minmax(0,1fr)); }
 }
 
+.motion-label { display: none; }
+main:has(#whole-controls:not([hidden])) .stage-label { display: none; }
+main:has(#whole-controls:not([hidden])) .motion-label { display: inline; }
+main:has(#whole-controls:not([hidden])) .browse { display: none; }
+main:has(#whole-controls:not([hidden])) .inspector-heading { display: none; }
+#muscle-inspector:not([hidden]) { order: -1; }
+.inspect #muscle-inspector p, .inspect #muscle-value { font-size: .93rem; }
+@media (min-width: 651px) {
+  main:has(#whole-controls:not([hidden])) { grid-template-columns: minmax(0, 1fr) minmax(305px, 28vw); }
+  main:has(#whole-controls:not([hidden])) .inspect { grid-column: 2; }
+  main:has(#whole-controls:not([hidden])) .stage { height: calc(100svh - 76px); }
+}
+@media (max-width: 650px) {
+  main:has(#whole-controls:not([hidden])) .stage { height: 350px; }
+  main:has(#whole-controls:not([hidden])) .stage-footer span { display: none; }
+}
+
 #whole-layer-options { display: grid; gap: .35rem; margin: .5rem 0; }
 #whole-timeline { width: clamp(5rem, 14vw, 12rem); vertical-align: middle; }

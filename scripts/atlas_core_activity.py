@@ -27,8 +27,8 @@ GROUPS = {
 
 def summarize(run):
     manifest = json.loads((run / "manifest.json").read_text())
-    if manifest["scenario_id"] != "pushup_palms":
-        raise ValueError("expected a saved pushup_palms run")
+    if manifest["scenario_id"] not in {"pushup_flat_palm", "pushup_palms"}:
+        raise ValueError("expected a saved palm push-up run")
     used = {}
 
     def verified(name):

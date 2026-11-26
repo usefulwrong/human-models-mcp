@@ -156,9 +156,10 @@ Blender Cycles runtime. Start a new standalone visual experiment with:
 python3 scripts/render_demo.py --preview
 ```
 
-That command computes an assisted palm experiment and prints a named index.html with
-PNG, MP4/GIF, scene and passport. Native paths are not muscle volumes; materials
-are presentation. GPU rendering is optional and does not move physics to GPU.
+That command computes the articulated pushup_flat_palm experiment, prints its
+full-cycle acceptance and generates PNG, MP4/GIF, a scene and a passport.
+Native paths represent model transmissions and materials are presentation.
+GPU rendering is optional. Physics runs on CPU.
 
 From this directory (after copying it entirely to the target project directory):
 

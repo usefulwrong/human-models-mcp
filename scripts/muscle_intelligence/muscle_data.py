@@ -13,12 +13,14 @@ from zipfile import BadZipFile, ZipFile
 import numpy as np
 
 from anatomy_lab import canonical, digest, read_bounded
+from human_models_mcp.results import error
 from human_models_mcp.scene_export import safe_archive
+from human_models_mcp.scientific_quantity import DERIVED, MUSCLE, scientific_quantity, sources
 from muscle_contract import MuscleRegistration, MuscleSearch, MuscleSeries, MuscleSelect, MuscleSelection
 from registration_evidence import at_frame, load_evidence
 
-UNITS = {"activation": "1", "excitation": "1", "force_N": "N", "force_magnitude_N": "N",
-         "length_m": "m", "velocity_m_per_s": "m/s", "power_W": "W", "work_J": "J"}
+UNITS = {name: row["unit"] for name, row in MUSCLE.items()
+         if name not in ("overlay", "display_surface", "full_integrator_work_J")}
 LIMITATIONS = (
     "Model activation is a dimensionless actuator state, distinct from surface EMG. "
     "Signed MuJoCo transmission force generally uses negative values for tension. "
@@ -27,6 +29,13 @@ LIMITATIONS = (
 )
 RAW_METRICS = tuple(k for k in UNITS if k not in ("force_magnitude_N", "work_J"))
 MOMENT_FIELDS = ("moment_values", "moment_columns", "moment_rowadr", "moment_rownnz")
+GROUP_DEFINITIONS = {
+    "arithmetic_mean_of_paths": "Arithmetic mean over the reviewed group's paths at each saved sample.",
+    "sum_of_signed_path_forces": "Scalar sum of signed transmission forces. A net anatomical force requires vector directions and points of application.",
+    "sum_of_absolute_path_forces": "Sum of the absolute scalar forces over the group's paths at each saved sample.",
+    "sum_of_signed_path_powers": "Sum of signed force times signed path velocity over the group's paths at each saved sample.",
+    "sum_of_signed_path_work": "Sum of cumulative sampled work over the group's paths at each saved sample.",
+}
 
 
 def verified_bytes(root, manifest, name, limit):
@@ -84,6 +93,49 @@ def activation_color(value):
     """Linear RGB endpoints, shared with Three and Blender through the selection receipt."""
     a = min(1.0, max(0.0, value))
     return [0.025 + 0.955 * a, 0.15 + 0.57 * a, 0.55 - 0.485 * a]
+
+
+def signal_identity(row):
+    status = {"REVIEWED_ANATOMICAL": "accepted", "CANDIDATE": "candidate", "CONFLICT": "conflict"}
+    return {"actuator_id": row["id"], "exact_name": row["exact_name"], "side": row["side"],
+            "mapping_status": status.get(row["status"], "unmapped"),
+            "actuator_to_group": {"id": row["group"], "status": "REVIEWED" if row["group"] else "UNMAPPED"},
+            "anatomical_scope": row.get("status_axes", {}).get("anatomical_concept", row["status"]),
+            "fma": [{"id": c["fma_id"], "status": status.get(c["status"], "unmapped"), "source": c["source"]}
+                    for c in row["concept_membership"]],
+            "display_assets": row["display_assets"], "registration": "ILLUSTRATIVE" if row["display_assets"] else None,
+            "source_xml_sha256": row.get("registration_review", {}).get("model_xml_sha256")}
+
+
+def signal_evidence(context, metric, files, window=None, asset=None, group=None, available=True):
+    _, mapping, _, run, base = context
+    return {**scientific_quantity(run, {metric: {**MUSCLE[metric],
+                                               "availability": "AVAILABLE" if available else "NO_DATA"}},
+                                  files=files, window=window,
+                                  uncertainty=("Source muscle force parameters and recruitment are uncalibrated for this run.",
+                                               "The controller and support model affect the computed values.",
+                                               "Display registration and deformation are illustrative.")),
+            "source_manifest_sha256": base["source_result_sha256"],
+            "mapping_revision_sha256": base["mapping_revision_sha256"], "motion_sha256": base["motion_sha256"],
+            "crosswalk": {"revision": base["crosswalk_revision"], "catalog_sha256": base["anatomy_revision"],
+                          "review_rules_sha256": mapping.get("review_rules_sha256"),
+                          "group_to_fma": ({"group_id": group["group_id"], "fma_id": group.get("parent_fma_id"),
+                                            "status": "REVIEWED_SIDED_GROUP" if group.get("parent_fma_id")
+                                            else "UNMAPPED"} if group else None)},
+            "display_identity": ({"node": asset["display_copy"], "geometry_sha256": asset.get("geometry_sha256"),
+                                  "dataset": asset["dataset"], "fma_id": asset.get("fma_id"),
+                                  "dataset_revision": asset.get("dataset_revision"),
+                                  "fma_to_geometry": {"source_membership": asset.get("source_membership"),
+                                                      "registration": asset.get("registration"),
+                                                      "deformation": asset.get("deformation"),
+                                                      "deformation_validation": asset.get("deformation_validation")},
+                                  "fma_scope": "source_geometry",
+                                  "native_association": ("reviewed_part" if asset.get("part_actuator_id") is not None
+                                                         else "reviewed_sided_group" if asset.get("group_id") else None),
+                                  "mapping_status": "accepted" if asset.get("group_id") else "geometry_only"}
+                                 if asset else None),
+            "independent_check": "Check saved actuator arrays and the model route. Human validation needs a separately measured "
+                                 "observable and protocol. EMG can inform activation timing under a defined protocol."}
 
 
 class MuscleData:
@@ -146,11 +198,11 @@ class MuscleData:
         group = mapping["groups"].get(group_id)
         if group_id:
             if group is None:
-                return {**base, "mapping_status": "UNMAPPED", "series": []}
+                return {**base, "mapping_status": "UNMAPPED", "data_status": "NO_DATA", "series": []}
             ids = group["actuator_ids"]
         rows = mapping["rows"]
         if any(i >= len(rows) for i in ids):
-            return {**base, "mapping_status": "UNMAPPED", "series": []}
+            return {**base, "mapping_status": "UNMAPPED", "data_status": "NO_DATA", "series": []}
         frames = scene["frames"]
         if not 3 <= len(frames) <= 401 or [f["state_index"] for f in frames] != list(range(len(frames))):
             raise ValueError("invalid saved state indices")
@@ -207,6 +259,8 @@ class MuscleData:
         page = chosen[offset:offset + stride * limit:stride]
         if offset > len(chosen):
             raise ValueError("sample offset exceeds the window")
+        if any(digest(trajectory["states"][i].tobytes()) != frames[i]["state_sha256"] for i in page):
+            raise ValueError("saved state SHA-256 differs from MotionScene")
         phases = {f["phase"]: f["state_index"] for f in frames if f["phase"] != "motion"}
         bottom = phases.get("bottom")
         if bottom is None or not 0 < bottom < len(frames) - 1:
@@ -223,7 +277,27 @@ class MuscleData:
                                      "mean_per_path": values[subset].mean(axis=0).tolist()}
                     if aggregate is not None:
                         summary[name]["mean_derived"] = float(aggregate[subset].mean())
+        bound = ["trajectory.npz", "trajectory_metadata.json", "actuators.json", *names]
+        if metric == "work_J":
+            bound.append("muscle_ranking.json")
+        scientific = signal_evidence(context, metric, sources(manifest, *bound),
+                                     {"requested_time_s": [float(lo), float(hi)], "sampling": "exact_saved_samples",
+                                      "offset": offset, "stride": stride, "limit": limit},
+                                     group=group, available=bool(len(page)))
+        if rule:
+            scientific["quantities"]["aggregate"] = {**MUSCLE[metric], "origin": DERIVED,
+                                                     "native_identifier": None,
+                                                     "definition": GROUP_DEFINITIONS[rule],
+                                                     "availability": "AVAILABLE" if len(page) else "NO_DATA"}
+        if phase_summary:
+            scientific["quantities"]["phase_summary"] = {**MUSCLE[metric], "origin": DERIVED,
+                "native_identifier": None,
+                "definition": "Arithmetic mean of exact saved samples in the requested phase and time window, before pagination.",
+                "availability": "AVAILABLE" if summary else "NO_DATA"}
+        if metric == "work_J":
+            scientific["quantities"]["full_integrator_work_J"] = MUSCLE["full_integrator_work_J"]
         return {**base, "mapping_status": "REVIEWED_ANATOMICAL" if group else "NATIVE_ONLY", "group": group,
+                "data_status": "AVAILABLE" if len(page) else "NO_DATA", "scientific_quantity": scientific,
                 "state_indices": page.tolist(), "time_s": clock[page].tolist(), "phases": phase_labels,
                 "state_sha256": [frames[i]["state_sha256"] for i in page],
                 "phase_anchors": phases, "window_sample_count": len(chosen),
@@ -231,6 +305,7 @@ class MuscleData:
                 "phase_summary": summary, "aggregation": rule,
                 "aggregate": aggregate[page].tolist() if aggregate is not None else None,
                 "series": [{"actuator_id": idx, "exact_name": rows[idx]["exact_name"],
+                            "identity": signal_identity(rows[idx]),
                             "values": values[page, j].tolist()} for j, idx in enumerate(ids)]}
 
     def search(self, context, request):
@@ -239,14 +314,16 @@ class MuscleData:
             node = str(request.display_node)
             asset = mapping["reviewed_display_assets"].get(node) or mapping["motion_display_assets"].get(node)
             if asset is None or (request.side and request.side != asset.get("side")):
-                return {**base, "mapping_status": "UNMAPPED", "asset": None, "group": None, "rows": []}
+                return {**base, "mapping_status": "UNMAPPED", "data_status": "NO_DATA",
+                        "asset": None, "group": None, "rows": []}
             group = mapping["groups"].get(asset.get("group_id"))
             rows = [mapping["rows"][i] for i in group["actuator_ids"]] if group else []
             status = ("REVIEWED_ANATOMICAL" if asset.get("part_actuator_id") is not None else
                       "REVIEWED_GROUP_ONLY" if group else "GEOMETRY_ONLY")
             candidates = [r["id"] for r in mapping["rows"] if not r["group"] and asset.get("fma_id")
                           and any(c["fma_id"] == asset["fma_id"] for c in r["concept_membership"])]
-            return {**base, "mapping_status": status, "asset": asset, "group": group, "rows": rows,
+            return {**base, "mapping_status": status, "data_status": "AVAILABLE" if rows else "NO_DATA",
+                    "asset": asset, "group": group, "rows": rows,
                     "candidate_actuator_ids": candidates}
         q = request.query.casefold().strip()
 
@@ -313,7 +390,8 @@ class MuscleData:
             fma = [c for c in found[0]["concept_membership"] if c["fma_id"].casefold() == q]
             if fma and fma[0]["status"] != "REVIEWED_ANATOMICAL":
                 identity_status = fma[0]["status"]
-        return {**base, "mapping_status": identity_status, "rows": result, "count": len(found),
+        return {**base, "mapping_status": identity_status, "data_status": "AVAILABLE" if result else "NO_DATA",
+                "rows": result, "count": len(found),
                 "next_offset": request.offset + request.limit if len(found) > request.offset + request.limit else None}
 
     def validate_view(self, context, index, selection, palette=True):
@@ -350,6 +428,12 @@ class MuscleData:
                   "frame": scene["frames"][index], "selection": selection.model_dump(),
                   "asset": asset, "native": row, "group": group, "display_nodes": display_nodes,
                   "opacity_nodes": opacity_nodes}
+        frame = result["frame"]
+        result["data_status"] = "NO_DATA"
+        result["scientific_quantity"] = signal_evidence(
+            context, selection.metric, sources(context[3], "trajectory.npz"),
+            {"state_index": index, "time_s": frame["frame_time"], "state_sha256": frame["state_sha256"],
+             "sampling": "exact_saved_sample"}, asset=asset, group=group, available=False)
         if (ids or row) and palette:
             ts = scene["frames"][index]["frame_time"]
             signals = self.series(context, selection.metric,
@@ -357,6 +441,11 @@ class MuscleData:
                                   group["group_id"] if selection.actuator_id is None else None, ts, ts)
             result["sample"] = {"aggregation": signals["aggregation"], "aggregate": signals["aggregate"],
                                 "series": signals["series"]}
+            if selection.metric == "work_J":
+                result["sample"]["full_integrator_work_J"] = signals["full_integrator_work_J"]
+            result["data_status"] = signals["data_status"]
+            result["scientific_quantity"]["sources_sha256"] = signals["scientific_quantity"]["sources_sha256"]
+            result["scientific_quantity"]["quantities"] = signals["scientific_quantity"]["quantities"]
             if selection.overlay:
                 act = signals if selection.metric == "activation" else self.series(
                     context, "activation", [], group["group_id"], ts, ts)
@@ -366,6 +455,9 @@ class MuscleData:
                     "linear_rgb_at_0": activation_color(0), "linear_rgb_at_1": activation_color(1),
                     "display_nodes": [a["display_copy"] for a in mapping["reviewed_display_assets"].values()
                                       if a["group_id"] == group["group_id"] and a["part_actuator_id"] is not None]}
+                result["scientific_quantity"]["quantities"]["overlay"] = MUSCLE["overlay"]
+        if asset:
+            result["scientific_quantity"]["quantities"]["display_surface"] = MUSCLE["display_surface"]
         return result
 
     def registration(self, context, request):
@@ -415,6 +507,8 @@ class MuscleData:
         if isinstance(request, MuscleSearch):
             return self.search(context, request)
         if isinstance(request, MuscleSeries):
+            if request.unit is not None and request.unit != UNITS[request.metric]:
+                return error("invalid_input", "requested unit is incompatible with the saved quantity")
             return self.series(context, request.metric, request.actuator_ids, request.group_id, request.start_s,
                                request.end_s, request.offset, request.limit, request.stride, request.phase_summary)
         if isinstance(request, MuscleSelection):

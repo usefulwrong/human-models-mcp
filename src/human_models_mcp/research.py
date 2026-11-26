@@ -10,6 +10,7 @@ from .rendering import RenderOptions, render_result
 from .results import error
 
 Recipe = Literal["pushup_scientific", "pushup_muscle_paths", "pushup_anatomy", "pushup_rectus", "pushup_cinematic"]
+DEFAULT_RESEARCH_SCENARIO = "pushup_flat_palm"
 
 
 class ResearchViews(BaseModel):
@@ -19,7 +20,9 @@ class ResearchViews(BaseModel):
 
 
 class ResearchRequest(ResearchViews):
-    scenario_id: Literal["pushup", "pushup_palms", "pushup_knuckles"] = "pushup_palms"
+    scenario_id: Literal["pushup", "pushup_palms", "pushup_knuckles", "pushup_palms_contact", "pushup_flat_palm"] = (
+        DEFAULT_RESEARCH_SCENARIO
+    )
     parameters: dict = Field(default_factory=dict, description="Overrides validated by the named scenario.")
     idempotency_key: str | None = Field(default=None, min_length=1, max_length=128)
 
